@@ -2,10 +2,19 @@ import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigat
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 /**
+ * Auth Stack Navigator - стек авторизации
+ */
+export type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
+};
+
+/**
  * Root Stack Navigator - верхний уровень навигации
  * Содержит основные стеки и модальные окна
  */
 export type RootStackParamList = {
+  AuthStack: NavigatorScreenParams<AuthStackParamList>;
   MainStack: NavigatorScreenParams<MainStackParamList>;
   Modal: undefined;
   // Здесь можно добавить другие модальные окна или экраны вне основного потока
