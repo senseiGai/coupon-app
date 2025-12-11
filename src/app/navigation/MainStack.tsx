@@ -1,25 +1,24 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Home, Palmtree, Wallet, FileText } from 'lucide-react-native';
+import { Gift, FolderOpen, MessageCircle } from 'lucide-react-native';
 
 // Импортируем экраны
 import { HomePage } from '../../pages/main/HomePage';
-import { BalanceScreen } from '../../pages/main/BalanceScreen';
-import { ToursScreen } from '../../pages/main/ToursScreen';
 import { DocumentsScreen } from '../../pages/main/DocumentsScreen';
+import { ChatScreen } from '../../pages/main/ChatScreen';
 
 export type MainTabParamList = {
   Home: undefined;
-  Tours: undefined;
-  Balance: undefined;
   Documents: undefined;
+  Chat: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 /**
  * MainStack - основной стек навигации приложения с табами
+ * Интуитивный интерфейс без текстовых подписей
  */
 export default function MainStack() {
   return (
@@ -29,40 +28,15 @@ export default function MainStack() {
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: '#0EA5E9',
         tabBarInactiveTintColor: '#94A3B8',
-        tabBarLabelStyle: styles.tabLabel,
+        tabBarShowLabel: false, // Убираем все текстовые подписи
       }}>
       <Tab.Screen
         name="Home"
         component={HomePage}
         options={{
-          tabBarLabel: 'Главная',
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <Home size={22} color={color} strokeWidth={2} />
-            </View>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Tours"
-        component={ToursScreen}
-        options={{
-          tabBarLabel: 'Туры',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <Palmtree size={22} color={color} strokeWidth={2} />
-            </View>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Balance"
-        component={BalanceScreen}
-        options={{
-          tabBarLabel: 'Баланс',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <Wallet size={22} color={color} strokeWidth={2} />
+              <Gift size={24} color={color} strokeWidth={2} />
             </View>
           ),
         }}
@@ -71,10 +45,20 @@ export default function MainStack() {
         name="Documents"
         component={DocumentsScreen}
         options={{
-          tabBarLabel: 'Документы',
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <FileText size={22} color={color} strokeWidth={2} />
+              <FolderOpen size={24} color={color} strokeWidth={2} />
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
+              <MessageCircle size={24} color={color} strokeWidth={2} />
             </View>
           ),
         }}
@@ -87,23 +71,28 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#FFFFFF',
     borderTopWidth: 0,
-    height: 85,
-    paddingTop: 10,
-    paddingBottom: 25,
-  },
-  tabLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-    marginTop: 4,
+    height: 88,
+    paddingTop: 12,
+    paddingBottom: 28,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 10,
   },
   tabIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   tabIconContainerActive: {
     backgroundColor: '#E0F2FE',
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
 });

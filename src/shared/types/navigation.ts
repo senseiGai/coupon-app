@@ -25,11 +25,8 @@ export type RootStackParamList = {
  */
 export type MainStackParamList = {
   Home: undefined;
-  AppointmentDetail: { appointmentId: string };
-  Archive: undefined;
-  AddPatient: undefined;
-  SelectAppointmentType: undefined;
-  SelectInjectionZones: { appointmentType: string };
+  Documents: undefined;
+  Chat: undefined;
   // Здесь можно добавить другие экраны основного стека
 };
 
@@ -54,7 +51,8 @@ export type MainStackScreenProps<T extends keyof MainStackParamList> = Composite
  */
 export type ModalScreenProps = RootStackScreenProps<'Modal'>;
 export type HomeScreenProps = MainStackScreenProps<'Home'>;
-export type AppointmentDetailScreenProps = MainStackScreenProps<'AppointmentDetail'>;
+export type DocumentsScreenProps = MainStackScreenProps<'Documents'>;
+export type ChatScreenProps = MainStackScreenProps<'Chat'>;
 
 declare global {
   namespace ReactNavigation {

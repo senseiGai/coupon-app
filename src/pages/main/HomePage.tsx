@@ -1,184 +1,142 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Hotel,
-  Plane,
-  Bus,
-  Palmtree,
-  FileText,
-  Gift,
-  MessageCircle,
-  Plus,
-} from 'lucide-react-native';
+import { Gift, Play, Sparkles } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { MainTabParamList } from '../../app/navigation/MainStack';
+import { LinearGradient } from 'expo-linear-gradient';
 
-// Моковые данные
-const mockDocuments = [
-  {
-    id: '1',
-    type: 'voucher',
-    title: 'Отель Sunrise Resort',
-    subtitle: 'Турция, Анталья',
-    date: '15 янв - 22 янв 2025',
-    status: 'active',
-  },
-  {
-    id: '2',
-    type: 'boarding',
-    title: 'Посадочный талон',
-    subtitle: 'SU-1234 • Москва → Анталья',
-    date: '15 янв, 08:30',
-    status: 'upcoming',
-  },
-  {
-    id: '3',
-    type: 'transfer',
-    title: 'Трансфер из аэропорта',
-    subtitle: 'Аэропорт → Sunrise Resort',
-    date: '15 янв, 14:00',
-    status: 'upcoming',
-  },
-];
-
-const DocumentIcon = ({ type }: { type: string }) => {
-  const iconProps = { size: 22, strokeWidth: 2 };
-  switch (type) {
-    case 'voucher':
-      return <Hotel {...iconProps} color="#0EA5E9" />;
-    case 'boarding':
-      return <Plane {...iconProps} color="#8B5CF6" />;
-    case 'transfer':
-      return <Bus {...iconProps} color="#F59E0B" />;
-    default:
-      return <FileText {...iconProps} color="#64748B" />;
-  }
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'active':
-      return '#10B981';
-    case 'upcoming':
-      return '#0EA5E9';
-    case 'expired':
-      return '#94A3B8';
-    default:
-      return '#64748B';
-  }
-};
-
-const getStatusText = (status: string) => {
-  switch (status) {
-    case 'active':
-      return 'Активен';
-    case 'upcoming':
-      return 'Скоро';
-    case 'expired':
-      return 'Истек';
-    default:
-      return status;
-  }
-};
+type NavigationProp = BottomTabNavigationProp<MainTabParamList>;
 
 export const HomePage = () => {
+  const navigation = useNavigation<NavigationProp>();
   const balance = 2450;
-  const userName = 'Гайдар';
+
+  const handlePlayAd = () => {
+    Alert.alert('🎥', `TV: ${balance}\nСмотрите рекламу, чтобы заработать больше TV`, [
+      { text: 'OK' },
+    ]);
+  };
+
+  const handleGiftPress = () => {
+    Alert.alert('🎁', 'Ваши бонусы и подарки', [{ text: 'OK' }]);
+  };
+
+  const handleCertificatePress = (discount: string, cost: string) => {
+    Alert.alert(
+      discount,
+      `Стоимость: ${cost}\n\nОбменяйте TV на сертификаты с выгодными скидками!`,
+      [
+        { text: 'Отмена', style: 'cancel' },
+        { text: 'Обменять', onPress: () => Alert.alert('✅', 'Сертификат активирован!') },
+      ]
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Привет, {userName} 👋</Text>
-            <Text style={styles.subGreeting}>Ваши путешествия</Text>
-          </View>
-          <TouchableOpacity style={styles.profileButton}>
-            <Text style={styles.profileButtonText}>ГТ</Text>
+        {/* Balance Card with Gradient */}
+        <View style={styles.balanceSection}>
+          <TouchableOpacity activeOpacity={0.9} onPress={handlePlayAd}>
+            <LinearGradient
+              colors={['#06B6D4', '#0EA5E9', '#3B82F6']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.balanceCard}>
+              <View style={styles.balanceHeader}>
+                <View style={styles.playBadge}>
+                  <Play size={20} color="#FFFFFF" strokeWidth={3} fill="#FFFFFF" />
+                </View>
+              </View>
+              <Text style={styles.balanceAmount}>{balance.toLocaleString()}</Text>
+              <Text style={styles.balanceCurrency}>TV</Text>
+              <View style={styles.shimmer} />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        {/* Balance Card */}
-        <TouchableOpacity style={styles.balanceCard} activeOpacity={0.9}>
-          <View style={styles.balanceHeader}>
-            <Text style={styles.balanceLabel}>Ваш баланс</Text>
-            <View style={styles.balanceBadge}>
-              <Text style={styles.balanceBadgeText}>+ Смотреть рекламу</Text>
-            </View>
-          </View>
-          <Text style={styles.balanceAmount}>{balance.toLocaleString()} ₽</Text>
-          <Text style={styles.balanceHint}>Копите баллы и получайте туры бесплатно</Text>
-        </TouchableOpacity>
-
-        {/* Quick Actions */}
-        <View style={styles.quickActions}>
-          <TouchableOpacity style={styles.quickActionItem}>
-            <View style={[styles.quickActionIcon, { backgroundColor: '#EFF6FF' }]}>
-              <Palmtree size={24} color="#0EA5E9" strokeWidth={2} />
-            </View>
-            <Text style={styles.quickActionText}>Туры</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickActionItem}>
-            <View style={[styles.quickActionIcon, { backgroundColor: '#F0FDF4' }]}>
-              <FileText size={24} color="#10B981" strokeWidth={2} />
-            </View>
-            <Text style={styles.quickActionText}>Документы</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickActionItem}>
-            <View style={[styles.quickActionIcon, { backgroundColor: '#FEF3C7' }]}>
-              <Gift size={24} color="#F59E0B" strokeWidth={2} />
-            </View>
-            <Text style={styles.quickActionText}>Бонусы</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.quickActionItem}>
-            <View style={[styles.quickActionIcon, { backgroundColor: '#FCE7F3' }]}>
-              <MessageCircle size={24} color="#EC4899" strokeWidth={2} />
-            </View>
-            <Text style={styles.quickActionText}>Поддержка</Text>
+        {/* Gift Button - Бонусы с градиентом */}
+        <View style={styles.giftSection}>
+          <TouchableOpacity activeOpacity={0.85} onPress={handleGiftPress}>
+            <LinearGradient
+              colors={['#FCD34D', '#F59E0B', '#D97706']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.giftButton}>
+              <Gift size={40} color="#FFFFFF" strokeWidth={2.5} />
+              <Sparkles size={18} color="#FFFFFF" strokeWidth={2} style={styles.sparkleIcon} />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        {/* Documents Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Мои документы</Text>
-            <TouchableOpacity>
-              <Text style={styles.sectionLink}>Все</Text>
-            </TouchableOpacity>
-          </View>
-
-          {mockDocuments.map((doc) => (
-            <TouchableOpacity key={doc.id} style={styles.documentCard} activeOpacity={0.7}>
-              <View style={styles.documentIconContainer}>
-                <DocumentIcon type={doc.type} />
+        {/* Сертификаты с яркими градиентами */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.certificatesScrollContent}
+          style={styles.certificatesScroll}>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => handleCertificatePress('10%', '1 TV')}
+            style={styles.certificateWrapper}>
+            <LinearGradient
+              colors={['#10B981', '#059669', '#047857']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.certificateCard}>
+              <View style={styles.certificateTop}>
+                <Sparkles size={20} color="#FFFFFF" strokeWidth={2} />
               </View>
-              <View style={styles.documentInfo}>
-                <Text style={styles.documentTitle}>{doc.title}</Text>
-                <Text style={styles.documentSubtitle}>{doc.subtitle}</Text>
-                <Text style={styles.documentDate}>{doc.date}</Text>
+              <Text style={styles.certificateDiscount}>10%</Text>
+              <View style={styles.certificateBottom}>
+                <Text style={styles.certificateTv}>1 TV</Text>
               </View>
-              <View
-                style={[
-                  styles.statusBadge,
-                  { backgroundColor: getStatusColor(doc.status) + '20' },
-                ]}>
-                <Text style={[styles.statusText, { color: getStatusColor(doc.status) }]}>
-                  {getStatusText(doc.status)}
-                </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => handleCertificatePress('50%', '5 TV')}
+            style={styles.certificateWrapper}>
+            <LinearGradient
+              colors={['#EC4899', '#DB2777', '#BE185D']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.certificateCard}>
+              <View style={styles.certificateTop}>
+                <Sparkles size={20} color="#FFFFFF" strokeWidth={2} />
               </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+              <Text style={styles.certificateDiscount}>50%</Text>
+              <View style={styles.certificateBottom}>
+                <Text style={styles.certificateTv}>5 TV</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
 
-        {/* Promo Banner */}
-        <TouchableOpacity style={styles.promoBanner} activeOpacity={0.9}>
-          <View style={styles.promoContent}>
-            <Text style={styles.promoTitle}>Турция от 15 000 баллов! 🇹🇷</Text>
-            <Text style={styles.promoSubtitle}>Смотрите рекламу и копите на путешествие мечты</Text>
-          </View>
-          <Text style={styles.promoArrow}>→</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => handleCertificatePress('🎁', '10 TV')}
+            style={styles.certificateWrapper}>
+            <LinearGradient
+              colors={['#8B5CF6', '#7C3AED', '#6D28D9']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.certificateCard}>
+              <View style={styles.certificateTop}>
+                <Sparkles size={20} color="#FFFFFF" strokeWidth={2} />
+              </View>
+              <View style={styles.certificateIconContainer}>
+                <Gift size={48} color="#FFFFFF" strokeWidth={2.5} />
+              </View>
+              <View style={styles.certificateBottom}>
+                <Text style={styles.certificateTvFree}>10 TV</Text>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </ScrollView>
 
-        <View style={{ height: 32 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -187,191 +145,140 @@ export const HomePage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F1F5F9',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
-  },
-  greeting: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: 4,
-  },
-  subGreeting: {
-    fontSize: 15,
-    color: '#64748B',
-  },
-  profileButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#0EA5E9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+  balanceSection: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
   },
   balanceCard: {
-    marginHorizontal: 20,
-    backgroundColor: '#0EA5E9',
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 24,
+    borderRadius: 28,
+    padding: 36,
+    alignItems: 'center',
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 15,
+    overflow: 'hidden',
   },
   balanceHeader: {
+    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'center',
+    marginBottom: 20,
   },
-  balanceLabel: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '500',
-  },
-  balanceBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  balanceBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  balanceAmount: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  balanceHint: {
-    fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.7)',
-  },
-  quickActions: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    marginBottom: 28,
-    justifyContent: 'space-between',
-  },
-  quickActionItem: {
-    alignItems: 'center',
-  },
-  quickActionIcon: {
+  playBadge: {
     width: 56,
     height: 56,
-    borderRadius: 16,
-    alignItems: 'center',
+    borderRadius: 28,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
-    marginBottom: 8,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 8,
   },
-  quickActionEmoji: {
+  balanceAmount: {
+    fontSize: 64,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 3,
+    textShadowColor: 'rgba(0, 0, 0, 0.15)',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 8,
+  },
+  balanceCurrency: {
     fontSize: 24,
+    fontWeight: '700',
+    color: 'rgba(255, 255, 255, 0.95)',
+    marginTop: 8,
+    letterSpacing: 6,
   },
-  quickActionText: {
-    fontSize: 12,
-    color: '#64748B',
-    fontWeight: '500',
+  shimmer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
-  section: {
+  giftSection: {
+    alignItems: 'center',
+    marginTop: 36,
+    marginBottom: 20,
+  },
+  giftButton: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#F59E0B',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 12,
+  },
+  sparkleIcon: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+  },
+  certificatesScroll: {
+    marginTop: 32,
+  },
+  certificatesScrollContent: {
     paddingHorizontal: 20,
-    marginBottom: 24,
+    paddingRight: 20,
   },
-  sectionHeader: {
-    flexDirection: 'row',
+  certificateWrapper: {
+    marginRight: 12,
+  },
+  certificateCard: {
+    width: 140,
+    height: 160,
+    borderRadius: 24,
+    padding: 18,
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
+    elevation: 10,
+    overflow: 'hidden',
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#0F172A',
+  certificateTop: {
+    width: '100%',
+    alignItems: 'flex-end',
   },
-  sectionLink: {
-    fontSize: 14,
-    color: '#0EA5E9',
-    fontWeight: '600',
+  certificateIconContainer: {
+    marginTop: 4,
   },
-  documentCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+  certificateDiscount: {
+    fontSize: 44,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    lineHeight: 48,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 6,
   },
-  documentIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14,
-  },
-  documentInfo: {
-    flex: 1,
-  },
-  documentTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#0F172A',
-    marginBottom: 3,
-  },
-  documentSubtitle: {
-    fontSize: 13,
-    color: '#64748B',
-    marginBottom: 2,
-  },
-  documentDate: {
-    fontSize: 12,
-    color: '#94A3B8',
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  statusText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  promoBanner: {
-    marginHorizontal: 20,
-    backgroundColor: '#FEF3C7',
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: 'row',
+  certificateBottom: {
+    width: '100%',
     alignItems: 'center',
   },
-  promoContent: {
-    flex: 1,
+  certificateTv: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: 'rgba(255, 255, 255, 0.95)',
   },
-  promoTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#92400E',
-    marginBottom: 4,
-  },
-  promoSubtitle: {
-    fontSize: 13,
-    color: '#B45309',
-  },
-  promoArrow: {
-    fontSize: 24,
-    color: '#92400E',
-    marginLeft: 12,
+  certificateTvFree: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: 'rgba(255, 255, 255, 0.95)',
   },
 });
