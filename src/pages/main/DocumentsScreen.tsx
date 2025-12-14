@@ -76,7 +76,7 @@ export const DocumentsScreen = () => {
             <FileText size={48} color="#94A3B8" strokeWidth={1.5} />
           </View>
         )}
-        <View style={{ height: 100 }} />
+        <View style={{ height: 140 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -85,10 +85,10 @@ export const DocumentsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F8FAFC',
   },
   scrollContent: {
-    paddingTop: 48,
+    paddingTop: 20,
   },
   documentsList: {
     paddingHorizontal: 20,

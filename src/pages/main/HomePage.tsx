@@ -1,142 +1,125 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Gift, Play, Sparkles } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import type { MainTabParamList } from '../../app/navigation/MainStack';
+import {
+  Gift,
+  Percent,
+  Ticket,
+  TrendingUp,
+  Star,
+  Zap,
+  Crown,
+  Sparkles,
+  Play,
+} from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-type NavigationProp = BottomTabNavigationProp<MainTabParamList>;
+const { width } = Dimensions.get('window');
+const BANNER_WIDTH = width - 32;
+const CARD_WIDTH = (width - 48) / 2;
 
 export const HomePage = () => {
-  const navigation = useNavigation<NavigationProp>();
-  const balance = 2450;
-
-  const handlePlayAd = () => {
-    Alert.alert('🎥', `TV: ${balance}\nСмотрите рекламу, чтобы заработать больше TV`, [
-      { text: 'OK' },
-    ]);
-  };
-
-  const handleGiftPress = () => {
-    Alert.alert('🎁', 'Ваши бонусы и подарки', [{ text: 'OK' }]);
-  };
-
-  const handleCertificatePress = (discount: string, cost: string) => {
-    Alert.alert(
-      discount,
-      `Стоимость: ${cost}\n\nОбменяйте TV на сертификаты с выгодными скидками!`,
-      [
-        { text: 'Отмена', style: 'cancel' },
-        { text: 'Обменять', onPress: () => Alert.alert('✅', 'Сертификат активирован!') },
-      ]
-    );
-  };
+  const userBalance = 2450;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Balance Card with Gradient */}
-        <View style={styles.balanceSection}>
-          <TouchableOpacity activeOpacity={0.9} onPress={handlePlayAd}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Hello! 👋</Text>
+            <Text style={styles.subtitle}>Choose your bonus</Text>
+          </View>
+        </View>
+
+        {/* Main Banner - Balance Card */}
+        <View style={styles.bannerSection}>
+          <View style={styles.balanceBanner}>
+            <View style={styles.balanceBannerHeader}>
+              <Text style={styles.balanceBannerLabel}>Your balance</Text>
+              <TouchableOpacity activeOpacity={0.8} style={styles.watchAdButton}>
+                <Text style={styles.watchAdText}>+ Watch ads</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.balanceBannerAmount}>{userBalance.toLocaleString()} ₽</Text>
+            <Text style={styles.balanceBannerHint}>Earn points and get tours for free</Text>
+          </View>
+        </View>
+
+        {/* Quick Actions Grid */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.singleCardContainer}>
+            {/* Bonuses - Orange */}
+            <TouchableOpacity activeOpacity={0.8} style={styles.fullWidthCard}>
+              <LinearGradient
+                colors={['#F59E0B', '#D97706']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.cardGradient}>
+                <View style={styles.cardIcon}>
+                  <Gift size={32} color="#FFFFFF" strokeWidth={2.5} />
+                </View>
+                <Text style={styles.cardTitle}>Bonuses</Text>
+                <Text style={styles.cardSubtitle}>Daily</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Promotional Banners */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Special Offers</Text>
+
+          {/* Purple Banner */}
+          <TouchableOpacity activeOpacity={0.9} style={styles.promoBanner}>
             <LinearGradient
-              colors={['#06B6D4', '#0EA5E9', '#3B82F6']}
+              colors={['#A855F7', '#9333EA', '#7E22CE']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={styles.balanceCard}>
-              <View style={styles.balanceHeader}>
-                <View style={styles.playBadge}>
-                  <Play size={20} color="#FFFFFF" strokeWidth={3} fill="#FFFFFF" />
+              style={styles.bannerGradient}>
+              <View style={styles.promoContent}>
+                <View style={styles.promoLeft}>
+                  <View style={styles.promoIcon}>
+                    <Crown size={36} color="#FFFFFF" strokeWidth={2.5} />
+                  </View>
+                  <View style={styles.promoText}>
+                    <Text style={styles.promoTitle}>Premium tours</Text>
+                    <Text style={styles.promoSubtitle}>Exclusive destinations</Text>
+                  </View>
+                </View>
+                <View style={styles.sparkleIcon}>
+                  <Sparkles size={24} color="#FFFFFF" strokeWidth={2} />
                 </View>
               </View>
-              <Text style={styles.balanceAmount}>{balance.toLocaleString()}</Text>
-              <Text style={styles.balanceCurrency}>TV</Text>
-              <View style={styles.shimmer} />
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Teal Banner */}
+          <TouchableOpacity activeOpacity={0.9} style={styles.promoBanner}>
+            <LinearGradient
+              colors={['#14B8A6', '#0D9488', '#0F766E']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.bannerGradient}>
+              <View style={styles.promoContent}>
+                <View style={styles.promoLeft}>
+                  <View style={styles.promoIcon}>
+                    <Zap size={36} color="#FFFFFF" strokeWidth={2.5} />
+                  </View>
+                  <View style={styles.promoText}>
+                    <Text style={styles.promoTitle}>Flash deals</Text>
+                    <Text style={styles.promoSubtitle}>Limited time</Text>
+                  </View>
+                </View>
+                <View style={styles.sparkleIcon}>
+                  <Star size={24} color="#FFFFFF" strokeWidth={2} fill="#FFFFFF" />
+                </View>
+              </View>
             </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        {/* Gift Button - Бонусы с градиентом */}
-        <View style={styles.giftSection}>
-          <TouchableOpacity activeOpacity={0.85} onPress={handleGiftPress}>
-            <LinearGradient
-              colors={['#FCD34D', '#F59E0B', '#D97706']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.giftButton}>
-              <Gift size={40} color="#FFFFFF" strokeWidth={2.5} />
-              <Sparkles size={18} color="#FFFFFF" strokeWidth={2} style={styles.sparkleIcon} />
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-        {/* Сертификаты с яркими градиентами */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.certificatesScrollContent}
-          style={styles.certificatesScroll}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() => handleCertificatePress('10%', '1 TV')}
-            style={styles.certificateWrapper}>
-            <LinearGradient
-              colors={['#10B981', '#059669', '#047857']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.certificateCard}>
-              <View style={styles.certificateTop}>
-                <Sparkles size={20} color="#FFFFFF" strokeWidth={2} />
-              </View>
-              <Text style={styles.certificateDiscount}>10%</Text>
-              <View style={styles.certificateBottom}>
-                <Text style={styles.certificateTv}>1 TV</Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() => handleCertificatePress('50%', '5 TV')}
-            style={styles.certificateWrapper}>
-            <LinearGradient
-              colors={['#EC4899', '#DB2777', '#BE185D']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.certificateCard}>
-              <View style={styles.certificateTop}>
-                <Sparkles size={20} color="#FFFFFF" strokeWidth={2} />
-              </View>
-              <Text style={styles.certificateDiscount}>50%</Text>
-              <View style={styles.certificateBottom}>
-                <Text style={styles.certificateTv}>5 TV</Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() => handleCertificatePress('🎁', '10 TV')}
-            style={styles.certificateWrapper}>
-            <LinearGradient
-              colors={['#8B5CF6', '#7C3AED', '#6D28D9']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.certificateCard}>
-              <View style={styles.certificateTop}>
-                <Sparkles size={20} color="#FFFFFF" strokeWidth={2} />
-              </View>
-              <View style={styles.certificateIconContainer}>
-                <Gift size={48} color="#FFFFFF" strokeWidth={2.5} />
-              </View>
-              <View style={styles.certificateBottom}>
-                <Text style={styles.certificateTvFree}>10 TV</Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </ScrollView>
-
-        <View style={{ height: 100 }} />
+        <View style={{ height: 140 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -145,140 +128,215 @@ export const HomePage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F8FAFC',
   },
-  balanceSection: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
+  scrollContent: {
+    paddingBottom: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  greeting: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#64748B',
+    fontWeight: '500',
   },
   balanceCard: {
-    borderRadius: 28,
-    padding: 36,
-    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 16,
     shadowColor: '#0EA5E9',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 15,
-    overflow: 'hidden',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  balanceHeader: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  playBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 8,
+  balanceLabel: {
+    fontSize: 11,
+    color: '#64748B',
+    fontWeight: '600',
+    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   balanceAmount: {
-    fontSize: 64,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    letterSpacing: 3,
-    textShadowColor: 'rgba(0, 0, 0, 0.15)',
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 8,
-  },
-  balanceCurrency: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '700',
-    color: 'rgba(255, 255, 255, 0.95)',
-    marginTop: 8,
-    letterSpacing: 6,
+    color: '#0EA5E9',
   },
-  shimmer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  bannerSection: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
-  giftSection: {
-    alignItems: 'center',
-    marginTop: 36,
-    marginBottom: 20,
-  },
-  giftButton: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#F59E0B',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 12,
-  },
-  sparkleIcon: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-  },
-  certificatesScroll: {
-    marginTop: 32,
-  },
-  certificatesScrollContent: {
+  balanceBanner: {
+    width: BANNER_WIDTH,
+    backgroundColor: '#38BDF8',
+    borderRadius: 20,
     paddingHorizontal: 20,
-    paddingRight: 20,
-  },
-  certificateWrapper: {
-    marginRight: 12,
-  },
-  certificateCard: {
-    width: 140,
-    height: 160,
-    borderRadius: 24,
-    padding: 18,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
+    paddingVertical: 20,
+    shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
-    shadowRadius: 14,
-    elevation: 10,
-    overflow: 'hidden',
+    shadowRadius: 16,
+    elevation: 8,
   },
-  certificateTop: {
-    width: '100%',
-    alignItems: 'flex-end',
+  balanceBannerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  certificateIconContainer: {
-    marginTop: 4,
-  },
-  certificateDiscount: {
-    fontSize: 44,
-    fontWeight: '900',
+  balanceBannerLabel: {
+    fontSize: 16,
+    fontWeight: '600',
     color: '#FFFFFF',
-    lineHeight: 48,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
   },
-  certificateBottom: {
+  watchAdButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 18,
+  },
+  watchAdText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#0EA5E9',
+  },
+  balanceBannerAmount: {
+    fontSize: 40,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 6,
+  },
+  balanceBannerHint: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '500',
+    fontStyle: 'italic',
+  },
+  section: {
+    paddingTop: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1E293B',
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  cardsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    gap: 12,
+    justifyContent: 'space-between',
+  },
+  singleCardContainer: {
+    paddingHorizontal: 16,
+  },
+  actionCard: {
+    width: CARD_WIDTH,
+    marginBottom: 4,
+  },
+  fullWidthCard: {
     width: '100%',
+  },
+  cardGradient: {
+    width: '100%',
+    height: 140,
+    borderRadius: 20,
+    padding: 16,
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  cardIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  certificateTv: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: 'rgba(255, 255, 255, 0.95)',
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 2,
   },
-  certificateTvFree: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: 'rgba(255, 255, 255, 0.95)',
+  cardSubtitle: {
+    fontSize: 13,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    fontWeight: '500',
+  },
+  promoBanner: {
+    marginHorizontal: 16,
+    marginTop: 12,
+  },
+  bannerGradient: {
+    width: '100%',
+    height: 100,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  promoContent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  promoLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  promoIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  promoText: {
+    flex: 1,
+  },
+  promoTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 3,
+  },
+  promoSubtitle: {
+    fontSize: 13,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    fontWeight: '500',
+  },
+  sparkleIcon: {
+    marginLeft: 12,
   },
 });

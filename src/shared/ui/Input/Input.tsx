@@ -22,18 +22,18 @@ export const Input = ({ label, error, style, ...props }: InputProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 18,
   },
   label: {
-    color: '#334155',
-    marginBottom: 6,
-    fontWeight: '500',
+    color: '#1E293B',
+    marginBottom: 8,
+    fontWeight: '600',
     fontSize: 14,
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderRadius: 12,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 2,
+    borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
@@ -44,10 +44,12 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderColor: '#F87171',
+    backgroundColor: '#FEF2F2',
   },
   errorText: {
     color: '#EF4444',
     fontSize: 13,
-    marginTop: 4,
+    marginTop: 6,
+    fontWeight: '500',
   },
 });

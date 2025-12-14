@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { Gift, FolderOpen, MessageCircle } from 'lucide-react-native';
 
 // Импортируем экраны
@@ -16,9 +16,16 @@ export type MainTabParamList = {
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+const TabIcon = ({ icon: Icon, focused }: { icon: any; focused: boolean }) => {
+  return (
+    <View style={styles.tabIconContainer}>
+      <Icon size={26} color={focused ? '#0EA5E9' : '#9CA3AF'} strokeWidth={focused ? 2.5 : 2} />
+    </View>
+  );
+};
+
 /**
  * MainStack - основной стек навигации приложения с табами
- * Интуитивный интерфейс без текстовых подписей
  */
 export default function MainStack() {
   return (
@@ -26,41 +33,27 @@ export default function MainStack() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#0EA5E9',
-        tabBarInactiveTintColor: '#94A3B8',
-        tabBarShowLabel: false, // Убираем все текстовые подписи
+        tabBarShowLabel: false,
       }}>
       <Tab.Screen
         name="Home"
         component={HomePage}
         options={{
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <Gift size={24} color={color} strokeWidth={2} />
-            </View>
-          ),
+          tabBarIcon: ({ focused }) => <TabIcon icon={Gift} focused={focused} />,
         }}
       />
       <Tab.Screen
         name="Documents"
         component={DocumentsScreen}
         options={{
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <FolderOpen size={24} color={color} strokeWidth={2} />
-            </View>
-          ),
+          tabBarIcon: ({ focused }) => <TabIcon icon={FolderOpen} focused={focused} />,
         }}
       />
       <Tab.Screen
         name="Chat"
         component={ChatScreen}
         options={{
-          tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <MessageCircle size={24} color={color} strokeWidth={2} />
-            </View>
-          ),
+          tabBarIcon: ({ focused }) => <TabIcon icon={MessageCircle} focused={focused} />,
         }}
       />
     </Tab.Navigator>
@@ -70,29 +63,19 @@ export default function MainStack() {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#FFFFFF',
-    borderTopWidth: 0,
-    height: 88,
-    paddingTop: 12,
-    paddingBottom: 28,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+    height: Platform.OS === 'ios' ? 80 : 60,
+    paddingTop: 10,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 10,
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 8,
   },
   tabIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  tabIconContainerActive: {
-    backgroundColor: '#E0F2FE',
-    shadowColor: '#0EA5E9',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
   },
 });

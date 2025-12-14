@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Umbrella, Pyramid, Building2, Palmtree, Waves, Check } from 'lucide-react-native';
+import { Umbrella, Pyramid, Building2, Palmtree, Waves, Check, Star } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const tours = [
   {
@@ -89,6 +90,27 @@ export const ToursScreen = () => {
           </View>
         </View>
 
+        {/* Featured Banner */}
+        <View style={styles.bannerSection}>
+          <TouchableOpacity activeOpacity={0.9}>
+            <LinearGradient
+              colors={['#EC4899', '#DB2777', '#BE185D']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.featuredBanner}>
+              <View style={styles.bannerContent}>
+                <View style={styles.bannerLeft}>
+                  <Text style={styles.bannerTitle}>Горящие туры</Text>
+                  <Text style={styles.bannerSubtitle}>Скидки до 70%</Text>
+                </View>
+                <View style={styles.bannerIcon}>
+                  <Star size={40} color="#FFFFFF" strokeWidth={2.5} fill="#FFFFFF" />
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
         {/* Categories */}
         <ScrollView
           horizontal
@@ -168,7 +190,7 @@ export const ToursScreen = () => {
           })}
         </View>
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: 140 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -185,23 +207,74 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 16,
+    paddingBottom: 12,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#1E293B',
   },
   balanceChip: {
     backgroundColor: '#0EA5E9',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 20,
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
   },
   balanceChipText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  bannerSection: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 12,
+  },
+  featuredBanner: {
+    width: '100%',
+    height: 120,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#EC4899',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  bannerContent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  bannerLeft: {
+    flex: 1,
+  },
+  bannerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  bannerSubtitle: {
+    fontSize: 15,
+    color: '#FFFFFF',
+    opacity: 0.95,
     fontWeight: '600',
+  },
+  bannerIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   categoriesContainer: {
     paddingHorizontal: 20,

@@ -31,20 +31,26 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   primaryButton: {
     backgroundColor: '#0EA5E9',
   },
   secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
     borderColor: '#0EA5E9',
+    shadowOpacity: 0.1,
   },
   buttonText: {
-    fontWeight: '600',
+    fontWeight: '700',
     fontSize: 16,
   },
   primaryText: {

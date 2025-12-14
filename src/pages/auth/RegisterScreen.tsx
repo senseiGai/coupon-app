@@ -124,33 +124,38 @@ export default function RegisterScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F0F7FF',
+    backgroundColor: '#F8FAFC',
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 48,
+    paddingHorizontal: 20,
+    paddingVertical: 40,
   },
   header: {
-    marginBottom: 40,
-    alignItems: 'center',
+    marginBottom: 36,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
-    color: '#0EA5E9',
+    color: '#1E293B',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 15,
-    color: '#94A3B8',
+    fontSize: 16,
+    color: '#64748B',
+    fontWeight: '500',
   },
   formContainer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 24,
     padding: 24,
     marginBottom: 24,
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
   },
   footer: {
     alignItems: 'center',
@@ -161,6 +166,6 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     color: '#0EA5E9',
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });
