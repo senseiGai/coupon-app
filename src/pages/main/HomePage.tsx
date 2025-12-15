@@ -10,8 +10,10 @@ import {
   Crown,
   Sparkles,
   Play,
+  Languages,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useState } from 'react';
 
 const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width - 32;
@@ -19,6 +21,46 @@ const CARD_WIDTH = (width - 48) / 2;
 
 export const HomePage = () => {
   const userBalance = 2450;
+  const [language, setLanguage] = useState<'en' | 'ru'>('en');
+
+  const toggleLanguage = () => {
+    setLanguage((prev) => (prev === 'en' ? 'ru' : 'en'));
+  };
+
+  const texts = {
+    en: {
+      greeting: 'Hello! 👋',
+      subtitle: 'Choose your bonus',
+      balance: 'Your balance',
+      watchAds: '+ Watch ads',
+      hint: 'Earn points and get tours for free',
+      quickActions: 'Quick Actions',
+      bonuses: 'Bonuses',
+      daily: 'Daily',
+      specialOffers: 'Special Offers',
+      premiumTours: 'Premium tours',
+      exclusiveDestinations: 'Exclusive destinations',
+      flashDeals: 'Flash deals',
+      limitedTime: 'Limited time',
+    },
+    ru: {
+      greeting: 'Привет! 👋',
+      subtitle: 'Выбери свой бонус',
+      balance: 'Ваш баланс',
+      watchAds: '+ Смотреть рекламу',
+      hint: 'Копите баллы и получайте туры бесплатно',
+      quickActions: 'Быстрые действия',
+      bonuses: 'Бонусы',
+      daily: 'Ежедневно',
+      specialOffers: 'Специальные предложения',
+      premiumTours: 'Premium туры',
+      exclusiveDestinations: 'Эксклюзивные направления',
+      flashDeals: 'Быстрые сделки',
+      limitedTime: 'Ограниченное время',
+    },
+  };
+
+  const t = texts[language];
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -26,28 +68,35 @@ export const HomePage = () => {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Hello! 👋</Text>
-            <Text style={styles.subtitle}>Choose your bonus</Text>
+            <Text style={styles.greeting}>{t.greeting}</Text>
+            <Text style={styles.subtitle}>{t.subtitle}</Text>
           </View>
+          <TouchableOpacity
+            style={styles.languageButton}
+            onPress={toggleLanguage}
+            activeOpacity={0.7}>
+            <Languages size={24} color="#0EA5E9" strokeWidth={2} />
+            <Text style={styles.languageText}>{language.toUpperCase()}</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Main Banner - Balance Card */}
         <View style={styles.bannerSection}>
           <View style={styles.balanceBanner}>
             <View style={styles.balanceBannerHeader}>
-              <Text style={styles.balanceBannerLabel}>Your balance</Text>
+              <Text style={styles.balanceBannerLabel}>{t.balance}</Text>
               <TouchableOpacity activeOpacity={0.8} style={styles.watchAdButton}>
-                <Text style={styles.watchAdText}>+ Watch ads</Text>
+                <Text style={styles.watchAdText}>{t.watchAds}</Text>
               </TouchableOpacity>
             </View>
             <Text style={styles.balanceBannerAmount}>{userBalance.toLocaleString()} ₽</Text>
-            <Text style={styles.balanceBannerHint}>Earn points and get tours for free</Text>
+            <Text style={styles.balanceBannerHint}>{t.hint}</Text>
           </View>
         </View>
 
         {/* Quick Actions Grid */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={styles.sectionTitle}>{t.quickActions}</Text>
           <View style={styles.singleCardContainer}>
             {/* Bonuses - Orange */}
             <TouchableOpacity activeOpacity={0.8} style={styles.fullWidthCard}>
@@ -59,8 +108,8 @@ export const HomePage = () => {
                 <View style={styles.cardIcon}>
                   <Gift size={32} color="#FFFFFF" strokeWidth={2.5} />
                 </View>
-                <Text style={styles.cardTitle}>Bonuses</Text>
-                <Text style={styles.cardSubtitle}>Daily</Text>
+                <Text style={styles.cardTitle}>{t.bonuses}</Text>
+                <Text style={styles.cardSubtitle}>{t.daily}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -68,7 +117,7 @@ export const HomePage = () => {
 
         {/* Promotional Banners */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Special Offers</Text>
+          <Text style={styles.sectionTitle}>{t.specialOffers}</Text>
 
           {/* Purple Banner */}
           <TouchableOpacity activeOpacity={0.9} style={styles.promoBanner}>
@@ -83,8 +132,8 @@ export const HomePage = () => {
                     <Crown size={36} color="#FFFFFF" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
-                    <Text style={styles.promoTitle}>Premium tours</Text>
-                    <Text style={styles.promoSubtitle}>Exclusive destinations</Text>
+                    <Text style={styles.promoTitle}>{t.premiumTours}</Text>
+                    <Text style={styles.promoSubtitle}>{t.exclusiveDestinations}</Text>
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
@@ -107,8 +156,8 @@ export const HomePage = () => {
                     <Zap size={36} color="#FFFFFF" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
-                    <Text style={styles.promoTitle}>Flash deals</Text>
-                    <Text style={styles.promoSubtitle}>Limited time</Text>
+                    <Text style={styles.promoTitle}>{t.flashDeals}</Text>
+                    <Text style={styles.promoSubtitle}>{t.limitedTime}</Text>
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
@@ -151,6 +200,25 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#64748B',
     fontWeight: '500',
+  },
+  languageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    gap: 6,
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  languageText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0EA5E9',
   },
   balanceCard: {
     backgroundColor: '#FFFFFF',

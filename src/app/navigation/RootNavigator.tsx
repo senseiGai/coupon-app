@@ -16,6 +16,7 @@ export default function RootNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
+        animation: 'fade',
       }}>
       {/* <Stack.Screen name="AuthStack" component={AuthStack} /> */}
       <Stack.Screen name="MainStack" component={MainStack} />

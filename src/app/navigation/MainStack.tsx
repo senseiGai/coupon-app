@@ -54,6 +54,7 @@ export default function MainStack() {
         component={ChatScreen}
         options={{
           tabBarIcon: ({ focused }) => <TabIcon icon={MessageCircle} focused={focused} />,
+          tabBarStyle: { display: 'none' },
         }}
       />
     </Tab.Navigator>

@@ -10,9 +10,10 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Send, Paperclip, Headphones } from 'lucide-react-native';
+import { Send, Paperclip, Headphones, ChevronLeft } from 'lucide-react-native';
 import { useState, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
 interface Message {
   id: string;
@@ -24,7 +25,7 @@ interface Message {
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: 'Здравствуйте! 👋\nДобро пожаловать в службу поддержки. Чем могу помочь?',
+    text: 'Hello! 👋\nWelcome to support service. How can I help you?',
     isUser: false,
     time: '10:00',
   },
@@ -34,6 +35,7 @@ export const ChatScreen = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputText, setInputText] = useState('');
   const scrollViewRef = useRef<ScrollView>(null);
+  const navigation = useNavigation();
 
   const sendMessage = () => {
     if (inputText.trim()) {
@@ -62,6 +64,14 @@ export const ChatScreen = () => {
         end={{ x: 1, y: 0 }}
         style={styles.headerGradient}>
         <View style={styles.headerContent}>
+          {/* Back Button */}
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}>
+            <ChevronLeft size={28} color="#FFFFFF" strokeWidth={2.5} />
+          </TouchableOpacity>
+
           {/* Avatar */}
           <View style={styles.avatarContainer}>
             <LinearGradient colors={['#FFFFFF', '#F0F9FF']} style={styles.avatar}>
@@ -72,10 +82,10 @@ export const ChatScreen = () => {
 
           {/* Info */}
           <View style={styles.headerInfo}>
-            <Text style={styles.headerTitle}>Служба поддержки</Text>
+            <Text style={styles.headerTitle}>Support Service</Text>
             <View style={styles.statusRow}>
               <View style={styles.statusDot} />
-              <Text style={styles.headerSubtitle}>Онлайн • Отвечаем быстро</Text>
+              <Text style={styles.headerSubtitle}>Online • Fast response</Text>
             </View>
           </View>
         </View>
@@ -90,9 +100,9 @@ export const ChatScreen = () => {
           style={styles.messagesContainer}
           contentContainerStyle={styles.messagesContent}
           showsVerticalScrollIndicator={false}>
-          {/* Дата */}
+          {/* Date */}
           <View style={styles.dateContainer}>
-            <Text style={styles.dateText}>Сегодня</Text>
+            <Text style={styles.dateText}>Today</Text>
           </View>
 
           {messages.map((message) => (
@@ -143,7 +153,7 @@ export const ChatScreen = () => {
             style={styles.textInput}
             value={inputText}
             onChangeText={setInputText}
-            placeholder="Напишите сообщение..."
+            placeholder="Write a message..."
             placeholderTextColor="#94A3B8"
             multiline
             maxLength={1000}
@@ -184,6 +194,14 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
   },
   avatarContainer: {
     position: 'relative',
@@ -338,7 +356,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 16,
+    paddingBottom: Platform.OS === 'ios' ? 32 : 16,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#F1F5F9',
