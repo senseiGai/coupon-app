@@ -8,12 +8,44 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Send, Paperclip, Headphones, ChevronLeft } from 'lucide-react-native';
+import { Send, Paperclip, Plane } from 'lucide-react-native';
 import { useState, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Генерируем позиции для самолётиков по сетке (чтобы не накладывались)
+const generateAirplanes = () => {
+  const airplanes = [];
+  const cols = 4; // Колонки
+  const rows = 6; // Ряды
+  const cellWidth = SCREEN_WIDTH / cols;
+  const cellHeight = (SCREEN_HEIGHT - 200) / rows;
+
+  let id = 0;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      // Небольшое случайное смещение внутри ячейки
+      const offsetX = (Math.random() - 0.5) * (cellWidth * 0.4);
+      const offsetY = (Math.random() - 0.5) * (cellHeight * 0.4);
+
+      airplanes.push({
+        id: id++,
+        x: col * cellWidth + cellWidth / 2 + offsetX - 12,
+        y: row * cellHeight + cellHeight / 2 + offsetY,
+        rotation: Math.random() * 360,
+        scale: 1,
+        opacity: 0.12 + Math.random() * 0.06,
+      });
+    }
+  }
+  return airplanes;
+};
+
+const airplanes = generateAirplanes();
 
 interface Message {
   id: string;
@@ -35,7 +67,6 @@ export const ChatScreen = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputText, setInputText] = useState('');
   const scrollViewRef = useRef<ScrollView>(null);
-  const navigation = useNavigation();
 
   const sendMessage = () => {
     if (inputText.trim()) {
@@ -64,25 +95,17 @@ export const ChatScreen = () => {
         end={{ x: 1, y: 0 }}
         style={styles.headerGradient}>
         <View style={styles.headerContent}>
-          {/* Back Button */}
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}>
-            <ChevronLeft size={28} color="#FFFFFF" strokeWidth={2.5} />
-          </TouchableOpacity>
-
-          {/* Avatar */}
+          {/* Avatar с логотипом */}
           <View style={styles.avatarContainer}>
-            <LinearGradient colors={['#FFFFFF', '#F0F9FF']} style={styles.avatar}>
-              <Headphones size={24} color="#0EA5E9" strokeWidth={2} />
-            </LinearGradient>
+            <View style={styles.avatar}>
+              <Image source={require('../../../assets/logo.jpg')} style={styles.logoImage} />
+            </View>
             <View style={styles.onlineIndicator} />
           </View>
 
           {/* Info */}
           <View style={styles.headerInfo}>
-            <Text style={styles.headerTitle}>Support Service</Text>
+            <Text style={styles.headerTitle}>Chat</Text>
             <View style={styles.statusRow}>
               <View style={styles.statusDot} />
               <Text style={styles.headerSubtitle}>Online • Fast response</Text>
@@ -95,6 +118,25 @@ export const ChatScreen = () => {
         style={styles.chatContainer}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}>
+        {/* Фон с самолётиками */}
+        <View style={styles.airplanesBackground}>
+          {airplanes.map((airplane) => (
+            <View
+              key={airplane.id}
+              style={[
+                styles.airplaneContainer,
+                {
+                  left: airplane.x,
+                  top: airplane.y,
+                  transform: [{ rotate: `${airplane.rotation}deg` }, { scale: airplane.scale }],
+                  opacity: airplane.opacity,
+                },
+              ]}>
+              <Plane size={24} color="#0EA5E9" strokeWidth={1.5} />
+            </View>
+          ))}
+        </View>
+
         <ScrollView
           ref={scrollViewRef}
           style={styles.messagesContainer}
@@ -112,11 +154,14 @@ export const ChatScreen = () => {
                 styles.messageWrapper,
                 message.isUser ? styles.userMessageWrapper : styles.supportMessageWrapper,
               ]}>
-              {/* Аватар поддержки */}
+              {/* Аватар поддержки с логотипом */}
               {!message.isUser && (
                 <View style={styles.messageAvatarContainer}>
                   <View style={styles.messageAvatar}>
-                    <Headphones size={16} color="#0EA5E9" strokeWidth={2} />
+                    <Image
+                      source={require('../../../assets/logo.jpg')}
+                      style={styles.messageLogoImage}
+                    />
                   </View>
                 </View>
               )}
@@ -195,14 +240,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 8,
-  },
   avatarContainer: {
     position: 'relative',
     marginRight: 14,
@@ -213,11 +250,18 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  logoImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   onlineIndicator: {
     position: 'absolute',
@@ -258,8 +302,20 @@ const styles = StyleSheet.create({
   chatContainer: {
     flex: 1,
   },
+  airplanesBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 0,
+  },
+  airplaneContainer: {
+    position: 'absolute',
+  },
   messagesContainer: {
     flex: 1,
+    zIndex: 1,
   },
   messagesContent: {
     padding: 16,
@@ -297,11 +353,17 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F0F9FF',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#E0F2FE',
+    overflow: 'hidden',
+  },
+  messageLogoImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
   },
   messageBubble: {
     maxWidth: '75%',
