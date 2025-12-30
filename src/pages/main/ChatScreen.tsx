@@ -9,12 +9,22 @@ import {
   Platform,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Send, Paperclip, Plane } from 'lucide-react-native';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLanguage } from '../../shared/lib/hooks';
+import {
+  useLanguage,
+  useMessageHistory,
+  useSendMessage,
+  useMarkAsRead,
+  useAdmin,
+  useProfile,
+} from '../../shared/lib/hooks';
+import { socketService } from '../../shared/lib/socket/socketService';
+import type { PrivateMessage } from '../../shared/types/message';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -48,43 +58,145 @@ const generateAirplanes = () => {
 
 const airplanes = generateAirplanes();
 
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  time: string;
-}
-
 export const ChatScreen = () => {
   const { t } = useLanguage();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'Hello! 👋\nWelcome to support service. How can I help you?',
-      isUser: false,
-      time: '10:00',
-    },
-  ]);
   const [inputText, setInputText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const sendMessage = () => {
-    if (inputText.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: inputText.trim(),
-        isUser: true,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-      setMessages([...messages, newMessage]);
-      setInputText('');
+  // Получаем текущего пользователя
+  const { data: profile } = useProfile();
+  const currentUserId = profile?.id;
 
-      // Автоматический скролл вниз
+  // Получаем ID админа из API
+  const { data: admin, isLoading: isLoadingAdmin } = useAdmin();
+  const ADMIN_ID = admin?.id || 2; // Fallback на 2 если еще загружается
+
+  // Загружаем историю сообщений с админом
+  const {
+    data: messages = [],
+    isLoading: isLoadingMessages,
+    refetch,
+  } = useMessageHistory(ADMIN_ID);
+  const sendMessageMutation = useSendMessage();
+  const markAsReadMutation = useMarkAsRead();
+
+  const isLoading = isLoadingAdmin || isLoadingMessages;
+
+  // Подключаемся к WebSocket при монтировании
+  useEffect(() => {
+    console.log('[ChatScreen] Connecting to WebSocket...');
+    socketService.connect();
+
+    // Подписываемся на новые сообщения
+    socketService.onNewMessage((message) => {
+      console.log('[ChatScreen] Received new message:', message);
+      refetch();
+
+      // Автоматически отмечаем как прочитанные если чат открыт
+      if (message.senderId === ADMIN_ID) {
+        markAsReadMutation.mutate(ADMIN_ID);
+      }
+    });
+
+    // Подписываемся на индикатор печати от админа
+    socketService.onUserTyping((data) => {
+      if (data.userId === ADMIN_ID) {
+        setIsTyping(data.isTyping);
+      }
+    });
+
+    // Отмечаем все сообщения как прочитанные при открытии чата
+    markAsReadMutation.mutate(ADMIN_ID);
+
+    return () => {
+      socketService.disconnect();
+      socketService.removeAllListeners();
+    };
+  }, [ADMIN_ID]);
+
+  // Автоматический скролл при новых сообщениях
+  useEffect(() => {
+    if (messages.length > 0) {
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
+  }, [messages]);
+
+  const sendMessage = async () => {
+    if (!inputText.trim()) return;
+
+    const messageText = inputText.trim();
+    setInputText('');
+
+    // Останавливаем индикатор печати
+    if (socketService.isConnected()) {
+      socketService.sendTyping({
+        receiverId: ADMIN_ID,
+        isTyping: false,
+      });
+    }
+
+    try {
+      await sendMessageMutation.mutateAsync({
+        receiverId: ADMIN_ID,
+        message: messageText,
+      });
+
+      // Скроллим вниз после отправки
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    } catch (error) {
+      console.error('[ChatScreen] Failed to send message:', error);
+    }
   };
+
+  // Обработка ввода текста с индикатором печати
+  const handleTextChange = (text: string) => {
+    setInputText(text);
+
+    if (!socketService.isConnected()) return;
+
+    // Отправляем что начали печатать
+    socketService.sendTyping({
+      receiverId: ADMIN_ID,
+      isTyping: true,
+    });
+
+    // Сбрасываем предыдущий таймер
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    // Через 1 секунду бездействия - перестаем печатать
+    const timeout = setTimeout(() => {
+      socketService.sendTyping({
+        receiverId: ADMIN_ID,
+        isTyping: false,
+      });
+    }, 1000);
+
+    setTypingTimeout(timeout);
+  };
+
+  // Форматируем сообщения для отображения
+  const formatMessages = () => {
+    return messages.map((msg) => ({
+      id: msg.id,
+      text: msg.message,
+      isUser: msg.senderId !== ADMIN_ID,
+      time: new Date(msg.createdAt).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      isRead: msg.isRead,
+    }));
+  };
+
+  const formattedMessages = formatMessages();
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -149,46 +261,78 @@ export const ChatScreen = () => {
             <Text style={styles.dateText}>{t.common.today || 'Today'}</Text>
           </View>
 
-          {messages.map((message) => (
-            <View
-              key={message.id}
-              style={[
-                styles.messageWrapper,
-                message.isUser ? styles.userMessageWrapper : styles.supportMessageWrapper,
-              ]}>
-              {/* Аватар поддержки с логотипом */}
-              {!message.isUser && (
-                <View style={styles.messageAvatarContainer}>
-                  <View style={styles.messageAvatar}>
-                    <Image
-                      source={require('../../../assets/logo.jpg')}
-                      style={styles.messageLogoImage}
-                    />
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#0EA5E9" />
+            </View>
+          ) : (
+            <>
+              {formattedMessages.map((message) => (
+                <View
+                  key={message.id}
+                  style={[
+                    styles.messageWrapper,
+                    message.isUser ? styles.userMessageWrapper : styles.supportMessageWrapper,
+                  ]}>
+                  {/* Аватар поддержки с логотипом */}
+                  {!message.isUser && (
+                    <View style={styles.messageAvatarContainer}>
+                      <View style={styles.messageAvatar}>
+                        <Image
+                          source={require('../../../assets/logo.jpg')}
+                          style={styles.messageLogoImage}
+                        />
+                      </View>
+                    </View>
+                  )}
+
+                  {message.isUser ? (
+                    <LinearGradient
+                      colors={['#0EA5E9', '#0284C7']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={[styles.messageBubble, styles.userMessage]}>
+                      <Text style={[styles.messageText, styles.userMessageText]}>
+                        {message.text}
+                      </Text>
+                      <View style={styles.messageFooter}>
+                        <Text style={[styles.messageTime, styles.userMessageTime]}>
+                          {message.time}
+                        </Text>
+                        <Text style={styles.readStatus}>{message.isRead ? '✓✓' : '✓'}</Text>
+                      </View>
+                    </LinearGradient>
+                  ) : (
+                    <View style={[styles.messageBubble, styles.supportMessage]}>
+                      <Text style={[styles.messageText, styles.supportMessageText]}>
+                        {message.text}
+                      </Text>
+                      <Text style={[styles.messageTime, styles.supportMessageTime]}>
+                        {message.time}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+
+              {/* Индикатор печати админа */}
+              {isTyping && (
+                <View style={[styles.messageWrapper, styles.supportMessageWrapper]}>
+                  <View style={styles.messageAvatarContainer}>
+                    <View style={styles.messageAvatar}>
+                      <Image
+                        source={require('../../../assets/logo.jpg')}
+                        style={styles.messageLogoImage}
+                      />
+                    </View>
+                  </View>
+                  <View style={[styles.messageBubble, styles.supportMessage, styles.typingBubble]}>
+                    <Text style={styles.typingText}>Admin is typing...</Text>
                   </View>
                 </View>
               )}
-
-              {message.isUser ? (
-                <LinearGradient
-                  colors={['#0EA5E9', '#0284C7']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={[styles.messageBubble, styles.userMessage]}>
-                  <Text style={[styles.messageText, styles.userMessageText]}>{message.text}</Text>
-                  <Text style={[styles.messageTime, styles.userMessageTime]}>{message.time}</Text>
-                </LinearGradient>
-              ) : (
-                <View style={[styles.messageBubble, styles.supportMessage]}>
-                  <Text style={[styles.messageText, styles.supportMessageText]}>
-                    {message.text}
-                  </Text>
-                  <Text style={[styles.messageTime, styles.supportMessageTime]}>
-                    {message.time}
-                  </Text>
-                </View>
-              )}
-            </View>
-          ))}
+            </>
+          )}
         </ScrollView>
 
         {/* Input */}
@@ -199,7 +343,7 @@ export const ChatScreen = () => {
           <TextInput
             style={styles.textInput}
             value={inputText}
-            onChangeText={setInputText}
+            onChangeText={handleTextChange}
             placeholder={t.main.chat.message}
             placeholderTextColor="#94A3B8"
             multiline
@@ -209,7 +353,7 @@ export const ChatScreen = () => {
             style={[styles.sendButton, inputText.trim() && styles.sendButtonActive]}
             onPress={sendMessage}
             activeOpacity={0.7}
-            disabled={!inputText.trim()}>
+            disabled={!inputText.trim() || sendMessageMutation.isPending}>
             <LinearGradient
               colors={inputText.trim() ? ['#0EA5E9', '#0284C7'] : ['#E2E8F0', '#E2E8F0']}
               start={{ x: 0, y: 0 }}
@@ -468,5 +612,31 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  messageFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
+  readStatus: {
+    fontSize: 12,
+    color: '#E0F2FE',
+    fontWeight: '600',
+  },
+  typingBubble: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  typingText: {
+    fontSize: 14,
+    color: '#64748B',
+    fontStyle: 'italic',
   },
 });

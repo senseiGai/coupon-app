@@ -13,6 +13,7 @@ export const API_CONFIG = {
     USERS_BALANCE: '/users/balance',
     USERS_BALANCE_ADD: '/users/balance/add',
     USERS_BALANCE_SET: '/users/balance/set',
+    USERS_ADMIN: '/users/admin', // Получить ID админа
 
     // Tours
     TOURS: '/tours',
@@ -40,5 +41,14 @@ export const API_CONFIG = {
     ADMIN_DOCUMENT_BY_ID: (id: string) => `/admin/documents/${id}`,
     ADMIN_DOCUMENT_ASSIGN: (documentId: string, userId: number) =>
       `/admin/documents/${documentId}/assign/${userId}`,
+
+    // Messages
+    MESSAGES: {
+      CONVERSATIONS: '/messages/conversations',
+      HISTORY: '/messages/history',
+      READ: '/messages/read',
+      UNREAD_COUNT: '/messages/unread/count',
+      CONVERSATION: '/messages/conversation',
+    },
   },
 };
