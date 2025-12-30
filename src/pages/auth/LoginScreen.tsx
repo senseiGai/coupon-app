@@ -7,15 +7,20 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../app/navigation/AuthStack';
 import { Input } from '../../shared/ui/Input/Input';
 import { Button } from '../../shared/ui/Button/Button';
+import { useLanguage, useLogin } from '../../shared/lib/hooks';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
+  const { t, language, setLanguage } = useLanguage();
+  const loginMutation = useLogin();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{
@@ -28,26 +33,33 @@ export default function LoginScreen({ navigation }: Props) {
     return emailRegex.test(email);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const newErrors: typeof errors = {};
 
     if (!email) {
-      newErrors.email = 'Email обязателен';
+      newErrors.email = t.auth.login.errors.emailRequired;
     } else if (!validateEmail(email)) {
-      newErrors.email = 'Неверный формат email';
+      newErrors.email = t.auth.login.errors.emailInvalid;
     }
 
     if (!password) {
-      newErrors.password = 'Пароль обязателен';
+      newErrors.password = t.auth.login.errors.passwordRequired;
     } else if (password.length < 6) {
-      newErrors.password = 'Пароль должен быть не менее 6 символов';
+      newErrors.password = t.auth.login.errors.passwordMinLength;
     }
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Здесь будет логика входа
-      console.log('Вход:', { email, password });
+      try {
+        console.log('[LoginScreen] Logging in with:', { email, password });
+        const result = await loginMutation.mutateAsync({ email, password });
+        console.log('[LoginScreen] Login successful:', result);
+        // RootNavigator автоматически переведет на MainStack когда увидит токен
+      } catch (error: any) {
+        console.error('[LoginScreen] Login error:', error);
+        Alert.alert(t.common.error, error.message || 'Login failed. Please try again.');
+      }
     }
   };
 
@@ -56,17 +68,19 @@ export default function LoginScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        {/* Заголовок */}
+        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Вход</Text>
-          <Text style={styles.subtitle}>Войдите в свой аккаунт</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>{t.auth.login.title}</Text>
+            <Text style={styles.subtitle}>{t.auth.login.subtitle}</Text>
+          </View>
         </View>
 
-        {/* Форма */}
+        {/* Form */}
         <View style={styles.formContainer}>
           <Input
-            label="Email"
-            placeholder="example@email.com"
+            label={t.auth.login.email}
+            placeholder={t.auth.login.emailPlaceholder}
             value={email}
             onChangeText={setEmail}
             error={errors.email}
@@ -76,8 +90,8 @@ export default function LoginScreen({ navigation }: Props) {
           />
 
           <Input
-            label="Пароль"
-            placeholder="Введите пароль"
+            label={t.auth.login.password}
+            placeholder={t.auth.login.passwordPlaceholder}
             value={password}
             onChangeText={setPassword}
             error={errors.password}
@@ -86,18 +100,24 @@ export default function LoginScreen({ navigation }: Props) {
             autoComplete="password"
           />
 
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Забыли пароль?</Text>
-          </TouchableOpacity>
+          {/* <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={styles.forgotPasswordText}>{t.auth.login.forgotPassword}</Text>
+          </TouchableOpacity> */}
 
-          <Button title="Войти" onPress={handleLogin} />
+          {loginMutation.isPending ? (
+            <View style={styles.loadingButton}>
+              <ActivityIndicator color="#FFFFFF" />
+            </View>
+          ) : (
+            <Button title={t.auth.login.signIn} onPress={handleLogin} />
+          )}
         </View>
 
-        {/* Нижняя секция */}
+        {/* Footer */}
         <View style={styles.footer}>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
             <Text style={styles.footerText}>
-              Нет аккаунта? <Text style={styles.footerLink}>Зарегистрироваться</Text>
+              {t.auth.login.noAccount} <Text style={styles.footerLink}>{t.auth.login.signUp}</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -119,6 +139,9 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 36,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   title: {
     fontSize: 32,
@@ -130,6 +153,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#64748B',
     fontWeight: '500',
+  },
+  languageButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#E0F2FE',
+  },
+  languageText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0EA5E9',
   },
   formContainer: {
     backgroundColor: '#FFFFFF',
@@ -151,6 +185,14 @@ const styles = StyleSheet.create({
     color: '#0EA5E9',
     fontSize: 14,
     fontWeight: '600',
+  },
+  loadingButton: {
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: '#0EA5E9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    opacity: 0.8,
   },
   footer: {
     alignItems: 'center',

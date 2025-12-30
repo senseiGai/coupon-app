@@ -7,15 +7,20 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../app/navigation/AuthStack';
 import { Input } from '../../shared/ui/Input/Input';
 import { Button } from '../../shared/ui/Button/Button';
+import { useLanguage, useRegister } from '../../shared/lib/hooks';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
 export default function RegisterScreen({ navigation }: Props) {
+  const { t, language, setLanguage } = useLanguage();
+  const registerMutation = useRegister();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -30,32 +35,54 @@ export default function RegisterScreen({ navigation }: Props) {
     return emailRegex.test(email);
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     const newErrors: typeof errors = {};
 
     if (!email) {
-      newErrors.email = 'Email обязателен';
+      newErrors.email = t.auth.register.errors.emailRequired;
     } else if (!validateEmail(email)) {
-      newErrors.email = 'Неверный формат email';
+      newErrors.email = t.auth.register.errors.emailInvalid;
     }
 
     if (!password) {
-      newErrors.password = 'Пароль обязателен';
+      newErrors.password = t.auth.register.errors.passwordRequired;
     } else if (password.length < 6) {
-      newErrors.password = 'Пароль должен быть не менее 6 символов';
+      newErrors.password = t.auth.register.errors.passwordMinLength;
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'Подтвердите пароль';
+      newErrors.confirmPassword = t.auth.register.errors.confirmPasswordRequired;
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Пароли не совпадают';
+      newErrors.confirmPassword = t.auth.register.errors.passwordMismatch;
     }
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Здесь будет логика регистрации
-      console.log('Регистрация:', { email, password });
+      try {
+        console.log('[RegisterScreen] Submitting registration with:', { email, password });
+        const result = await registerMutation.mutateAsync({
+          email,
+          password,
+        });
+        console.log('[RegisterScreen] Registration successful:', result);
+        Alert.alert(t.common.success, t.auth.register.successMessage, [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Очищаем поля и переходим на LoginScreen
+              setEmail('');
+              setPassword('');
+              setConfirmPassword('');
+              setErrors({});
+              navigation.replace('Login');
+            },
+          },
+        ]);
+      } catch (error: any) {
+        console.error('[RegisterScreen] Registration error:', error);
+        Alert.alert(t.common.error, error.message || 'Registration failed. Please try again.');
+      }
     }
   };
 
@@ -64,17 +91,19 @@ export default function RegisterScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        {/* Заголовок */}
+        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Регистрация</Text>
-          <Text style={styles.subtitle}>Создайте свой аккаунт для продолжения</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>{t.auth.register.title}</Text>
+            <Text style={styles.subtitle}>{t.auth.register.subtitle}</Text>
+          </View>
         </View>
 
-        {/* Форма */}
+        {/* Form */}
         <View style={styles.formContainer}>
           <Input
-            label="Email"
-            placeholder="example@email.com"
+            label={t.auth.register.email}
+            placeholder={t.auth.register.emailPlaceholder}
             value={email}
             onChangeText={setEmail}
             error={errors.email}
@@ -84,8 +113,8 @@ export default function RegisterScreen({ navigation }: Props) {
           />
 
           <Input
-            label="Пароль"
-            placeholder="Минимум 6 символов"
+            label={t.auth.register.password}
+            placeholder={t.auth.register.passwordPlaceholder}
             value={password}
             onChangeText={setPassword}
             error={errors.password}
@@ -95,8 +124,8 @@ export default function RegisterScreen({ navigation }: Props) {
           />
 
           <Input
-            label="Подтвердите пароль"
-            placeholder="Повторите пароль"
+            label={t.auth.register.confirmPassword}
+            placeholder={t.auth.register.confirmPasswordPlaceholder}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             error={errors.confirmPassword}
@@ -105,14 +134,21 @@ export default function RegisterScreen({ navigation }: Props) {
             autoComplete="password"
           />
 
-          <Button title="Зарегистрироваться" onPress={handleRegister} />
+          {registerMutation.isPending ? (
+            <View style={styles.loadingButton}>
+              <ActivityIndicator color="#FFFFFF" />
+            </View>
+          ) : (
+            <Button title={t.auth.register.signUp} onPress={handleRegister} />
+          )}
         </View>
 
-        {/* Нижняя секция */}
+        {/* Footer */}
         <View style={styles.footer}>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Text style={styles.footerText}>
-              Уже есть аккаунт? <Text style={styles.footerLink}>Войти</Text>
+              {t.auth.register.haveAccount}{' '}
+              <Text style={styles.footerLink}>{t.auth.register.signIn}</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -134,6 +170,9 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 36,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   title: {
     fontSize: 32,
@@ -146,6 +185,17 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontWeight: '500',
   },
+  languageButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#E0F2FE',
+  },
+  languageText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0EA5E9',
+  },
   formContainer: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
@@ -156,6 +206,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 16,
     elevation: 4,
+  },
+  loadingButton: {
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: '#0EA5E9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    opacity: 0.8,
   },
   footer: {
     alignItems: 'center',

@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Send, Paperclip, Plane } from 'lucide-react-native';
 import { useState, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useLanguage } from '../../shared/lib/hooks';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -54,17 +55,16 @@ interface Message {
   time: string;
 }
 
-const initialMessages: Message[] = [
-  {
-    id: '1',
-    text: 'Hello! 👋\nWelcome to support service. How can I help you?',
-    isUser: false,
-    time: '10:00',
-  },
-];
-
 export const ChatScreen = () => {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const { t } = useLanguage();
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      text: 'Hello! 👋\nWelcome to support service. How can I help you?',
+      isUser: false,
+      time: '10:00',
+    },
+  ]);
   const [inputText, setInputText] = useState('');
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -105,10 +105,12 @@ export const ChatScreen = () => {
 
           {/* Info */}
           <View style={styles.headerInfo}>
-            <Text style={styles.headerTitle}>Chat</Text>
+            <Text style={styles.headerTitle}>{t.main.chat.title}</Text>
             <View style={styles.statusRow}>
               <View style={styles.statusDot} />
-              <Text style={styles.headerSubtitle}>Online • Fast response</Text>
+              <Text style={styles.headerSubtitle}>
+                {t.main.chat.online} • {t.main.chat.fastResponse}
+              </Text>
             </View>
           </View>
         </View>
@@ -144,7 +146,7 @@ export const ChatScreen = () => {
           showsVerticalScrollIndicator={false}>
           {/* Date */}
           <View style={styles.dateContainer}>
-            <Text style={styles.dateText}>Today</Text>
+            <Text style={styles.dateText}>{t.common.today || 'Today'}</Text>
           </View>
 
           {messages.map((message) => (
@@ -198,7 +200,7 @@ export const ChatScreen = () => {
             style={styles.textInput}
             value={inputText}
             onChangeText={setInputText}
-            placeholder="Write a message..."
+            placeholder={t.main.chat.message}
             placeholderTextColor="#94A3B8"
             multiline
             maxLength={1000}

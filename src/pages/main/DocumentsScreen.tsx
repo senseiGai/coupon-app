@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FileText, Download, Eye, Search } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
+import { useLanguage } from '../../shared/lib/hooks';
 
 interface Document {
   id: string;
@@ -28,6 +29,7 @@ const mockDocuments: Document[] = [
 ];
 
 export const DocumentsScreen = () => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredDocuments = mockDocuments.filter(
@@ -37,13 +39,13 @@ export const DocumentsScreen = () => {
   );
 
   const handleViewDocument = (doc: Document) => {
-    Alert.alert('📄', `${doc.title}\n${doc.type} • ${doc.date}`, [{ text: 'Close' }]);
+    Alert.alert('📄', `${doc.title}\n${doc.type} • ${doc.date}`, [{ text: t.common.cancel }]);
   };
 
   const handleDownloadDocument = (doc: Document) => {
     Alert.alert('⬇️', `Downloading ${doc.title}...`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Download', onPress: () => Alert.alert('✅', 'Document downloaded!') },
+      { text: t.common.cancel, style: 'cancel' },
+      { text: t.main.documents.upload, onPress: () => Alert.alert('✅', 'Document downloaded!') },
     ]);
   };
 
@@ -51,8 +53,10 @@ export const DocumentsScreen = () => {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Documents</Text>
-        <Text style={styles.headerSubtitle}>{filteredDocuments.length} documents</Text>
+        <Text style={styles.headerTitle}>{t.main.documents.title}</Text>
+        <Text style={styles.headerSubtitle}>
+          {filteredDocuments.length} {t.main.documents.documents}
+        </Text>
       </View>
 
       {/* Search Bar */}
@@ -61,7 +65,7 @@ export const DocumentsScreen = () => {
           <Search size={20} color="#94A3B8" strokeWidth={2} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search documents..."
+            placeholder={t.main.documents.searchPlaceholder}
             placeholderTextColor="#94A3B8"
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -126,8 +130,8 @@ export const DocumentsScreen = () => {
         ) : (
           <View style={styles.emptyState}>
             <FileText size={64} color="#CBD5E1" strokeWidth={1.5} />
-            <Text style={styles.emptyText}>No documents yet</Text>
-            <Text style={styles.emptySubtext}>Your documents will appear here</Text>
+            <Text style={styles.emptyText}>{t.main.documents.noDocuments}</Text>
+            <Text style={styles.emptySubtext}>{t.main.documents.noDocumentsHint}</Text>
           </View>
         )}
         <View style={{ height: 100 }} />

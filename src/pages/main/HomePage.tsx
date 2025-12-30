@@ -1,82 +1,80 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  Gift,
-  Percent,
-  Ticket,
-  TrendingUp,
-  Star,
-  Zap,
-  Crown,
-  Sparkles,
-  Play,
-  Languages,
-} from 'lucide-react-native';
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Gift, Star, Zap, Crown, Sparkles, LogOut, Languages } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
+import { useLanguage, useLogout } from '../../shared/lib/hooks';
 
 const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width - 32;
 const CARD_WIDTH = (width - 48) / 2;
 
 export const HomePage = () => {
+  const { t, language, setLanguage } = useLanguage();
+  const logoutMutation = useLogout();
   const userBalance = 2450;
-  const [language, setLanguage] = useState<'en' | 'ru'>('en');
 
   const toggleLanguage = () => {
-    setLanguage((prev) => (prev === 'en' ? 'ru' : 'en'));
+    setLanguage(language === 'en' ? 'ru' : 'en');
   };
 
-  const texts = {
-    en: {
-      greeting: 'Hello! 👋',
-      subtitle: 'Choose your bonus',
-      balance: 'Your balance',
-      watchAds: '+ Watch ads',
-      hint: 'Earn points and get tours for free',
-      quickActions: 'Quick Actions',
-      bonuses: 'Bonuses',
-      daily: 'Daily',
-      specialOffers: 'Special Offers',
-      premiumTours: 'Premium tours',
-      exclusiveDestinations: 'Exclusive destinations',
-      flashDeals: 'Flash deals',
-      limitedTime: 'Limited time',
-    },
-    ru: {
-      greeting: 'Привет! 👋',
-      subtitle: 'Выбери свой бонус',
-      balance: 'Ваш баланс',
-      watchAds: '+ Смотреть рекламу',
-      hint: 'Копите баллы и получайте туры бесплатно',
-      quickActions: 'Быстрые действия',
-      bonuses: 'Бонусы',
-      daily: 'Ежедневно',
-      specialOffers: 'Специальные предложения',
-      premiumTours: 'Premium туры',
-      exclusiveDestinations: 'Эксклюзивные направления',
-      flashDeals: 'Быстрые сделки',
-      limitedTime: 'Ограниченное время',
-    },
-  };
+  const handleLogout = async () => {
+    const logoutMessage =
+      language === 'en' ? 'Are you sure you want to log out?' : 'Вы уверены, что хотите выйти?';
 
-  const t = texts[language];
+    Alert.alert(t.common.logout, logoutMessage, [
+      {
+        text: t.common.cancel,
+        onPress: () => console.log('Logout cancelled'),
+        style: 'cancel',
+      },
+      {
+        text: t.common.logout,
+        onPress: async () => {
+          try {
+            console.log('[HomePage] Logging out...');
+            await logoutMutation.mutateAsync();
+            console.log(
+              '[HomePage] Logout successful, QueryClient cleared, RootNavigator will automatically switch to AuthStack'
+            );
+            // RootNavigator автоматически переключится на AuthStack когда увидит отсутствие токена
+          } catch (error) {
+            console.error('[HomePage] Logout error:', error);
+            const errorMessage =
+              language === 'en'
+                ? 'Logout failed. Please try again.'
+                : 'Не удалось выйти. Попробуйте снова.';
+            Alert.alert(t.common.error, errorMessage);
+          }
+        },
+        style: 'destructive',
+      },
+    ]);
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>{t.greeting}</Text>
-            <Text style={styles.subtitle}>{t.subtitle}</Text>
+            <Text style={styles.greeting}>{t.main.home.greeting}</Text>
+            <Text style={styles.subtitle}>{t.main.home.subtitle}</Text>
           </View>
+
           <TouchableOpacity
             style={styles.languageButton}
             onPress={toggleLanguage}
             activeOpacity={0.7}>
             <Languages size={24} color="#0EA5E9" strokeWidth={2} />
-            <Text style={styles.languageText}>{language.toUpperCase()}</Text>
+            <Text style={styles.languageText}>{language === 'en' ? 'EN' : ' РУ'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -84,19 +82,19 @@ export const HomePage = () => {
         <View style={styles.bannerSection}>
           <View style={styles.balanceBanner}>
             <View style={styles.balanceBannerHeader}>
-              <Text style={styles.balanceBannerLabel}>{t.balance}</Text>
+              <Text style={styles.balanceBannerLabel}>{t.main.home.balance}</Text>
               <TouchableOpacity activeOpacity={0.8} style={styles.watchAdButton}>
-                <Text style={styles.watchAdText}>{t.watchAds}</Text>
+                <Text style={styles.watchAdText}>{t.main.home.watchAds}</Text>
               </TouchableOpacity>
             </View>
             <Text style={styles.balanceBannerAmount}>{userBalance.toLocaleString()} ₽</Text>
-            <Text style={styles.balanceBannerHint}>{t.hint}</Text>
+            <Text style={styles.balanceBannerHint}>{t.main.home.hint}</Text>
           </View>
         </View>
 
         {/* Quick Actions Grid */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.quickActions}</Text>
+          <Text style={styles.sectionTitle}>{t.main.home.quickActions}</Text>
           <View style={styles.singleCardContainer}>
             {/* Bonuses - Orange */}
             <TouchableOpacity activeOpacity={0.8} style={styles.fullWidthCard}>
@@ -108,8 +106,8 @@ export const HomePage = () => {
                 <View style={styles.cardIcon}>
                   <Gift size={32} color="#FFFFFF" strokeWidth={2.5} />
                 </View>
-                <Text style={styles.cardTitle}>{t.bonuses}</Text>
-                <Text style={styles.cardSubtitle}>{t.daily}</Text>
+                <Text style={styles.cardTitle}>{t.main.home.bonuses}</Text>
+                <Text style={styles.cardSubtitle}>{t.main.home.daily}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -117,7 +115,7 @@ export const HomePage = () => {
 
         {/* Promotional Banners */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.specialOffers}</Text>
+          <Text style={styles.sectionTitle}>{t.main.home.specialOffers}</Text>
 
           {/* Purple Banner */}
           <TouchableOpacity activeOpacity={0.9} style={styles.promoBanner}>
@@ -132,8 +130,8 @@ export const HomePage = () => {
                     <Crown size={36} color="#FFFFFF" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
-                    <Text style={styles.promoTitle}>{t.premiumTours}</Text>
-                    <Text style={styles.promoSubtitle}>{t.exclusiveDestinations}</Text>
+                    <Text style={styles.promoTitle}>{t.main.home.premiumTours}</Text>
+                    <Text style={styles.promoSubtitle}>{t.main.home.exclusiveDestinations}</Text>
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
@@ -156,8 +154,8 @@ export const HomePage = () => {
                     <Zap size={36} color="#FFFFFF" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
-                    <Text style={styles.promoTitle}>{t.flashDeals}</Text>
-                    <Text style={styles.promoSubtitle}>{t.limitedTime}</Text>
+                    <Text style={styles.promoTitle}>{t.main.home.flashDeals}</Text>
+                    <Text style={styles.promoSubtitle}>{t.main.home.limitedTime}</Text>
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
@@ -165,6 +163,14 @@ export const HomePage = () => {
                 </View>
               </View>
             </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* Logout Button */}
+        <View style={styles.section}>
+          <TouchableOpacity activeOpacity={0.7} onPress={handleLogout} style={styles.logoutButton}>
+            <LogOut size={20} color="#FFFFFF" strokeWidth={2.5} />
+            <Text style={styles.logoutButtonText}>{t.common.logout}</Text>
           </TouchableOpacity>
         </View>
 
@@ -178,9 +184,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
-  },
-  scrollContent: {
-    paddingBottom: 20,
   },
   header: {
     flexDirection: 'row',
@@ -406,5 +409,25 @@ const styles = StyleSheet.create({
   },
   sparkleIcon: {
     marginLeft: 12,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 16,
+    backgroundColor: '#EF4444',
+    paddingVertical: 14,
+    borderRadius: 16,
+    gap: 10,
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  logoutButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 });

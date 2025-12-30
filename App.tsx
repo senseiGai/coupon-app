@@ -14,6 +14,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import './global.css';
 
 import RootNavigator from '@/app/navigation/RootNavigator';
+import { ApiProvider } from '@/app/providers/ApiProvider';
+import { LanguageProvider } from '@/shared/lib/hooks';
 
 // Prevent the splash screen from auto-hiding
 // SplashScreen.preventAutoHideAsync();
@@ -36,11 +38,15 @@ export default function App() {
   // }
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <RootNavigator />
-        <StatusBar style="auto" />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <LanguageProvider>
+      <ApiProvider>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <RootNavigator />
+            <StatusBar style="auto" />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </ApiProvider>
+    </LanguageProvider>
   );
 }
