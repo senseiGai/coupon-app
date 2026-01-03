@@ -1,0 +1,1 @@
+export { admobService } from './admobService';

@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { BonusService } from '@/entities/bonus/model/bonusService';
 import { BonusTransaction, BonusBalance, BonusLimits, BONUS_CONFIG } from '@/shared/types/bonus';
 import { useLanguage } from '@/shared/lib/hooks';
+import { admobService } from '@/shared/lib/admob';
 
 // Mock данные - в реальном приложении будут из API/State
 const mockTransactions: BonusTransaction[] = [
@@ -82,7 +83,7 @@ export const BalanceScreen = () => {
     bonusExpirationDays: BONUS_CONFIG.LIMITS.BONUS_EXPIRATION_DAYS,
   };
 
-  const handleWatchAd = () => {
+  const handleWatchAd = async () => {
     const canWatch = BonusService.canWatchAd(limits);
 
     if (!canWatch.allowed) {
@@ -90,14 +91,52 @@ export const BalanceScreen = () => {
       return;
     }
 
-    // Здесь будет интеграция с AdMob Rewarded Ads
+    // Проверяем, готова ли реклама
+    if (!admobService.isAdReady()) {
+      Alert.alert(
+        t.main.balance.watchAdTitle,
+        'Реклама загружается... Попробуйте через несколько секунд.',
+        [{ text: 'OK' }]
+      );
+      // Предзагружаем рекламу
+      admobService.preloadAd();
+      return;
+    }
+
+    // Показываем подтверждение
     const description = t.main.balance.watchAdDescription.replace(
       '{amount}',
       String(BONUS_CONFIG.REWARDS.AD_VIEW)
     );
     Alert.alert(t.main.balance.watchAdTitle, description, [
       { text: t.common.cancel, style: 'cancel' },
-      { text: t.main.balance.watchAdButton, onPress: () => console.log('Show rewarded ad') },
+      {
+        text: t.main.balance.watchAdButton,
+        onPress: async () => {
+          try {
+            const result = await admobService.showRewardedAd();
+
+            if (result.success) {
+              // Здесь должна быть логика начисления бонусов через API
+              Alert.alert(
+                t.common.success,
+                `Вы получили ${BONUS_CONFIG.REWARDS.AD_VIEW} бонусов!`,
+                [{ text: 'OK' }]
+              );
+              console.log('[BalanceScreen] Ad watched successfully, reward earned');
+            } else {
+              Alert.alert(
+                t.common.error,
+                result.error || 'Не удалось показать рекламу. Попробуйте позже.',
+                [{ text: 'OK' }]
+              );
+            }
+          } catch (error) {
+            console.error('[BalanceScreen] Error showing ad:', error);
+            Alert.alert(t.common.error, 'Произошла ошибка при показе рекламы.', [{ text: 'OK' }]);
+          }
+        },
+      },
     ]);
   };
 
