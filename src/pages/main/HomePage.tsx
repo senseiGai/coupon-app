@@ -99,7 +99,7 @@ export const HomePage = () => {
                 <Text style={styles.watchAdText}>{t.main.home.watchAds}</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.balanceBannerAmount}>{userBalance.toLocaleString()} ₽</Text>
+            <Text style={styles.balanceBannerAmount}>{userBalance.toLocaleString()}</Text>
             <Text style={styles.balanceBannerHint}>{t.main.home.hint}</Text>
           </View>
         </View>

@@ -127,7 +127,7 @@ export const BalanceScreen = () => {
           <Text style={styles.balanceLabel}>{t.main.balance.availableBonuses}</Text>
           <Text style={styles.balanceAmount}>{BonusService.formatBonus(balance.available)}</Text>
           <Text style={styles.balanceEquivalent}>
-            = {balance.available.toLocaleString('ru-RU')} ₽ {t.main.balance.bonusEquivalent}
+            = {balance.available.toLocaleString('ru-RU')} {t.main.balance.bonusEquivalent}
           </Text>
           <View style={styles.balanceHint}>
             <Text style={styles.balanceHintText}>{t.main.balance.bonusHint}</Text>

@@ -4732,6 +4732,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-localization@npm:^17.0.8":
+  version: 17.0.8
+  resolution: "expo-localization@npm:17.0.8"
+  dependencies:
+    rtl-detect: "npm:^1.0.2"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+  checksum: 10c0/daba7f06bc014bd1c48ce9f39b7a8471b657d9b6dfb4ef1513d163f198d0763d93feaa444168e00b8910eb0595f1baf61e2ee2dcdfced5da84a8575b2b6ed7a1
+  languageName: node
+  linkType: hard
+
 "expo-modules-autolinking@npm:3.0.23":
   version: 3.0.23
   resolution: "expo-modules-autolinking@npm:3.0.23"
@@ -7006,6 +7018,7 @@ __metadata:
     expo: "npm:^54.0.0"
     expo-file-system: "npm:~19.0.21"
     expo-linear-gradient: "npm:~15.0.8"
+    expo-localization: "npm:^17.0.8"
     expo-sharing: "npm:~14.0.8"
     expo-status-bar: "npm:~3.0.8"
     lucide-react-native: "npm:^0.560.0"
@@ -8376,6 +8389,13 @@ __metadata:
   bin:
     rimraf: bin.js
   checksum: 10c0/9cb7757acb489bd83757ba1a274ab545eafd75598a9d817e0c3f8b164238dd90eba50d6b848bd4dcc5f3040912e882dc7ba71653e35af660d77b25c381d402e8
+  languageName: node
+  linkType: hard
+
+"rtl-detect@npm:^1.0.2":
+  version: 1.1.2
+  resolution: "rtl-detect@npm:1.1.2"
+  checksum: 10c0/1b92888aafca1593314f837e83fdf02eb208faae3e713ab87c176804728efd3b1980d53b64f65f1fa593348087e852c5cd729b7b9372950f6e9b7be489afc0ca
   languageName: node
   linkType: hard
 

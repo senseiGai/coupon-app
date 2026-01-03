@@ -104,7 +104,7 @@ export const ToursScreen = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t.main.tours.title}</Text>
           <View style={styles.balanceChip}>
-            <Text style={styles.balanceChipText}>{userBalance.toLocaleString()} ₽</Text>
+            <Text style={styles.balanceChipText}>{userBalance.toLocaleString()}</Text>
           </View>
         </View>
 
