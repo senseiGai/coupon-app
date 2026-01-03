@@ -91,66 +91,66 @@ export default function RegisterScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={{ flex: 1 }}>
+        <View style={styles.contentWrapper}>
+          {/* Header */}
+          <View style={styles.header}>
             <Text style={styles.title}>{t.auth.register.title}</Text>
             <Text style={styles.subtitle}>{t.auth.register.subtitle}</Text>
           </View>
-        </View>
 
-        {/* Form */}
-        <View style={styles.formContainer}>
-          <Input
-            label={t.auth.register.email}
-            placeholder={t.auth.register.emailPlaceholder}
-            value={email}
-            onChangeText={setEmail}
-            error={errors.email}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-          />
+          {/* Form */}
+          <View style={styles.formContainer}>
+            <Input
+              label={t.auth.register.email}
+              placeholder={t.auth.register.emailPlaceholder}
+              value={email}
+              onChangeText={setEmail}
+              error={errors.email}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+            />
 
-          <Input
-            label={t.auth.register.password}
-            placeholder={t.auth.register.passwordPlaceholder}
-            value={password}
-            onChangeText={setPassword}
-            error={errors.password}
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="password"
-          />
+            <Input
+              label={t.auth.register.password}
+              placeholder={t.auth.register.passwordPlaceholder}
+              value={password}
+              onChangeText={setPassword}
+              error={errors.password}
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="password"
+            />
 
-          <Input
-            label={t.auth.register.confirmPassword}
-            placeholder={t.auth.register.confirmPasswordPlaceholder}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            error={errors.confirmPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="password"
-          />
+            <Input
+              label={t.auth.register.confirmPassword}
+              placeholder={t.auth.register.confirmPasswordPlaceholder}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              error={errors.confirmPassword}
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="password"
+            />
 
-          {registerMutation.isPending ? (
-            <View style={styles.loadingButton}>
-              <ActivityIndicator color="#FFFFFF" />
-            </View>
-          ) : (
-            <Button title={t.auth.register.signUp} onPress={handleRegister} />
-          )}
-        </View>
+            {registerMutation.isPending ? (
+              <View style={styles.loadingButton}>
+                <ActivityIndicator color="#FFFFFF" />
+              </View>
+            ) : (
+              <Button title={t.auth.register.signUp} onPress={handleRegister} />
+            )}
+          </View>
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.footerText}>
-              {t.auth.register.haveAccount}{' '}
-              <Text style={styles.footerLink}>{t.auth.register.signIn}</Text>
-            </Text>
-          </TouchableOpacity>
+          {/* Footer */}
+          <View style={styles.footer}>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.footerText}>
+                {t.auth.register.haveAccount}{' '}
+                <Text style={styles.footerLink}>{t.auth.register.signIn}</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -164,26 +164,32 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
     paddingHorizontal: 20,
     paddingVertical: 40,
   },
+  contentWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    maxWidth: 500,
+    width: '100%',
+    alignSelf: 'center',
+  },
   header: {
-    marginBottom: 36,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    marginBottom: 40,
+    alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: '700',
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: 12,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#64748B',
     fontWeight: '500',
+    textAlign: 'center',
   },
   languageButton: {
     paddingHorizontal: 12,
@@ -199,8 +205,8 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    padding: 24,
-    marginBottom: 24,
+    padding: 28,
+    marginBottom: 28,
     shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -217,10 +223,12 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: 'center',
+    paddingTop: 8,
   },
   footerText: {
     fontSize: 15,
     color: '#64748B',
+    textAlign: 'center',
   },
   footerLink: {
     color: '#0EA5E9',
