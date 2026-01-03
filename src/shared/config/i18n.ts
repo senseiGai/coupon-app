@@ -151,6 +151,63 @@ export const translations = {
       loginFailed: 'Login failed. Please try again.',
       registrationFailed: 'Registration failed. Please try again.',
     },
+
+    // Bonus Rules
+    bonusRules: {
+      title: 'How the bonus system works',
+      description: 'Bonuses are a virtual reward for activity in the app',
+      sections: [
+        {
+          title: 'What are bonuses',
+          items: [
+            'Bonuses are a virtual reward, NOT money',
+            'Bonuses have no monetary equivalent',
+            'Cannot be exchanged for real money',
+            'Cannot be withdrawn from account',
+            'Used ONLY as a discount within the app',
+          ],
+        },
+        {
+          title: 'How to earn bonuses',
+          items: [
+            'bonuses for registration',
+            'bonuses for completing profile',
+            'bonuses for watching an ad (up to {maxAds} times per day)',
+            'bonuses for inviting a friend',
+          ],
+        },
+        {
+          title: 'How to use bonuses',
+          items: [
+            '1 bonus = 1 ruble discount on tour booking',
+            'You can pay maximum {maxDiscount}% of tour cost',
+            'Minimum order amount is {minOrder} rubles',
+            'The rest must be paid with real money',
+            'Bonuses are applied automatically when placing an order',
+          ],
+        },
+        {
+          title: 'Limitations',
+          items: [
+            'Maximum {maxAds} ad views per day',
+            'Bonus validity period is {expirationDays} days',
+            'Expired bonuses are automatically deducted',
+            'Bonuses cannot be transferred to another user',
+          ],
+        },
+        {
+          title: 'Important notes',
+          items: [
+            '⚠️ Bonuses do not guarantee free goods or services',
+            '⚠️ This is a marketing loyalty program, not a way to earn',
+            '⚠️ Administration may change program conditions',
+            '⚠️ Cheating and fraud are prohibited - account will be blocked',
+          ],
+        },
+      ],
+      disclaimer:
+        'Watching ads is rewarded only for full viewing of the video, not for clicks on ads. We use official advertising SDKs (Google AdMob Rewarded Ads) approved by Google Play.',
+    },
   },
 
   ru: {
@@ -303,6 +360,63 @@ export const translations = {
       logoutFailed: 'Не удалось выйти. Попробуйте снова.',
       loginFailed: 'Не удалось войти. Попробуйте снова.',
       registrationFailed: 'Не удалось зарегистрироваться. Попробуйте снова.',
+    },
+
+    // Bonus Rules
+    bonusRules: {
+      title: 'Как работает бонусная система',
+      description: 'Бонусы — это виртуальная награда за активность в приложении',
+      sections: [
+        {
+          title: 'Что такое бонусы',
+          items: [
+            'Бонусы — это виртуальная награда, НЕ деньги',
+            'Бонусы не имеют денежного эквивалента',
+            'Нельзя обменять на реальные деньги',
+            'Нельзя вывести со счёта',
+            'Используются ТОЛЬКО как скидка внутри приложения',
+          ],
+        },
+        {
+          title: 'Как получить бонусы',
+          items: [
+            'бонусов при регистрации',
+            'бонусов за заполнение профиля',
+            'бонусов за просмотр рекламного ролика (до {maxAds} раз в день)',
+            'бонусов за приглашенного друга',
+          ],
+        },
+        {
+          title: 'Как использовать бонусы',
+          items: [
+            '1 бонус = 1 рубль скидки на бронирование тура',
+            'Можно оплатить максимум {maxDiscount}% стоимости тура',
+            'Минимальная сумма заказа — {minOrder} рублей',
+            'Остальную часть нужно оплатить реальными деньгами',
+            'Бонусы применяются автоматически при оформлении заказа',
+          ],
+        },
+        {
+          title: 'Ограничения',
+          items: [
+            'Максимум {maxAds} просмотров рекламы в день',
+            'Срок действия бонусов — {expirationDays} дней',
+            'Истекшие бонусы автоматически списываются',
+            'Бонусы нельзя передать другому пользователю',
+          ],
+        },
+        {
+          title: 'Важные замечания',
+          items: [
+            '⚠️ Бонусы не гарантируют бесплатное получение товаров или услуг',
+            '⚠️ Это маркетинговая программа лояльности, а не способ заработка',
+            '⚠️ Администрация может изменить условия программы',
+            '⚠️ Запрещена накрутка и мошенничество — аккаунт будет заблокирован',
+          ],
+        },
+      ],
+      disclaimer:
+        'Просмотр рекламы вознаграждается только за полный просмотр ролика, а не за клики по рекламе. Мы используем официальные рекламные SDK (Google AdMob Rewarded Ads), одобренные Google Play.',
     },
   },
 
@@ -457,6 +571,63 @@ export const translations = {
       logoutFailed: 'Не вдалося вийти. Спробуйте ще раз.',
       loginFailed: 'Не вдалося увійти. Спробуйте ще раз.',
       registrationFailed: 'Не вдалося зареєструватися. Спробуйте ще раз.',
+    },
+
+    // Bonus Rules
+    bonusRules: {
+      title: 'Як працює бонусна система',
+      description: 'Бонуси — це віртуальна винагорода за активність в додатку',
+      sections: [
+        {
+          title: 'Що таке бонуси',
+          items: [
+            'Бонуси — це віртуальна винагорода, НЕ гроші',
+            'Бонуси не мають грошового еквіваленту',
+            'Не можна обміняти на реальні гроші',
+            'Не можна вивести з рахунку',
+            'Використовуються ТІЛЬКИ як знижка всередині додатку',
+          ],
+        },
+        {
+          title: 'Як отримати бонуси',
+          items: [
+            'бонусів при реєстрації',
+            'бонусів за заповнення профілю',
+            'бонусів за перегляд рекламного ролика (до {maxAds} разів на день)',
+            'бонусів за запрошеного друга',
+          ],
+        },
+        {
+          title: 'Як використовувати бонуси',
+          items: [
+            '1 бонус = 1 рубль знижки на бронювання туру',
+            'Можна оплатити максимум {maxDiscount}% вартості туру',
+            'Мінімальна сума замовлення — {minOrder} рублів',
+            'Решту потрібно оплатити реальними грошима',
+            'Бонуси застосовуються автоматично при оформленні замовлення',
+          ],
+        },
+        {
+          title: 'Обмеження',
+          items: [
+            'Максимум {maxAds} переглядів реклами на день',
+            'Термін дії бонусів — {expirationDays} днів',
+            'Прострочені бонуси автоматично списуються',
+            'Бонуси не можна передати іншому користувачу',
+          ],
+        },
+        {
+          title: 'Важливі зауваження',
+          items: [
+            '⚠️ Бонуси не гарантують безкоштовне отримання товарів або послуг',
+            '⚠️ Це маркетингова програма лояльності, а не спосіб заробітку',
+            '⚠️ Адміністрація може змінити умови програми',
+            '⚠️ Заборонена накрутка та шахрайство — акаунт буде заблоковано',
+          ],
+        },
+      ],
+      disclaimer:
+        'Перегляд реклами винагороджується тільки за повний перегляд ролика, а не за кліки по рекламі. Ми використовуємо офіційні рекламні SDK (Google AdMob Rewarded Ads), схвалені Google Play.',
     },
   },
 } as const;
