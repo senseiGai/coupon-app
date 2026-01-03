@@ -17,6 +17,7 @@ import {
   BONUS_CONFIG,
   BONUS_RULES,
 } from '@/shared/types/bonus';
+import { useLanguage } from '@/shared/lib/hooks';
 
 // Mock данные - в реальном приложении будут из API/State
 const mockTransactions: BonusTransaction[] = [
@@ -67,6 +68,7 @@ const mockTransactions: BonusTransaction[] = [
 ];
 
 export const BalanceScreen = () => {
+  const { t } = useLanguage();
   const [showRules, setShowRules] = useState(false);
 
   // Mock состояние - в реальном приложении из контекста/store
@@ -90,19 +92,19 @@ export const BalanceScreen = () => {
     const canWatch = BonusService.canWatchAd(limits);
 
     if (!canWatch.allowed) {
-      Alert.alert('Лимит достигнут', canWatch.reason || 'Попробуйте завтра');
+      Alert.alert(t.main.balance.limitReached, canWatch.reason || t.main.balance.tryTomorrow);
       return;
     }
 
     // Здесь будет интеграция с AdMob Rewarded Ads
-    Alert.alert(
-      'Просмотр рекламы',
-      `Вы получите ${BONUS_CONFIG.REWARDS.AD_VIEW} бонусов за полный просмотр рекламного ролика.\n\n⚠️ Вознаграждение начисляется только за полный просмотр, а не за клики.`,
-      [
-        { text: 'Отмена', style: 'cancel' },
-        { text: 'Смотреть', onPress: () => console.log('Show rewarded ad') },
-      ]
+    const description = t.main.balance.watchAdDescription.replace(
+      '{amount}',
+      String(BONUS_CONFIG.REWARDS.AD_VIEW)
     );
+    Alert.alert(t.main.balance.watchAdTitle, description, [
+      { text: t.common.cancel, style: 'cancel' },
+      { text: t.main.balance.watchAdButton, onPress: () => console.log('Show rewarded ad') },
+    ]);
   };
 
   const handleShowRules = () => {
@@ -114,7 +116,7 @@ export const BalanceScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Бонусы</Text>
+          <Text style={styles.headerTitle}>{t.main.balance.bonusesTitle}</Text>
           <TouchableOpacity onPress={handleShowRules} style={styles.infoButton}>
             <Info size={24} color="#0EA5E9" />
           </TouchableOpacity>
@@ -123,21 +125,18 @@ export const BalanceScreen = () => {
         {/* Important Notice */}
         <View style={styles.noticeCard}>
           <AlertCircle size={20} color="#0EA5E9" />
-          <Text style={styles.noticeText}>
-            Бонусы — виртуальная награда, НЕ деньги. Используются только как скидка внутри
-            приложения.
-          </Text>
+          <Text style={styles.noticeText}>{t.main.balance.noticeText}</Text>
         </View>
 
         {/* Balance Card */}
         <View style={styles.balanceCard}>
-          <Text style={styles.balanceLabel}>Доступно бонусов</Text>
+          <Text style={styles.balanceLabel}>{t.main.balance.availableBonuses}</Text>
           <Text style={styles.balanceAmount}>{BonusService.formatBonus(balance.available)}</Text>
           <Text style={styles.balanceEquivalent}>
-            = {balance.available.toLocaleString('ru-RU')} ₽ скидки
+            = {balance.available.toLocaleString('ru-RU')} ₽ {t.main.balance.bonusEquivalent}
           </Text>
           <View style={styles.balanceHint}>
-            <Text style={styles.balanceHintText}>💡 1 бонус = 1 рубль скидки при бронировании</Text>
+            <Text style={styles.balanceHintText}>{t.main.balance.bonusHint}</Text>
           </View>
         </View>
 
@@ -155,9 +154,9 @@ export const BalanceScreen = () => {
               <Play size={24} color="#0EA5E9" strokeWidth={2} fill="#0EA5E9" />
             </View>
             <View style={styles.watchAdContent}>
-              <Text style={styles.watchAdTitle}>Смотреть рекламу</Text>
+              <Text style={styles.watchAdTitle}>{t.main.balance.watchAdTitle}</Text>
               <Text style={styles.watchAdSubtitle}>
-                +{BONUS_CONFIG.REWARDS.AD_VIEW} бонусов за просмотр
+                +{BONUS_CONFIG.REWARDS.AD_VIEW} {t.main.home.bonuses.toLowerCase()}
               </Text>
             </View>
             <View style={styles.watchAdArrow}>
@@ -166,7 +165,8 @@ export const BalanceScreen = () => {
           </TouchableOpacity>
           <View style={styles.adLimitInfo}>
             <Text style={styles.adLimitText}>
-              Сегодня: {limits.currentAdViewsToday}/{limits.maxAdViewsPerDay} просмотров
+              {t.main.balance.today}: {limits.currentAdViewsToday}/{limits.maxAdViewsPerDay}{' '}
+              {t.main.balance.views}
             </Text>
             <View style={styles.adLimitBar}>
               <View
@@ -205,39 +205,44 @@ export const BalanceScreen = () => {
 
         {/* How to Earn */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Как получить бонусы</Text>
+          <Text style={styles.sectionTitle}>{t.main.balance.howToEarn}</Text>
           <View style={styles.earnCard}>
             <View style={styles.earnItem}>
               <Text style={styles.earnEmoji}>🎉</Text>
               <View style={styles.earnInfo}>
-                <Text style={styles.earnTitle}>Регистрация</Text>
-                <Text style={styles.earnAmount}>+{BONUS_CONFIG.REWARDS.REGISTRATION} бонусов</Text>
+                <Text style={styles.earnTitle}>{t.main.balance.registration}</Text>
+                <Text style={styles.earnAmount}>
+                  +{BONUS_CONFIG.REWARDS.REGISTRATION} {t.main.home.bonuses.toLowerCase()}
+                </Text>
               </View>
             </View>
             <View style={styles.earnItem}>
               <Text style={styles.earnEmoji}>✅</Text>
               <View style={styles.earnInfo}>
-                <Text style={styles.earnTitle}>Заполнить профиль</Text>
+                <Text style={styles.earnTitle}>{t.main.balance.completeProfile}</Text>
                 <Text style={styles.earnAmount}>
-                  +{BONUS_CONFIG.REWARDS.PROFILE_COMPLETE} бонусов
+                  +{BONUS_CONFIG.REWARDS.PROFILE_COMPLETE} {t.main.home.bonuses.toLowerCase()}
                 </Text>
               </View>
             </View>
             <View style={styles.earnItem}>
               <Text style={styles.earnEmoji}>📺</Text>
               <View style={styles.earnInfo}>
-                <Text style={styles.earnTitle}>Просмотр рекламы</Text>
+                <Text style={styles.earnTitle}>{t.main.balance.watchAd}</Text>
                 <Text style={styles.earnAmount}>
-                  +{BONUS_CONFIG.REWARDS.AD_VIEW} бонусов (до{' '}
-                  {BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY}/день)
+                  +{BONUS_CONFIG.REWARDS.AD_VIEW} {t.main.home.bonuses.toLowerCase()} (
+                  {t.main.tours.from} {BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY}/
+                  {t.main.balance.perDay})
                 </Text>
               </View>
             </View>
             <View style={styles.earnItem}>
               <Text style={styles.earnEmoji}>👥</Text>
               <View style={styles.earnInfo}>
-                <Text style={styles.earnTitle}>Пригласить друга</Text>
-                <Text style={styles.earnAmount}>+{BONUS_CONFIG.REWARDS.REFERRAL} бонусов</Text>
+                <Text style={styles.earnTitle}>{t.main.balance.inviteFriend}</Text>
+                <Text style={styles.earnAmount}>
+                  +{BONUS_CONFIG.REWARDS.REFERRAL} {t.main.home.bonuses.toLowerCase()}
+                </Text>
               </View>
             </View>
           </View>
@@ -246,7 +251,7 @@ export const BalanceScreen = () => {
         {/* History */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>История операций</Text>
+            <Text style={styles.sectionTitle}>{t.main.balance.history}</Text>
           </View>
 
           {mockTransactions.map((transaction) => (

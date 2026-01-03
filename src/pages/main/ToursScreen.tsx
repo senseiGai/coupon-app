@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Umbrella, Pyramid, Building2, Palmtree, Waves, Check, Star } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useLanguage } from '@/shared/lib/hooks';
 
 const tours = [
   {
@@ -12,7 +13,7 @@ const tours = [
     price: 15000,
     originalPrice: 45000,
     icon: 'beach',
-    tag: 'Популярное',
+    tagKey: 'popular',
   },
   {
     id: '2',
@@ -22,7 +23,7 @@ const tours = [
     price: 20000,
     originalPrice: 65000,
     icon: 'pyramid',
-    tag: 'Горящий тур',
+    tagKey: 'hotTour',
   },
   {
     id: '3',
@@ -32,7 +33,7 @@ const tours = [
     price: 35000,
     originalPrice: 120000,
     icon: 'city',
-    tag: null,
+    tagKey: null,
   },
   {
     id: '4',
@@ -42,7 +43,7 @@ const tours = [
     price: 25000,
     originalPrice: 80000,
     icon: 'palm',
-    tag: 'Новинка',
+    tagKey: 'new',
   },
   {
     id: '5',
@@ -52,7 +53,7 @@ const tours = [
     price: 50000,
     originalPrice: 200000,
     icon: 'waves',
-    tag: 'Премиум',
+    tagKey: null,
   },
 ];
 
@@ -74,17 +75,34 @@ const TourIcon = ({ type }: { type: string }) => {
   }
 };
 
-const categories = ['Все', 'Пляжный', 'Экскурсии', 'Горы', 'Острова'];
-
 export const ToursScreen = () => {
+  const { t } = useLanguage();
   const userBalance = 2450;
+
+  const categories = [
+    t.main.tours.all,
+    t.main.tours.beach,
+    t.main.tours.excursions,
+    t.main.tours.mountains,
+    t.main.tours.islands,
+  ];
+
+  const getTagLabel = (tagKey: string | null) => {
+    if (!tagKey) return null;
+    const tags: Record<string, string> = {
+      popular: t.main.tours.popular,
+      hotTour: t.main.tours.hotTour,
+      new: t.main.tours.new,
+    };
+    return tags[tagKey] || tagKey;
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Туры</Text>
+          <Text style={styles.headerTitle}>{t.main.tours.title}</Text>
           <View style={styles.balanceChip}>
             <Text style={styles.balanceChipText}>{userBalance.toLocaleString()} ₽</Text>
           </View>
@@ -100,8 +118,8 @@ export const ToursScreen = () => {
               style={styles.featuredBanner}>
               <View style={styles.bannerContent}>
                 <View style={styles.bannerLeft}>
-                  <Text style={styles.bannerTitle}>Горящие туры</Text>
-                  <Text style={styles.bannerSubtitle}>Скидки до 70%</Text>
+                  <Text style={styles.bannerTitle}>{t.main.tours.hotDeals}</Text>
+                  <Text style={styles.bannerSubtitle}>{t.main.tours.specialDiscount} 70%</Text>
                 </View>
                 <View style={styles.bannerIcon}>
                   <Star size={40} color="#FFFFFF" strokeWidth={2.5} fill="#FFFFFF" />
@@ -138,9 +156,9 @@ export const ToursScreen = () => {
                 {/* Image placeholder */}
                 <View style={styles.tourImage}>
                   <TourIcon type={tour.icon} />
-                  {tour.tag && (
+                  {tour.tagKey && (
                     <View style={styles.tourTag}>
-                      <Text style={styles.tourTagText}>{tour.tag}</Text>
+                      <Text style={styles.tourTagText}>{getTagLabel(tour.tagKey)}</Text>
                     </View>
                   )}
                 </View>
@@ -154,15 +172,17 @@ export const ToursScreen = () => {
                   {/* Price */}
                   <View style={styles.priceRow}>
                     <View>
-                      <Text style={styles.tourPrice}>{tour.price.toLocaleString()} баллов</Text>
+                      <Text style={styles.tourPrice}>
+                        {tour.price.toLocaleString()} {t.main.tours.points}
+                      </Text>
                       <Text style={styles.tourOriginalPrice}>
-                        Обычная цена: {tour.originalPrice.toLocaleString()} ₽
+                        {t.main.tours.normalPrice}: {tour.originalPrice.toLocaleString()} ₽
                       </Text>
                     </View>
                     {canAfford ? (
                       <View style={styles.affordBadge}>
                         <View style={styles.affordBadgeContent}>
-                          <Text style={styles.affordBadgeText}>Доступно</Text>
+                          <Text style={styles.affordBadgeText}>{t.main.tours.available}</Text>
                           <Check size={14} color="#16A34A" strokeWidth={3} />
                         </View>
                       </View>

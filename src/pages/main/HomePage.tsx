@@ -22,14 +22,30 @@ export const HomePage = () => {
   const userBalance = 2450;
 
   const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'ru' : 'en');
+    if (language === 'en') {
+      setLanguage('ru');
+    } else if (language === 'ru') {
+      setLanguage('uk');
+    } else {
+      setLanguage('en');
+    }
+  };
+
+  const getLanguageLabel = () => {
+    switch (language) {
+      case 'en':
+        return 'EN';
+      case 'ru':
+        return 'РУ';
+      case 'uk':
+        return 'УК';
+      default:
+        return 'EN';
+    }
   };
 
   const handleLogout = async () => {
-    const logoutMessage =
-      language === 'en' ? 'Are you sure you want to log out?' : 'Вы уверены, что хотите выйти?';
-
-    Alert.alert(t.common.logout, logoutMessage, [
+    Alert.alert(t.common.logout, t.common.logoutConfirm, [
       {
         text: t.common.cancel,
         onPress: () => console.log('Logout cancelled'),
@@ -47,11 +63,7 @@ export const HomePage = () => {
             // RootNavigator автоматически переключится на AuthStack когда увидит отсутствие токена
           } catch (error) {
             console.error('[HomePage] Logout error:', error);
-            const errorMessage =
-              language === 'en'
-                ? 'Logout failed. Please try again.'
-                : 'Не удалось выйти. Попробуйте снова.';
-            Alert.alert(t.common.error, errorMessage);
+            Alert.alert(t.common.error, t.common.logoutFailed);
           }
         },
         style: 'destructive',
@@ -74,7 +86,7 @@ export const HomePage = () => {
             onPress={toggleLanguage}
             activeOpacity={0.7}>
             <Languages size={24} color="#0EA5E9" strokeWidth={2} />
-            <Text style={styles.languageText}>{language === 'en' ? 'EN' : ' РУ'}</Text>
+            <Text style={styles.languageText}>{getLanguageLabel()}</Text>
           </TouchableOpacity>
         </View>
 

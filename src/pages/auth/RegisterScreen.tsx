@@ -81,7 +81,7 @@ export default function RegisterScreen({ navigation }: Props) {
         ]);
       } catch (error: any) {
         console.error('[RegisterScreen] Registration error:', error);
-        Alert.alert(t.common.error, error.message || 'Registration failed. Please try again.');
+        Alert.alert(t.common.error, error.message || t.common.registrationFailed);
       }
     }
   };
