@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Play,
@@ -10,139 +18,38 @@ import {
 } from 'lucide-react-native';
 import { useState } from 'react';
 import { BonusService } from '@/entities/bonus/model/bonusService';
-import { BonusTransaction, BonusBalance, BonusLimits, BONUS_CONFIG } from '@/shared/types/bonus';
+import { BONUS_CONFIG } from '@/shared/types/bonus';
 import { useLanguage } from '@/shared/lib/hooks';
-import { admobService } from '@/shared/lib/admob';
-
-// Mock данные - в реальном приложении будут из API/State
-const mockTransactions: BonusTransaction[] = [
-  {
-    id: '1',
-    userId: 'user1',
-    type: 'earned_ad_view',
-    amount: 10,
-    balanceBefore: 2440,
-    balanceAfter: 2450,
-    description: 'Награда за просмотр рекламного ролика',
-    createdAt: new Date('2025-12-30T14:30:00'),
-    expiresAt: new Date('2026-12-30'),
-  },
-  {
-    id: '2',
-    userId: 'user1',
-    type: 'earned_ad_view',
-    amount: 10,
-    balanceBefore: 2430,
-    balanceAfter: 2440,
-    description: 'Награда за просмотр рекламного ролика',
-    createdAt: new Date('2025-12-30T12:15:00'),
-    expiresAt: new Date('2026-12-30'),
-  },
-  {
-    id: '3',
-    userId: 'user1',
-    type: 'spent_discount',
-    amount: -500,
-    balanceBefore: 2930,
-    balanceAfter: 2430,
-    description: 'Скидка на заказ №12345',
-    orderId: '12345',
-    createdAt: new Date('2025-12-29T18:00:00'),
-  },
-  {
-    id: '4',
-    userId: 'user1',
-    type: 'earned_registration',
-    amount: 100,
-    balanceBefore: 0,
-    balanceAfter: 100,
-    description: 'Приветственный бонус за регистрацию',
-    createdAt: new Date('2025-12-10T10:00:00'),
-    expiresAt: new Date('2026-12-10'),
-  },
-];
+import { useBonus } from '@/shared/lib/hooks/useBonus';
+import { RewardedAdButton } from '@/features/ads/ui/RewardedAdButton';
 
 export const BalanceScreen = () => {
   const { t } = useLanguage();
   const [showRules, setShowRules] = useState(false);
-
-  // Mock состояние - в реальном приложении из контекста/store
-  const balance: BonusBalance = {
-    userId: 'user1',
-    total: 2450,
-    available: 2450,
-    pending: 0,
-    lastUpdated: new Date(),
-  };
-
-  const limits: BonusLimits = {
-    maxAdViewsPerDay: BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY,
-    currentAdViewsToday: 3,
-    lastAdViewDate: new Date().toISOString().split('T')[0],
-    maxDiscountPercent: BONUS_CONFIG.LIMITS.MAX_DISCOUNT_PERCENT,
-    bonusExpirationDays: BONUS_CONFIG.LIMITS.BONUS_EXPIRATION_DAYS,
-  };
-
-  const handleWatchAd = async () => {
-    const canWatch = BonusService.canWatchAd(limits);
-
-    if (!canWatch.allowed) {
-      Alert.alert(t.main.balance.limitReached, canWatch.reason || t.main.balance.tryTomorrow);
-      return;
-    }
-
-    // Проверяем, готова ли реклама
-    if (!admobService.isAdReady()) {
-      Alert.alert(
-        t.main.balance.watchAdTitle,
-        'Реклама загружается... Попробуйте через несколько секунд.',
-        [{ text: 'OK' }]
-      );
-      // Предзагружаем рекламу
-      admobService.preloadAd();
-      return;
-    }
-
-    // Показываем подтверждение
-    const description = t.main.balance.watchAdDescription.replace(
-      '{amount}',
-      String(BONUS_CONFIG.REWARDS.AD_VIEW)
-    );
-    Alert.alert(t.main.balance.watchAdTitle, description, [
-      { text: t.common.cancel, style: 'cancel' },
-      {
-        text: t.main.balance.watchAdButton,
-        onPress: async () => {
-          try {
-            const result = await admobService.showRewardedAd();
-
-            if (result.success) {
-              // Здесь должна быть логика начисления бонусов через API
-              Alert.alert(
-                t.common.success,
-                `Вы получили ${BONUS_CONFIG.REWARDS.AD_VIEW} бонусов!`,
-                [{ text: 'OK' }]
-              );
-              console.log('[BalanceScreen] Ad watched successfully, reward earned');
-            } else {
-              Alert.alert(
-                t.common.error,
-                result.error || 'Не удалось показать рекламу. Попробуйте позже.',
-                [{ text: 'OK' }]
-              );
-            }
-          } catch (error) {
-            console.error('[BalanceScreen] Error showing ad:', error);
-            Alert.alert(t.common.error, 'Произошла ошибка при показе рекламы.', [{ text: 'OK' }]);
-          }
-        },
-      },
-    ]);
-  };
+  const { balance, limits, transactions, loading, fetchBalance, fetchLimits, fetchTransactions } =
+    useBonus();
 
   const handleShowRules = () => {
     setShowRules(!showRules);
   };
+
+  const handleAdSuccess = () => {
+    // Обновить данные после успешного просмотра рекламы
+    fetchBalance();
+    fetchLimits();
+    fetchTransactions();
+  };
+
+  if (loading && !balance) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0EA5E9" />
+          <Text style={styles.loadingText}>Загрузка...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -164,9 +71,11 @@ export const BalanceScreen = () => {
         {/* Balance Card */}
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>{t.main.balance.availableBonuses}</Text>
-          <Text style={styles.balanceAmount}>{BonusService.formatBonus(balance.available)}</Text>
+          <Text style={styles.balanceAmount}>
+            {BonusService.formatBonus(balance?.available || 0)}
+          </Text>
           <Text style={styles.balanceEquivalent}>
-            = {balance.available.toLocaleString('ru-RU')} {t.main.balance.bonusEquivalent}
+            = {(balance?.available || 0).toLocaleString('ru-RU')} {t.main.balance.bonusEquivalent}
           </Text>
           <View style={styles.balanceHint}>
             <Text style={styles.balanceHintText}>{t.main.balance.bonusHint}</Text>
@@ -175,27 +84,7 @@ export const BalanceScreen = () => {
 
         {/* Watch Ad Button */}
         <View style={styles.adSection}>
-          <TouchableOpacity
-            style={[
-              styles.watchAdButton,
-              limits.currentAdViewsToday >= limits.maxAdViewsPerDay && styles.watchAdButtonDisabled,
-            ]}
-            activeOpacity={0.8}
-            onPress={handleWatchAd}
-            disabled={limits.currentAdViewsToday >= limits.maxAdViewsPerDay}>
-            <View style={styles.watchAdIconContainer}>
-              <Play size={24} color="#0EA5E9" strokeWidth={2} fill="#0EA5E9" />
-            </View>
-            <View style={styles.watchAdContent}>
-              <Text style={styles.watchAdTitle}>{t.main.balance.watchAdTitle}</Text>
-              <Text style={styles.watchAdSubtitle}>
-                +{BONUS_CONFIG.REWARDS.AD_VIEW} {t.main.home.bonuses.toLowerCase()}
-              </Text>
-            </View>
-            <View style={styles.watchAdArrow}>
-              <ChevronRight size={20} color="#FFFFFF" strokeWidth={2.5} />
-            </View>
-          </TouchableOpacity>
+          <RewardedAdButton onSuccess={handleAdSuccess} />
           <View style={styles.adLimitInfo}>
             <Text style={styles.adLimitText}>
               {t.main.balance.today}: {limits.currentAdViewsToday}/{limits.maxAdViewsPerDay}{' '}
@@ -319,43 +208,49 @@ export const BalanceScreen = () => {
             <Text style={styles.sectionTitle}>{t.main.balance.history}</Text>
           </View>
 
-          {mockTransactions.map((transaction) => (
-            <View key={transaction.id} style={styles.historyItem}>
-              <View
-                style={[
-                  styles.historyIcon,
-                  { backgroundColor: transaction.amount > 0 ? '#DCFCE7' : '#FEE2E2' },
-                ]}>
-                {transaction.amount > 0 ? (
-                  <TrendingUp size={20} color="#16A34A" strokeWidth={2} />
-                ) : (
-                  <ShoppingCart size={20} color="#DC2626" strokeWidth={2} />
-                )}
-              </View>
-              <View style={styles.historyInfo}>
-                <Text style={styles.historyTitle}>
-                  {BonusService.getTransactionTitle(transaction.type)}
+          {transactions && transactions.length > 0 ? (
+            transactions.map((transaction) => (
+              <View key={transaction.id} style={styles.historyItem}>
+                <View
+                  style={[
+                    styles.historyIcon,
+                    { backgroundColor: transaction.amount > 0 ? '#DCFCE7' : '#FEE2E2' },
+                  ]}>
+                  {transaction.amount > 0 ? (
+                    <TrendingUp size={20} color="#16A34A" strokeWidth={2} />
+                  ) : (
+                    <ShoppingCart size={20} color="#DC2626" strokeWidth={2} />
+                  )}
+                </View>
+                <View style={styles.historyInfo}>
+                  <Text style={styles.historyTitle}>
+                    {BonusService.getTransactionTitle(transaction.type as any)}
+                  </Text>
+                  <Text style={styles.historyDescription}>{transaction.description}</Text>
+                  <Text style={styles.historyDate}>
+                    {new Date(transaction.createdAt).toLocaleString('ru-RU', {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </Text>
+                </View>
+                <Text
+                  style={[
+                    styles.historyAmount,
+                    { color: transaction.amount > 0 ? '#16A34A' : '#DC2626' },
+                  ]}>
+                  {transaction.amount > 0 ? '+' : ''}
+                  {Math.abs(transaction.amount)}
                 </Text>
-                <Text style={styles.historyDescription}>{transaction.description}</Text>
-                <Text style={styles.historyDate}>
-                  {new Date(transaction.createdAt).toLocaleString('ru-RU', {
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </Text>
               </View>
-              <Text
-                style={[
-                  styles.historyAmount,
-                  { color: transaction.amount > 0 ? '#16A34A' : '#DC2626' },
-                ]}>
-                {transaction.amount > 0 ? '+' : ''}
-                {Math.abs(transaction.amount)}
-              </Text>
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>Нет транзакций</Text>
             </View>
-          ))}
+          )}
         </View>
 
         {/* Footer spacing */}
@@ -646,5 +541,25 @@ const styles = StyleSheet.create({
   historyAmount: {
     fontSize: 16,
     fontWeight: '700',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#64748B',
+  },
+  emptyState: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: 32,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 15,
+    color: '#94A3B8',
   },
 });
