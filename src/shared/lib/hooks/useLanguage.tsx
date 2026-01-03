@@ -7,7 +7,7 @@ import React, {
   useEffect,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as RNLocalize from 'react-native-localize';
+import * as Localization from 'expo-localization';
 import { translations, Language } from '../../config/i18n';
 
 interface LanguageContextType {
@@ -23,11 +23,11 @@ const LANGUAGE_KEY = '@app_language';
 // Функция для получения языка системы
 const getDeviceLanguage = (): Language => {
   // Получаем массив локалей устройства в порядке предпочтения
-  const locales = RNLocalize.getLocales();
+  const locales = Localization.getLocales();
 
   if (locales && locales.length > 0) {
     // Берем первую локаль (наиболее предпочтительную)
-    const languageCode = locales[0].languageCode.toLowerCase();
+    const languageCode = locales[0].languageCode?.toLowerCase();
 
     // Проверяем, поддерживается ли язык
     if (languageCode === 'ru') return 'ru';
