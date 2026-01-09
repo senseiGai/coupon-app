@@ -6,9 +6,19 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Gift, Star, Zap, Crown, Sparkles, LogOut, Languages } from 'lucide-react-native';
+import {
+  Gift,
+  Star,
+  MessageCircle,
+  FileText,
+  Sparkles,
+  LogOut,
+  Languages,
+  Coins,
+} from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage, useLogout } from '../../shared/lib/hooks';
 
@@ -94,12 +104,18 @@ export const HomePage = () => {
         <View style={styles.bannerSection}>
           <View style={styles.balanceBanner}>
             <View style={styles.balanceBannerHeader}>
-              <Text style={styles.balanceBannerLabel}>{t.main.home.balance}</Text>
+              <View style={styles.balanceLabelRow}>
+                <Coins size={20} color="#FFFFFF" strokeWidth={2.5} />
+                <Text style={styles.balanceBannerLabel}>{t.main.home.balance}</Text>
+              </View>
               <TouchableOpacity activeOpacity={0.8} style={styles.watchAdButton}>
                 <Text style={styles.watchAdText}>{t.main.home.watchAds}</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.balanceBannerAmount}>{userBalance.toLocaleString()}</Text>
+            <View style={styles.balanceAmountRow}>
+              <Coins size={32} color="#FFD700" strokeWidth={2.5} />
+              <Text style={styles.balanceBannerAmount}>{userBalance.toLocaleString()}</Text>
+            </View>
             <Text style={styles.balanceBannerHint}>{t.main.home.hint}</Text>
           </View>
         </View>
@@ -108,15 +124,19 @@ export const HomePage = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.main.home.quickActions}</Text>
           <View style={styles.singleCardContainer}>
-            {/* Bonuses - Orange */}
+            {/* Bonuses - Orange with Golden Logo */}
             <TouchableOpacity activeOpacity={0.8} style={styles.fullWidthCard}>
               <LinearGradient
                 colors={['#F59E0B', '#D97706']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.cardGradient}>
-                <View style={styles.cardIcon}>
-                  <Gift size={32} color="#FFFFFF" strokeWidth={2.5} />
+                <View style={styles.cardIconWithLogo}>
+                  <Image
+                    source={require('../../../assets/logo.jpg')}
+                    style={styles.goldenLogo}
+                    resizeMode="contain"
+                  />
                 </View>
                 <Text style={styles.cardTitle}>{t.main.home.bonuses}</Text>
                 <Text style={styles.cardSubtitle}>{t.main.home.daily}</Text>
@@ -129,7 +149,7 @@ export const HomePage = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.main.home.specialOffers}</Text>
 
-          {/* Purple Banner */}
+          {/* Purple Banner - Chat */}
           <TouchableOpacity activeOpacity={0.9} style={styles.promoBanner}>
             <LinearGradient
               colors={['#A855F7', '#9333EA', '#7E22CE']}
@@ -139,7 +159,7 @@ export const HomePage = () => {
               <View style={styles.promoContent}>
                 <View style={styles.promoLeft}>
                   <View style={styles.promoIcon}>
-                    <Crown size={36} color="#FFFFFF" strokeWidth={2.5} />
+                    <MessageCircle size={36} color="#FFFFFF" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
                     <Text style={styles.promoTitle}>{t.main.home.premiumTours}</Text>
@@ -153,7 +173,7 @@ export const HomePage = () => {
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Teal Banner */}
+          {/* Teal Banner - Documents */}
           <TouchableOpacity activeOpacity={0.9} style={styles.promoBanner}>
             <LinearGradient
               colors={['#14B8A6', '#0D9488', '#0F766E']}
@@ -163,7 +183,7 @@ export const HomePage = () => {
               <View style={styles.promoContent}>
                 <View style={styles.promoLeft}>
                   <View style={styles.promoIcon}>
-                    <Zap size={36} color="#FFFFFF" strokeWidth={2.5} />
+                    <FileText size={36} color="#FFFFFF" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
                     <Text style={styles.promoTitle}>{t.main.home.flashDeals}</Text>
@@ -281,10 +301,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
+  balanceLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   balanceBannerLabel: {
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  balanceAmountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 6,
   },
   watchAdButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -301,7 +332,6 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 6,
   },
   balanceBannerHint: {
     fontSize: 14,
@@ -355,6 +385,27 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  cardIconWithLogo: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    borderWidth: 3,
+    borderColor: '#FFD700',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  goldenLogo: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   cardTitle: {
     fontSize: 17,

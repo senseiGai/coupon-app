@@ -48,6 +48,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Инициализация языка при загрузке приложения
+  // По умолчанию всегда английский, пока пользователь не выберет другой
   useEffect(() => {
     const initLanguage = async () => {
       try {
@@ -57,16 +58,15 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
           // Если язык был сохранен ранее, используем его
           setLanguageState(savedLanguage as Language);
         } else {
-          // Иначе берем язык системы
-          const deviceLang = getDeviceLanguage();
-          setLanguageState(deviceLang);
+          // По умолчанию английский язык
+          setLanguageState('en');
           // Сохраняем выбранный язык
-          await AsyncStorage.setItem(LANGUAGE_KEY, deviceLang);
+          await AsyncStorage.setItem(LANGUAGE_KEY, 'en');
         }
       } catch (error) {
         console.error('Error loading language:', error);
-        // В случае ошибки используем язык системы
-        setLanguageState(getDeviceLanguage());
+        // В случае ошибки используем английский
+        setLanguageState('en');
       } finally {
         setIsInitialized(true);
       }
