@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Send, Paperclip, Plane } from 'lucide-react-native';
+import { Send, Paperclip } from 'lucide-react-native';
 import { useState, useRef, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -25,38 +25,9 @@ import {
 } from '../../shared/lib/hooks';
 import { socketService } from '../../shared/lib/socket/socketService';
 import type { PrivateMessage } from '../../shared/types/message';
+import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-// Генерируем позиции для самолётиков по сетке (чтобы не накладывались)
-const generateAirplanes = () => {
-  const airplanes = [];
-  const cols = 4; // Колонки
-  const rows = 6; // Ряды
-  const cellWidth = SCREEN_WIDTH / cols;
-  const cellHeight = (SCREEN_HEIGHT - 200) / rows;
-
-  let id = 0;
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      // Небольшое случайное смещение внутри ячейки
-      const offsetX = (Math.random() - 0.5) * (cellWidth * 0.4);
-      const offsetY = (Math.random() - 0.5) * (cellHeight * 0.4);
-
-      airplanes.push({
-        id: id++,
-        x: col * cellWidth + cellWidth / 2 + offsetX - 12,
-        y: row * cellHeight + cellHeight / 2 + offsetY,
-        rotation: Math.random() * 360,
-        scale: 1,
-        opacity: 0.12 + Math.random() * 0.06,
-      });
-    }
-  }
-  return airplanes;
-};
-
-const airplanes = generateAirplanes();
 
 export const ChatScreen = () => {
   const { t } = useLanguage();
@@ -233,23 +204,7 @@ export const ChatScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}>
         {/* Фон с самолётиками */}
-        <View style={styles.airplanesBackground}>
-          {airplanes.map((airplane) => (
-            <View
-              key={airplane.id}
-              style={[
-                styles.airplaneContainer,
-                {
-                  left: airplane.x,
-                  top: airplane.y,
-                  transform: [{ rotate: `${airplane.rotation}deg` }, { scale: airplane.scale }],
-                  opacity: airplane.opacity,
-                },
-              ]}>
-              <Plane size={24} color="#0EA5E9" strokeWidth={1.5} />
-            </View>
-          ))}
-        </View>
+        <AirplaneBackground />
 
         <ScrollView
           ref={scrollViewRef}

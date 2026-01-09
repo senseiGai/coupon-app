@@ -22,6 +22,7 @@ import { BONUS_CONFIG } from '@/shared/types/bonus';
 import { useLanguage } from '@/shared/lib/hooks';
 import { useBonus } from '@/shared/lib/hooks/useBonus';
 import { RewardedAdButton } from '@/features/ads/ui/RewardedAdButton';
+import { AirplaneBackground } from '@/shared/ui/AirplaneBackground';
 
 export const BalanceScreen = () => {
   const { t } = useLanguage();
@@ -53,6 +54,7 @@ export const BalanceScreen = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <AirplaneBackground />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>

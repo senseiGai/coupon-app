@@ -21,6 +21,28 @@ import {
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage, useLogout } from '../../shared/lib/hooks';
+import { useNavigation } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { CompositeNavigationProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
+
+type MainTabParamList = {
+  Home: undefined;
+  Chat: undefined;
+  Documents: undefined;
+};
+
+type RootStackParamList = {
+  MainTabs: undefined;
+  BonusShop: undefined;
+  Balance: undefined;
+};
+
+type NavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList>,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 
 const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width - 32;
@@ -29,6 +51,7 @@ const CARD_WIDTH = (width - 48) / 2;
 export const HomePage = () => {
   const { t, language, setLanguage } = useLanguage();
   const logoutMutation = useLogout();
+  const navigation = useNavigation<NavigationProp>();
   const userBalance = 2450;
 
   const toggleLanguage = () => {
@@ -83,6 +106,7 @@ export const HomePage = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <AirplaneBackground />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
@@ -101,14 +125,20 @@ export const HomePage = () => {
         </View>
 
         {/* Main Banner - Balance Card */}
-        <View style={styles.bannerSection}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          style={styles.bannerSection}
+          onPress={() => navigation.navigate('Balance')}>
           <View style={styles.balanceBanner}>
             <View style={styles.balanceBannerHeader}>
               <View style={styles.balanceLabelRow}>
                 <Coins size={20} color="#FFFFFF" strokeWidth={2.5} />
                 <Text style={styles.balanceBannerLabel}>{t.main.home.balance}</Text>
               </View>
-              <TouchableOpacity activeOpacity={0.8} style={styles.watchAdButton}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.watchAdButton}
+                onPress={() => navigation.navigate('Balance')}>
                 <Text style={styles.watchAdText}>{t.main.home.watchAds}</Text>
               </TouchableOpacity>
             </View>
@@ -118,16 +148,19 @@ export const HomePage = () => {
             </View>
             <Text style={styles.balanceBannerHint}>{t.main.home.hint}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Quick Actions Grid */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.main.home.quickActions}</Text>
           <View style={styles.singleCardContainer}>
-            {/* Bonuses - Orange with Golden Logo */}
-            <TouchableOpacity activeOpacity={0.8} style={styles.fullWidthCard}>
+            {/* Bonuses - White-Blue */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.fullWidthCard}
+              onPress={() => navigation.navigate('BonusShop')}>
               <LinearGradient
-                colors={['#F59E0B', '#D97706']}
+                colors={['#FFFFFF', '#E0F2FE', '#BAE6FD']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.cardGradient}>
@@ -138,8 +171,8 @@ export const HomePage = () => {
                     resizeMode="contain"
                   />
                 </View>
-                <Text style={styles.cardTitle}>{t.main.home.bonuses}</Text>
-                <Text style={styles.cardSubtitle}>{t.main.home.daily}</Text>
+                <Text style={styles.cardTitleDark}>{t.main.home.bonuses}</Text>
+                <Text style={styles.cardSubtitleDark}>{t.main.home.daily}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -149,49 +182,57 @@ export const HomePage = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.main.home.specialOffers}</Text>
 
-          {/* Purple Banner - Chat */}
-          <TouchableOpacity activeOpacity={0.9} style={styles.promoBanner}>
+          {/* White-Blue Banner - Chat */}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            style={styles.promoBanner}
+            onPress={() => navigation.navigate('Chat')}>
             <LinearGradient
-              colors={['#A855F7', '#9333EA', '#7E22CE']}
+              colors={['#FFFFFF', '#E0F2FE', '#7DD3FC']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.bannerGradient}>
               <View style={styles.promoContent}>
                 <View style={styles.promoLeft}>
-                  <View style={styles.promoIcon}>
-                    <MessageCircle size={36} color="#FFFFFF" strokeWidth={2.5} />
+                  <View style={styles.promoIconBlue}>
+                    <MessageCircle size={36} color="#0EA5E9" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
-                    <Text style={styles.promoTitle}>{t.main.home.premiumTours}</Text>
-                    <Text style={styles.promoSubtitle}>{t.main.home.exclusiveDestinations}</Text>
+                    <Text style={styles.promoTitleDark}>{t.main.home.premiumTours}</Text>
+                    <Text style={styles.promoSubtitleDark}>
+                      {t.main.home.exclusiveDestinations}
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
-                  <Sparkles size={24} color="#FFFFFF" strokeWidth={2} />
+                  <Sparkles size={24} color="#0EA5E9" strokeWidth={2} />
                 </View>
               </View>
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Teal Banner - Documents */}
-          <TouchableOpacity activeOpacity={0.9} style={styles.promoBanner}>
+          {/* White-Blue Banner - Documents */}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            style={styles.promoBanner}
+            onPress={() => navigation.navigate('Documents')}>
             <LinearGradient
-              colors={['#14B8A6', '#0D9488', '#0F766E']}
+              colors={['#FFFFFF', '#E0F2FE', '#7DD3FC']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.bannerGradient}>
               <View style={styles.promoContent}>
                 <View style={styles.promoLeft}>
-                  <View style={styles.promoIcon}>
-                    <FileText size={36} color="#FFFFFF" strokeWidth={2.5} />
+                  <View style={styles.promoIconBlue}>
+                    <FileText size={36} color="#0EA5E9" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
-                    <Text style={styles.promoTitle}>{t.main.home.flashDeals}</Text>
-                    <Text style={styles.promoSubtitle}>{t.main.home.limitedTime}</Text>
+                    <Text style={styles.promoTitleDark}>{t.main.home.flashDeals}</Text>
+                    <Text style={styles.promoSubtitleDark}>{t.main.home.limitedTime}</Text>
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
-                  <Star size={24} color="#FFFFFF" strokeWidth={2} fill="#FFFFFF" />
+                  <Star size={24} color="#0EA5E9" strokeWidth={2} fill="#0EA5E9" />
                 </View>
               </View>
             </LinearGradient>
@@ -201,7 +242,7 @@ export const HomePage = () => {
         {/* Logout Button */}
         <View style={styles.section}>
           <TouchableOpacity activeOpacity={0.7} onPress={handleLogout} style={styles.logoutButton}>
-            <LogOut size={20} color="#FFFFFF" strokeWidth={2.5} />
+            <LogOut size={20} color="#0EA5E9" strokeWidth={2.5} />
             <Text style={styles.logoutButtonText}>{t.common.logout}</Text>
           </TouchableOpacity>
         </View>
@@ -372,11 +413,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 16,
     justifyContent: 'space-between',
-    shadowColor: '#000',
+    shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 6,
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
   },
   cardIcon: {
     width: 56,
@@ -413,10 +456,21 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 2,
   },
+  cardTitleDark: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#0369A1',
+    marginBottom: 2,
+  },
   cardSubtitle: {
     fontSize: 13,
     color: '#FFFFFF',
     opacity: 0.9,
+    fontWeight: '500',
+  },
+  cardSubtitleDark: {
+    fontSize: 13,
+    color: '#0EA5E9',
     fontWeight: '500',
   },
   promoBanner: {
@@ -428,11 +482,13 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 20,
     overflow: 'hidden',
-    shadowColor: '#000',
+    shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 6,
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
   },
   promoContent: {
     flex: 1,
@@ -455,6 +511,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 14,
   },
+  promoIconBlue: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'rgba(14, 165, 233, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
   promoText: {
     flex: 1,
   },
@@ -464,10 +529,21 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 3,
   },
+  promoTitleDark: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#0369A1',
+    marginBottom: 3,
+  },
   promoSubtitle: {
     fontSize: 13,
     color: '#FFFFFF',
     opacity: 0.9,
+    fontWeight: '500',
+  },
+  promoSubtitleDark: {
+    fontSize: 13,
+    color: '#0EA5E9',
     fontWeight: '500',
   },
   sparkleIcon: {
@@ -478,19 +554,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 16,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 14,
     borderRadius: 16,
     gap: 10,
-    shadowColor: '#EF4444',
+    shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
   },
   logoutButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#0EA5E9',
   },
 });

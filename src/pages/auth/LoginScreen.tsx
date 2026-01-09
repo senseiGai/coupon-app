@@ -15,6 +15,7 @@ import { AuthStackParamList } from '../../app/navigation/AuthStack';
 import { Input } from '../../shared/ui/Input/Input';
 import { Button } from '../../shared/ui/Button/Button';
 import { useLanguage, useLogin } from '../../shared/lib/hooks';
+import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -67,6 +68,7 @@ export default function LoginScreen({ navigation }: Props) {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}>
+      <AirplaneBackground />
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.contentWrapper}>
           {/* Header */}

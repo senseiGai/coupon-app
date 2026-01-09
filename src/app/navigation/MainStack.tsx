@@ -1,4 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Gift, FolderOpen, MessageCircle } from 'lucide-react-native';
@@ -7,6 +8,8 @@ import { Gift, FolderOpen, MessageCircle } from 'lucide-react-native';
 import { HomePage } from '../../pages/main/HomePage';
 import { DocumentsScreen } from '../../pages/main/DocumentsScreen';
 import { ChatScreen } from '../../pages/main/ChatScreen';
+import { BonusShopScreen } from '../../pages/main/BonusShopScreen';
+import { BalanceScreen } from '../../pages/main/BalanceScreen';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -14,13 +17,19 @@ export type MainTabParamList = {
   Documents: undefined;
 };
 
+export type RootStackParamList = {
+  MainTabs: undefined;
+  BonusShop: undefined;
+  Balance: undefined;
+};
+
 const Tab = createBottomTabNavigator<MainTabParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
- * MainStack - основной стек навигации приложения с табами
- * Интуитивный интерфейс без текстовых подписей
+ * TabNavigator - нижние табы
  */
-export default function MainStack() {
+function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -64,6 +73,20 @@ export default function MainStack() {
         }}
       />
     </Tab.Navigator>
+  );
+}
+
+/**
+ * MainStack - основной стек навигации приложения
+ * Содержит табы и дополнительные экраны
+ */
+export default function MainStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MainTabs" component={TabNavigator} />
+      <Stack.Screen name="BonusShop" component={BonusShopScreen} />
+      <Stack.Screen name="Balance" component={BalanceScreen} />
+    </Stack.Navigator>
   );
 }
 

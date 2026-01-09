@@ -16,6 +16,7 @@ import { Paths, File } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useLanguage, useDocuments } from '../../shared/lib/hooks';
 import type { Document as ApiDocument } from '../../shared/types/document';
+import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
 
 export const DocumentsScreen = () => {
   const { t, language } = useLanguage();
@@ -93,6 +94,7 @@ export const DocumentsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <AirplaneBackground />
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t.main.documents.title}</Text>
