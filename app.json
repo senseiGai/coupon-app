@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "my-expo-app",
-    "slug": "my-expo-app",
+    "name": "Travel with Alina",
+    "slug": "travel-with-alina",
     "version": "1.0.0",
     "web": {
       "favicon": "./assets/favicon.png"
@@ -26,9 +26,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.k1ngsterr.myexpoapp"
