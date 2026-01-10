@@ -154,16 +154,12 @@ export const HomePage = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.main.home.quickActions}</Text>
           <View style={styles.singleCardContainer}>
-            {/* Bonuses - White-Blue */}
+            {/* Bonuses - Blue */}
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.fullWidthCard}
               onPress={() => navigation.navigate('BonusShop')}>
-              <LinearGradient
-                colors={['#FFFFFF', '#E0F2FE', '#BAE6FD']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardGradient}>
+              <View style={styles.cardSolid}>
                 <View style={styles.cardIconWithLogo}>
                   <Image
                     source={require('../../../assets/logo.jpg')}
@@ -171,9 +167,9 @@ export const HomePage = () => {
                     resizeMode="contain"
                   />
                 </View>
-                <Text style={styles.cardTitleDark}>{t.main.home.bonuses}</Text>
-                <Text style={styles.cardSubtitleDark}>{t.main.home.daily}</Text>
-              </LinearGradient>
+                <Text style={styles.cardTitle}>{t.main.home.bonuses}</Text>
+                <Text style={styles.cardSubtitle}>{t.main.home.daily}</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -420,6 +416,19 @@ const styles = StyleSheet.create({
     elevation: 6,
     borderWidth: 1,
     borderColor: '#BAE6FD',
+  },
+  cardSolid: {
+    width: '100%',
+    height: 140,
+    borderRadius: 20,
+    padding: 16,
+    justifyContent: 'space-between',
+    backgroundColor: '#0EA5E9',
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 6,
   },
   cardIcon: {
     width: 56,
