@@ -4,6 +4,7 @@ import { Play } from 'lucide-react-native';
 import { admobService } from '@/shared/lib/admob';
 import { useBonus } from '@/shared/lib/hooks/useBonus';
 import { BONUS_CONFIG } from '@/shared/types/bonus';
+import { wp, hp, fontSize, responsive, sizes } from '@/shared/lib/responsive';
 
 interface RewardedAdButtonProps {
   onSuccess?: () => void;
@@ -91,7 +92,9 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   };
 
   const isDisabled =
-    loading || !adReady || (limits && limits.currentAdViewsToday >= limits.maxAdViewsPerDay);
+    loading || !adReady || !!(limits && limits.currentAdViewsToday >= limits.maxAdViewsPerDay);
+
+  const iconSize = responsive({ xs: 20, sm: 22, default: 24 });
 
   return (
     <TouchableOpacity
@@ -100,11 +103,17 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
       disabled={isDisabled}
       activeOpacity={0.8}>
       <View style={styles.iconContainer}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Play size={24} color="#fff" fill="#fff" />}
+        {loading ? (
+          <ActivityIndicator color="#fff" size={responsive({ xs: 'small', default: 'small' })} />
+        ) : (
+          <Play size={iconSize} color="#fff" fill="#fff" />
+        )}
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.buttonText}>{loading ? 'Загрузка...' : 'Смотреть рекламу'}</Text>
-        <Text style={styles.buttonSubtext}>
+        <Text style={styles.buttonText} numberOfLines={1}>
+          {loading ? 'Загрузка...' : 'Смотреть рекламу'}
+        </Text>
+        <Text style={styles.buttonSubtext} numberOfLines={1}>
           +{BONUS_CONFIG.REWARDS.AD_VIEW} бонусов
           {limits && ` (${limits.currentAdViewsToday}/${limits.maxAdViewsPerDay} сегодня)`}
         </Text>
@@ -118,17 +127,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#10b981',
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
+    borderRadius: wp(16),
+    padding: wp(16),
+    gap: wp(12),
   },
   buttonDisabled: {
     backgroundColor: '#9ca3af',
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: wp(48),
+    height: wp(48),
+    borderRadius: wp(24),
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -137,13 +146,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     fontWeight: '600',
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: hp(4),
   },
   buttonSubtext: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: 'rgba(255, 255, 255, 0.8)',
   },
 });

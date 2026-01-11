@@ -16,7 +16,11 @@ import { Paths, File } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useLanguage, useDocuments } from '../../shared/lib/hooks';
 import type { Document as ApiDocument } from '../../shared/types/document';
+<<<<<<< HEAD
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
+=======
+import { wp, hp, fontSize, responsive } from '../../shared/lib/responsive';
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
 export const DocumentsScreen = () => {
   const { t, language } = useLanguage();
@@ -106,7 +110,7 @@ export const DocumentsScreen = () => {
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchInputWrapper}>
-          <Search size={20} color="#94A3B8" strokeWidth={2} />
+          <Search size={wp(20)} color="#94A3B8" strokeWidth={2} />
           <TextInput
             style={styles.searchInput}
             placeholder={t.main.documents.searchPlaceholder}
@@ -147,7 +151,7 @@ export const DocumentsScreen = () => {
                     end={{ x: 1, y: 0 }}
                     style={styles.documentCard}>
                     <View style={styles.documentIconContainer}>
-                      <FileText size={40} color="#FFFFFF" strokeWidth={2} />
+                      <FileText size={wp(40)} color="#FFFFFF" strokeWidth={2} />
                     </View>
                     <View style={styles.documentInfo}>
                       <Text style={styles.documentTitle} numberOfLines={1}>
@@ -168,7 +172,7 @@ export const DocumentsScreen = () => {
                         e.stopPropagation();
                         handleDownloadDocument(doc);
                       }}>
-                      <Download size={22} color="#FFFFFF" strokeWidth={2} />
+                      <Download size={wp(22)} color="#FFFFFF" strokeWidth={2} />
                     </TouchableOpacity>
                   </LinearGradient>
                 </TouchableOpacity>
@@ -177,12 +181,12 @@ export const DocumentsScreen = () => {
           </View>
         ) : (
           <View style={styles.emptyState}>
-            <FileText size={64} color="#CBD5E1" strokeWidth={1.5} />
+            <FileText size={wp(64)} color="#CBD5E1" strokeWidth={1.5} />
             <Text style={styles.emptyText}>{t.main.documents.noDocuments}</Text>
             <Text style={styles.emptySubtext}>{t.main.documents.noDocumentsHint}</Text>
           </View>
         )}
-        <View style={{ height: 100 }} />
+        <View style={{ height: hp(100) }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -194,60 +198,60 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 16,
+    paddingHorizontal: wp(20),
+    paddingTop: hp(12),
+    paddingBottom: hp(16),
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: fontSize(28),
     fontWeight: '700',
     color: '#1E293B',
-    marginBottom: 4,
+    marginBottom: hp(4),
   },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#64748B',
     fontWeight: '500',
   },
   searchContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: wp(16),
+    paddingVertical: hp(12),
     backgroundColor: '#FFFFFF',
   },
   searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F8FAFC',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 10,
+    borderRadius: wp(16),
+    paddingHorizontal: wp(16),
+    paddingVertical: hp(12),
+    gap: wp(10),
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
   searchInput: {
     flex: 1,
-    fontSize: 15,
+    fontSize: fontSize(15),
     color: '#1E293B',
     fontWeight: '500',
   },
   scrollContent: {
-    paddingTop: 16,
+    paddingTop: hp(16),
   },
   documentsList: {
-    paddingHorizontal: 16,
+    paddingHorizontal: wp(16),
   },
   documentCardWrapper: {
-    marginBottom: 12,
+    marginBottom: hp(12),
   },
   documentCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 24,
-    padding: 16,
+    borderRadius: wp(24),
+    padding: wp(16),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
@@ -255,25 +259,25 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   documentIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
+    width: wp(64),
+    height: wp(64),
+    borderRadius: wp(20),
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 14,
+    marginRight: wp(14),
     flexShrink: 0,
   },
   documentInfo: {
     flex: 1,
-    gap: 4,
-    marginRight: 8,
+    gap: hp(4),
+    marginRight: wp(8),
   },
   documentTitle: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 2,
+    marginBottom: hp(2),
   },
   documentMeta: {
     flexDirection: 'row',
@@ -281,33 +285,33 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   documentType: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     fontWeight: '600',
     color: 'rgba(255, 255, 255, 0.9)',
     maxWidth: '50%',
   },
   documentDate: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     fontWeight: '500',
     color: 'rgba(255, 255, 255, 0.85)',
   },
   documentSize: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     fontWeight: '500',
     color: 'rgba(255, 255, 255, 0.75)',
-    marginTop: 2,
+    marginTop: hp(2),
   },
   metaDivider: {
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
+    width: wp(3),
+    height: wp(3),
+    borderRadius: wp(1.5),
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    marginHorizontal: 6,
+    marginHorizontal: wp(6),
   },
   actionButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
+    width: wp(52),
+    height: wp(52),
+    borderRadius: wp(18),
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -317,17 +321,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 120,
-    gap: 12,
+    paddingTop: hp(120),
+    gap: hp(12),
   },
   emptyText: {
-    fontSize: 20,
+    fontSize: fontSize(20),
     fontWeight: '700',
     color: '#64748B',
-    marginTop: 16,
+    marginTop: hp(16),
   },
   emptySubtext: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     fontWeight: '500',
     color: '#94A3B8',
   },
@@ -335,11 +339,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 120,
-    gap: 16,
+    paddingTop: hp(120),
+    gap: hp(16),
   },
   loadingText: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     fontWeight: '600',
     color: '#64748B',
   },

@@ -8,6 +8,7 @@ import { Gift, FolderOpen, MessageCircle } from 'lucide-react-native';
 import { HomePage } from '../../pages/main/HomePage';
 import { DocumentsScreen } from '../../pages/main/DocumentsScreen';
 import { ChatScreen } from '../../pages/main/ChatScreen';
+import { wp, hp, getBottomSpace } from '../../shared/lib/responsive';
 import { BonusShopScreen } from '../../pages/main/BonusShopScreen';
 import { BalanceScreen } from '../../pages/main/BalanceScreen';
 
@@ -25,6 +26,8 @@ export type RootStackParamList = {
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const iconSize = wp(24);
 
 /**
  * TabNavigator - нижние табы
@@ -45,7 +48,7 @@ function TabNavigator() {
         options={{
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <Gift size={24} color={color} strokeWidth={2} />
+              <Gift size={iconSize} color={color} strokeWidth={2} />
             </View>
           ),
         }}
@@ -56,7 +59,7 @@ function TabNavigator() {
         options={{
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <MessageCircle size={24} color={color} strokeWidth={2} />
+              <MessageCircle size={iconSize} color={color} strokeWidth={2} />
             </View>
           ),
         }}
@@ -67,7 +70,7 @@ function TabNavigator() {
         options={{
           tabBarIcon: ({ color, focused }) => (
             <View style={[styles.tabIconContainer, focused && styles.tabIconContainerActive]}>
-              <FolderOpen size={24} color={color} strokeWidth={2} />
+              <FolderOpen size={iconSize} color={color} strokeWidth={2} />
             </View>
           ),
         }}
@@ -94,9 +97,9 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#FFFFFF',
     borderTopWidth: 0,
-    height: 88,
-    paddingTop: 12,
-    paddingBottom: 28,
+    height: hp(88) + getBottomSpace(),
+    paddingTop: hp(12),
+    paddingBottom: hp(28) + getBottomSpace(),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.1,
@@ -104,9 +107,9 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   tabIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: wp(48),
+    height: wp(48),
+    borderRadius: wp(16),
     alignItems: 'center',
     justifyContent: 'center',
   },

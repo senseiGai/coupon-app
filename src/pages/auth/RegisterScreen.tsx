@@ -15,7 +15,11 @@ import { AuthStackParamList } from '../../app/navigation/AuthStack';
 import { Input } from '../../shared/ui/Input/Input';
 import { Button } from '../../shared/ui/Button/Button';
 import { useLanguage, useRegister } from '../../shared/lib/hooks';
+<<<<<<< HEAD
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
+=======
+import { wp, hp, fontSize, responsive } from '../../shared/lib/responsive';
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
@@ -166,8 +170,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 40,
+    paddingHorizontal: wp(20),
+    paddingVertical: hp(40),
   },
   contentWrapper: {
     flex: 1,
@@ -177,38 +181,38 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   header: {
-    marginBottom: 40,
+    marginBottom: hp(40),
     alignItems: 'center',
   },
   title: {
-    fontSize: 36,
+    fontSize: responsive({ xs: fontSize(30), sm: fontSize(34), default: fontSize(36) }),
     fontWeight: '700',
     color: '#1E293B',
-    marginBottom: 12,
+    marginBottom: hp(12),
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     color: '#64748B',
     fontWeight: '500',
     textAlign: 'center',
   },
   languageButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: wp(12),
+    paddingVertical: hp(6),
+    borderRadius: wp(8),
     backgroundColor: '#E0F2FE',
   },
   languageText: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     fontWeight: '600',
     color: '#0EA5E9',
   },
   formContainer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 28,
-    marginBottom: 28,
+    borderRadius: wp(24),
+    padding: wp(28),
+    marginBottom: hp(28),
     shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -216,8 +220,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   loadingButton: {
-    height: 56,
-    borderRadius: 12,
+    height: hp(56),
+    borderRadius: wp(12),
     backgroundColor: '#0EA5E9',
     justifyContent: 'center',
     alignItems: 'center',
@@ -225,10 +229,10 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: 'center',
-    paddingTop: 8,
+    paddingTop: hp(8),
   },
   footerText: {
-    fontSize: 15,
+    fontSize: fontSize(15),
     color: '#64748B',
     textAlign: 'center',
   },

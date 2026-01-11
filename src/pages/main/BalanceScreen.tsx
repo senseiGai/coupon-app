@@ -22,7 +22,11 @@ import { BONUS_CONFIG } from '@/shared/types/bonus';
 import { useLanguage } from '@/shared/lib/hooks';
 import { useBonus } from '@/shared/lib/hooks/useBonus';
 import { RewardedAdButton } from '@/features/ads/ui/RewardedAdButton';
+<<<<<<< HEAD
 import { AirplaneBackground } from '@/shared/ui/AirplaneBackground';
+=======
+import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
 export const BalanceScreen = () => {
   const { t } = useLanguage();
@@ -60,13 +64,13 @@ export const BalanceScreen = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t.main.balance.bonusesTitle}</Text>
           <TouchableOpacity onPress={handleShowRules} style={styles.infoButton}>
-            <Info size={24} color="#0EA5E9" />
+            <Info size={wp(24)} color="#0EA5E9" />
           </TouchableOpacity>
         </View>
 
         {/* Important Notice */}
         <View style={styles.noticeCard}>
-          <AlertCircle size={20} color="#0EA5E9" />
+          <AlertCircle size={wp(20)} color="#0EA5E9" />
           <Text style={styles.noticeText}>{t.main.balance.noticeText}</Text>
         </View>
 
@@ -219,9 +223,9 @@ export const BalanceScreen = () => {
                     { backgroundColor: transaction.amount > 0 ? '#DCFCE7' : '#FEE2E2' },
                   ]}>
                   {transaction.amount > 0 ? (
-                    <TrendingUp size={20} color="#16A34A" strokeWidth={2} />
+                    <TrendingUp size={wp(20)} color="#16A34A" strokeWidth={2} />
                   ) : (
-                    <ShoppingCart size={20} color="#DC2626" strokeWidth={2} />
+                    <ShoppingCart size={wp(20)} color="#DC2626" strokeWidth={2} />
                   )}
                 </View>
                 <View style={styles.historyInfo}>
@@ -256,7 +260,7 @@ export const BalanceScreen = () => {
         </View>
 
         {/* Footer spacing */}
-        <View style={{ height: 40 }} />
+        <View style={{ height: hp(40) }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -268,280 +272,280 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
+    paddingHorizontal: wp(20),
+    paddingTop: hp(16),
+    paddingBottom: hp(20),
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: fontSize(28),
     fontWeight: '700',
     color: '#0F172A',
   },
   infoButton: {
-    padding: 8,
+    padding: wp(8),
   },
   noticeCard: {
-    marginHorizontal: 20,
+    marginHorizontal: wp(20),
     backgroundColor: '#E0F2FE',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: wp(12),
+    padding: wp(16),
+    marginBottom: hp(16),
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 12,
+    gap: wp(12),
   },
   noticeText: {
     flex: 1,
-    fontSize: 13,
+    fontSize: fontSize(13),
     color: '#0369A1',
-    lineHeight: 18,
+    lineHeight: fontSize(18),
     fontWeight: '500',
   },
   balanceCard: {
-    marginHorizontal: 20,
+    marginHorizontal: wp(20),
     backgroundColor: '#0EA5E9',
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 20,
+    borderRadius: wp(20),
+    padding: wp(24),
+    marginBottom: hp(20),
     alignItems: 'center',
   },
   balanceLabel: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 8,
+    marginBottom: hp(8),
   },
   balanceAmount: {
-    fontSize: 42,
+    fontSize: responsive({ xs: fontSize(36), sm: fontSize(38), default: fontSize(42) }),
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 8,
+    marginBottom: hp(8),
   },
   balanceEquivalent: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: 16,
+    marginBottom: hp(16),
   },
   balanceHint: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingHorizontal: wp(16),
+    paddingVertical: hp(10),
+    borderRadius: wp(12),
   },
   balanceHintText: {
-    fontSize: 13,
+    fontSize: fontSize(13),
     color: '#FFFFFF',
     fontWeight: '500',
   },
   adSection: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: wp(20),
+    marginBottom: hp(20),
   },
   watchAdButton: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: wp(16),
+    padding: wp(20),
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: hp(12),
   },
   watchAdButtonDisabled: {
     opacity: 0.5,
   },
   watchAdIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: wp(48),
+    height: wp(48),
+    borderRadius: wp(12),
     backgroundColor: '#E0F2FE',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16,
+    marginRight: wp(16),
   },
   watchAdContent: {
     flex: 1,
   },
   watchAdTitle: {
-    fontSize: 17,
+    fontSize: fontSize(17),
     fontWeight: '600',
     color: '#0F172A',
-    marginBottom: 4,
+    marginBottom: hp(4),
   },
   watchAdSubtitle: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#10B981',
     fontWeight: '500',
   },
   watchAdArrow: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: wp(40),
+    height: wp(40),
+    borderRadius: wp(20),
     backgroundColor: '#0EA5E9',
     alignItems: 'center',
     justifyContent: 'center',
   },
   adLimitInfo: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 14,
+    borderRadius: wp(12),
+    padding: wp(14),
   },
   adLimitText: {
-    fontSize: 13,
+    fontSize: fontSize(13),
     color: '#64748B',
-    marginBottom: 8,
+    marginBottom: hp(8),
   },
   adLimitBar: {
-    height: 4,
+    height: hp(4),
     backgroundColor: '#E2E8F0',
-    borderRadius: 2,
+    borderRadius: wp(2),
   },
   adLimitFill: {
-    height: 4,
+    height: hp(4),
     backgroundColor: '#0EA5E9',
-    borderRadius: 2,
+    borderRadius: wp(2),
   },
   // Rules section
   rulesCard: {
-    marginHorizontal: 20,
+    marginHorizontal: wp(20),
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: wp(16),
+    padding: wp(20),
+    marginBottom: hp(20),
   },
   rulesTitle: {
-    fontSize: 20,
+    fontSize: fontSize(20),
     fontWeight: '700',
     color: '#0F172A',
-    marginBottom: 8,
+    marginBottom: hp(8),
   },
   rulesDescription: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#64748B',
-    marginBottom: 20,
-    lineHeight: 20,
+    marginBottom: hp(20),
+    lineHeight: fontSize(20),
   },
   ruleSection: {
-    marginBottom: 20,
+    marginBottom: hp(20),
   },
   ruleSectionTitle: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     fontWeight: '600',
     color: '#0F172A',
-    marginBottom: 10,
+    marginBottom: hp(10),
   },
   ruleItem: {
     flexDirection: 'row',
-    marginBottom: 6,
-    paddingLeft: 8,
+    marginBottom: hp(6),
+    paddingLeft: wp(8),
   },
   ruleBullet: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#0EA5E9',
-    marginRight: 8,
+    marginRight: wp(8),
     fontWeight: '700',
   },
   ruleText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#475569',
-    lineHeight: 20,
+    lineHeight: fontSize(20),
   },
   disclaimer: {
     backgroundColor: '#FFF7ED',
-    borderRadius: 12,
-    padding: 14,
-    marginTop: 10,
+    borderRadius: wp(12),
+    padding: wp(14),
+    marginTop: hp(10),
   },
   disclaimerText: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     color: '#9A3412',
-    lineHeight: 18,
+    lineHeight: fontSize(18),
   },
   // Earn section
   earnCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 12,
-    marginBottom: 20,
+    borderRadius: wp(16),
+    padding: wp(16),
+    marginTop: hp(12),
+    marginBottom: hp(20),
   },
   earnItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: hp(12),
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
   earnEmoji: {
-    fontSize: 32,
-    marginRight: 16,
+    fontSize: fontSize(32),
+    marginRight: wp(16),
   },
   earnInfo: {
     flex: 1,
   },
   earnTitle: {
-    fontSize: 15,
+    fontSize: fontSize(15),
     fontWeight: '500',
     color: '#0F172A',
-    marginBottom: 2,
+    marginBottom: hp(2),
   },
   earnAmount: {
-    fontSize: 13,
+    fontSize: fontSize(13),
     color: '#10B981',
     fontWeight: '600',
   },
   section: {
-    paddingHorizontal: 20,
+    paddingHorizontal: wp(20),
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: hp(16),
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: fontSize(18),
     fontWeight: '700',
     color: '#0F172A',
-    marginBottom: 12,
+    marginBottom: hp(12),
   },
   historyItem: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
+    borderRadius: wp(14),
+    padding: wp(14),
+    marginBottom: hp(10),
   },
   historyIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+    width: wp(44),
+    height: wp(44),
+    borderRadius: wp(12),
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 14,
+    marginRight: wp(14),
   },
   historyInfo: {
     flex: 1,
   },
   historyTitle: {
-    fontSize: 15,
+    fontSize: fontSize(15),
     fontWeight: '600',
     color: '#0F172A',
-    marginBottom: 2,
+    marginBottom: hp(2),
   },
   historyDescription: {
-    fontSize: 13,
+    fontSize: fontSize(13),
     color: '#64748B',
-    marginBottom: 2,
+    marginBottom: hp(2),
   },
   historyDate: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     color: '#94A3B8',
   },
   historyAmount: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     fontWeight: '700',
   },
   loadingContainer: {
@@ -550,18 +554,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 16,
+    marginTop: hp(16),
+    fontSize: fontSize(16),
     color: '#64748B',
   },
   emptyState: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 32,
+    borderRadius: wp(14),
+    padding: wp(32),
     alignItems: 'center',
   },
   emptyStateText: {
-    fontSize: 15,
+    fontSize: fontSize(15),
     color: '#94A3B8',
   },
 });

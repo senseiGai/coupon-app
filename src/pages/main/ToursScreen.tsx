@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Umbrella, Pyramid, Building2, Palmtree, Waves, Check, Star } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage } from '@/shared/lib/hooks';
+import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
 
 const tours = [
   {
@@ -58,7 +59,8 @@ const tours = [
 ];
 
 const TourIcon = ({ type }: { type: string }) => {
-  const iconProps = { size: 48, strokeWidth: 1.5, color: '#0EA5E9' };
+  const iconSize = responsive({ xs: 40, sm: 44, default: 48 });
+  const iconProps = { size: iconSize, strokeWidth: 1.5, color: '#0EA5E9' };
   switch (type) {
     case 'beach':
       return <Umbrella {...iconProps} />;
@@ -122,7 +124,7 @@ export const ToursScreen = () => {
                   <Text style={styles.bannerSubtitle}>{t.main.tours.specialDiscount} 70%</Text>
                 </View>
                 <View style={styles.bannerIcon}>
-                  <Star size={40} color="#FFFFFF" strokeWidth={2.5} fill="#FFFFFF" />
+                  <Star size={wp(40)} color="#FFFFFF" strokeWidth={2.5} fill="#FFFFFF" />
                 </View>
               </View>
             </LinearGradient>
@@ -183,7 +185,7 @@ export const ToursScreen = () => {
                       <View style={styles.affordBadge}>
                         <View style={styles.affordBadgeContent}>
                           <Text style={styles.affordBadgeText}>{t.main.tours.available}</Text>
-                          <Check size={14} color="#16A34A" strokeWidth={3} />
+                          <Check size={wp(14)} color="#16A34A" strokeWidth={3} />
                         </View>
                       </View>
                     ) : (
@@ -210,7 +212,7 @@ export const ToursScreen = () => {
           })}
         </View>
 
-        <View style={{ height: 140 }} />
+        <View style={{ height: hp(140) }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -225,20 +227,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
+    paddingHorizontal: wp(20),
+    paddingTop: hp(16),
+    paddingBottom: hp(12),
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: fontSize(28),
     fontWeight: '700',
     color: '#1E293B',
   },
   balanceChip: {
     backgroundColor: '#0EA5E9',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingHorizontal: wp(16),
+    paddingVertical: hp(10),
+    borderRadius: wp(20),
     shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
@@ -247,18 +249,18 @@ const styles = StyleSheet.create({
   },
   balanceChipText: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: fontSize(15),
     fontWeight: '700',
   },
   bannerSection: {
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 12,
+    paddingHorizontal: wp(20),
+    paddingTop: hp(8),
+    paddingBottom: hp(12),
   },
   featuredBanner: {
     width: '100%',
-    height: 120,
-    borderRadius: 20,
+    minHeight: hp(120),
+    borderRadius: wp(20),
     overflow: 'hidden',
     shadowColor: '#EC4899',
     shadowOffset: { width: 0, height: 6 },
@@ -271,48 +273,49 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: wp(24),
+    paddingVertical: hp(20),
   },
   bannerLeft: {
     flex: 1,
   },
   bannerTitle: {
-    fontSize: 24,
+    fontSize: fontSize(24),
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: hp(4),
   },
   bannerSubtitle: {
-    fontSize: 15,
+    fontSize: fontSize(15),
     color: '#FFFFFF',
     opacity: 0.95,
     fontWeight: '600',
   },
   bannerIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: wp(64),
+    height: wp(64),
+    borderRadius: wp(32),
     backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   categoriesContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    gap: 10,
+    paddingHorizontal: wp(20),
+    paddingBottom: hp(20),
+    gap: wp(10),
   },
   categoryChip: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingHorizontal: wp(18),
+    paddingVertical: hp(10),
+    borderRadius: wp(20),
     backgroundColor: '#FFFFFF',
-    marginRight: 10,
+    marginRight: wp(10),
   },
   categoryChipActive: {
     backgroundColor: '#0EA5E9',
   },
   categoryText: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     fontWeight: '500',
     color: '#64748B',
   },
@@ -320,16 +323,16 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   toursList: {
-    paddingHorizontal: 20,
+    paddingHorizontal: wp(20),
   },
   tourCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    marginBottom: 16,
+    borderRadius: wp(20),
+    marginBottom: hp(16),
     overflow: 'hidden',
   },
   tourImage: {
-    height: 160,
+    height: hp(160),
     backgroundColor: '#E0F2FE',
     alignItems: 'center',
     justifyContent: 'center',
@@ -337,36 +340,36 @@ const styles = StyleSheet.create({
   },
   tourTag: {
     position: 'absolute',
-    top: 12,
-    left: 12,
+    top: hp(12),
+    left: wp(12),
     backgroundColor: '#0EA5E9',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: wp(12),
+    paddingVertical: hp(6),
+    borderRadius: wp(8),
   },
   tourTagText: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: fontSize(12),
     fontWeight: '600',
   },
   tourInfo: {
-    padding: 18,
+    padding: wp(18),
   },
   tourTitle: {
-    fontSize: 18,
+    fontSize: fontSize(18),
     fontWeight: '700',
     color: '#0F172A',
-    marginBottom: 4,
+    marginBottom: hp(4),
   },
   tourHotel: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#64748B',
-    marginBottom: 2,
+    marginBottom: hp(2),
   },
   tourDuration: {
-    fontSize: 13,
+    fontSize: fontSize(13),
     color: '#94A3B8',
-    marginBottom: 14,
+    marginBottom: hp(14),
   },
   priceRow: {
     flexDirection: 'row',
@@ -374,59 +377,59 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   tourPrice: {
-    fontSize: 20,
+    fontSize: fontSize(20),
     fontWeight: '700',
     color: '#0EA5E9',
-    marginBottom: 2,
+    marginBottom: hp(2),
   },
   tourOriginalPrice: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     color: '#94A3B8',
     textDecorationLine: 'line-through',
   },
   affordBadge: {
     backgroundColor: '#DCFCE7',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: wp(12),
+    paddingVertical: hp(6),
+    borderRadius: wp(8),
   },
   affordBadgeContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: wp(4),
   },
   affordBadgeText: {
     color: '#16A34A',
-    fontSize: 13,
+    fontSize: fontSize(13),
     fontWeight: '600',
   },
   progressBadge: {
     backgroundColor: '#FEF3C7',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: wp(12),
+    paddingVertical: hp(6),
+    borderRadius: wp(8),
   },
   progressBadgeText: {
     color: '#B45309',
-    fontSize: 13,
+    fontSize: fontSize(13),
     fontWeight: '600',
   },
   tourProgress: {
-    marginTop: 14,
+    marginTop: hp(14),
   },
   tourProgressBar: {
-    height: 6,
+    height: hp(6),
     backgroundColor: '#E2E8F0',
-    borderRadius: 3,
-    marginBottom: 8,
+    borderRadius: wp(3),
+    marginBottom: hp(8),
   },
   tourProgressFill: {
-    height: 6,
+    height: hp(6),
     backgroundColor: '#0EA5E9',
-    borderRadius: 3,
+    borderRadius: wp(3),
   },
   tourProgressText: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     color: '#64748B',
   },
 });

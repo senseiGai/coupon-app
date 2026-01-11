@@ -4,9 +4,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
   Alert,
+<<<<<<< HEAD
   Image,
+=======
+  useWindowDimensions,
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -21,6 +24,7 @@ import {
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage, useLogout } from '../../shared/lib/hooks';
+<<<<<<< HEAD
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { CompositeNavigationProp } from '@react-navigation/native';
@@ -47,12 +51,33 @@ type NavigationProp = CompositeNavigationProp<
 const { width } = Dimensions.get('window');
 const BANNER_WIDTH = width - 32;
 const CARD_WIDTH = (width - 48) / 2;
+=======
+import {
+  wp,
+  hp,
+  fontSize,
+  sizes,
+  responsive,
+  isSmallDevice,
+  isTablet,
+} from '../../shared/lib/responsive';
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
 export const HomePage = () => {
   const { t, language, setLanguage } = useLanguage();
   const logoutMutation = useLogout();
+<<<<<<< HEAD
   const navigation = useNavigation<NavigationProp>();
+=======
+  const { width } = useWindowDimensions();
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
   const userBalance = 2450;
+
+  // Адаптивные размеры на основе текущей ширины экрана
+  const BANNER_WIDTH = width - wp(32);
+  const iconSize = responsive({ xs: 28, sm: 32, lg: 36, default: 32 });
+  const promoIconSize = responsive({ xs: 30, sm: 36, lg: 40, default: 36 });
+  const sparkleSize = responsive({ xs: 20, sm: 24, lg: 28, default: 24 });
 
   const toggleLanguage = () => {
     if (language === 'en') {
@@ -119,7 +144,7 @@ export const HomePage = () => {
             style={styles.languageButton}
             onPress={toggleLanguage}
             activeOpacity={0.7}>
-            <Languages size={24} color="#0EA5E9" strokeWidth={2} />
+            <Languages size={sizes.iconMD} color="#0EA5E9" strokeWidth={2} />
             <Text style={styles.languageText}>{getLanguageLabel()}</Text>
           </TouchableOpacity>
         </View>
@@ -154,6 +179,7 @@ export const HomePage = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.main.home.quickActions}</Text>
           <View style={styles.singleCardContainer}>
+<<<<<<< HEAD
             {/* Bonuses - Blue */}
             <TouchableOpacity
               activeOpacity={0.8}
@@ -166,6 +192,17 @@ export const HomePage = () => {
                     style={styles.goldenLogo}
                     resizeMode="contain"
                   />
+=======
+            {/* Bonuses - Orange */}
+            <TouchableOpacity activeOpacity={0.8} style={styles.fullWidthCard}>
+              <LinearGradient
+                colors={['#F59E0B', '#D97706']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.cardGradient}>
+                <View style={styles.cardIcon}>
+                  <Gift size={iconSize} color="#FFFFFF" strokeWidth={2.5} />
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
                 </View>
                 <Text style={styles.cardTitle}>{t.main.home.bonuses}</Text>
                 <Text style={styles.cardSubtitle}>{t.main.home.daily}</Text>
@@ -190,8 +227,13 @@ export const HomePage = () => {
               style={styles.bannerGradient}>
               <View style={styles.promoContent}>
                 <View style={styles.promoLeft}>
+<<<<<<< HEAD
                   <View style={styles.promoIconBlue}>
                     <MessageCircle size={36} color="#0EA5E9" strokeWidth={2.5} />
+=======
+                  <View style={styles.promoIcon}>
+                    <Crown size={promoIconSize} color="#FFFFFF" strokeWidth={2.5} />
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
                   </View>
                   <View style={styles.promoText}>
                     <Text style={styles.promoTitleDark}>{t.main.home.premiumTours}</Text>
@@ -201,7 +243,11 @@ export const HomePage = () => {
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
+<<<<<<< HEAD
                   <Sparkles size={24} color="#0EA5E9" strokeWidth={2} />
+=======
+                  <Sparkles size={sparkleSize} color="#FFFFFF" strokeWidth={2} />
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
                 </View>
               </View>
             </LinearGradient>
@@ -219,8 +265,13 @@ export const HomePage = () => {
               style={styles.bannerGradient}>
               <View style={styles.promoContent}>
                 <View style={styles.promoLeft}>
+<<<<<<< HEAD
                   <View style={styles.promoIconBlue}>
                     <FileText size={36} color="#0EA5E9" strokeWidth={2.5} />
+=======
+                  <View style={styles.promoIcon}>
+                    <Zap size={promoIconSize} color="#FFFFFF" strokeWidth={2.5} />
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
                   </View>
                   <View style={styles.promoText}>
                     <Text style={styles.promoTitleDark}>{t.main.home.flashDeals}</Text>
@@ -228,7 +279,11 @@ export const HomePage = () => {
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
+<<<<<<< HEAD
                   <Star size={24} color="#0EA5E9" strokeWidth={2} fill="#0EA5E9" />
+=======
+                  <Star size={sparkleSize} color="#FFFFFF" strokeWidth={2} fill="#FFFFFF" />
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
                 </View>
               </View>
             </LinearGradient>
@@ -238,12 +293,16 @@ export const HomePage = () => {
         {/* Logout Button */}
         <View style={styles.section}>
           <TouchableOpacity activeOpacity={0.7} onPress={handleLogout} style={styles.logoutButton}>
+<<<<<<< HEAD
             <LogOut size={20} color="#0EA5E9" strokeWidth={2.5} />
+=======
+            <LogOut size={wp(20)} color="#FFFFFF" strokeWidth={2.5} />
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
             <Text style={styles.logoutButtonText}>{t.common.logout}</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={{ height: 140 }} />
+        <View style={{ height: hp(140) }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -258,18 +317,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: wp(16),
+    paddingTop: hp(16),
+    paddingBottom: hp(8),
   },
   greeting: {
-    fontSize: 28,
+    fontSize: fontSize(28),
     fontWeight: '700',
     color: '#1E293B',
-    marginBottom: 4,
+    marginBottom: hp(4),
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: fontSize(15),
     color: '#64748B',
     fontWeight: '500',
   },
@@ -277,10 +336,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
-    gap: 6,
+    paddingHorizontal: wp(12),
+    paddingVertical: hp(8),
+    borderRadius: wp(16),
+    gap: wp(6),
     shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -288,15 +347,15 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   languageText: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     fontWeight: '700',
     color: '#0EA5E9',
   },
   balanceCard: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 16,
+    paddingHorizontal: wp(16),
+    paddingVertical: hp(10),
+    borderRadius: wp(16),
     shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -304,28 +363,28 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   balanceLabel: {
-    fontSize: 11,
+    fontSize: fontSize(11),
     color: '#64748B',
     fontWeight: '600',
-    marginBottom: 2,
+    marginBottom: hp(2),
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   balanceAmount: {
-    fontSize: 20,
+    fontSize: fontSize(20),
     fontWeight: '700',
     color: '#0EA5E9',
   },
   bannerSection: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: wp(16),
+    paddingTop: hp(16),
   },
   balanceBanner: {
-    width: BANNER_WIDTH,
+    width: '100%',
     backgroundColor: '#38BDF8',
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    borderRadius: wp(20),
+    paddingHorizontal: wp(20),
+    paddingVertical: hp(20),
     shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
@@ -336,7 +395,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: hp(12),
   },
   balanceLabelRow: {
     flexDirection: 'row',
@@ -344,7 +403,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   balanceBannerLabel: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     fontWeight: '600',
     color: '#FFFFFF',
   },
@@ -356,58 +415,63 @@ const styles = StyleSheet.create({
   },
   watchAdButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 18,
+    paddingHorizontal: wp(14),
+    paddingVertical: hp(8),
+    borderRadius: wp(18),
   },
   watchAdText: {
-    fontSize: 13,
+    fontSize: fontSize(13),
     fontWeight: '600',
     color: '#0EA5E9',
   },
   balanceBannerAmount: {
-    fontSize: 40,
+    fontSize: responsive({ xs: fontSize(32), sm: fontSize(36), default: fontSize(40) }),
     fontWeight: '700',
     color: '#FFFFFF',
+<<<<<<< HEAD
+=======
+    marginBottom: hp(6),
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
   },
   balanceBannerHint: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: 'rgba(255, 255, 255, 0.9)',
     fontWeight: '500',
     fontStyle: 'italic',
   },
   section: {
-    paddingTop: 24,
+    paddingTop: hp(24),
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: fontSize(20),
     fontWeight: '700',
     color: '#1E293B',
-    paddingHorizontal: 16,
-    marginBottom: 12,
+    paddingHorizontal: wp(16),
+    marginBottom: hp(12),
   },
   cardsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    gap: 12,
+    paddingHorizontal: wp(16),
+    gap: wp(12),
     justifyContent: 'space-between',
   },
   singleCardContainer: {
-    paddingHorizontal: 16,
+    paddingHorizontal: wp(16),
   },
   actionCard: {
-    width: CARD_WIDTH,
-    marginBottom: 4,
+    flex: 1,
+    minWidth: wp(150),
+    marginBottom: hp(4),
   },
   fullWidthCard: {
     width: '100%',
   },
   cardGradient: {
     width: '100%',
-    height: 140,
-    borderRadius: 20,
-    padding: 16,
+    height: hp(140),
+    borderRadius: wp(20),
+    padding: wp(16),
     justifyContent: 'space-between',
     shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
@@ -431,9 +495,9 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   cardIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: wp(56),
+    height: wp(56),
+    borderRadius: wp(16),
     backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -460,10 +524,10 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   cardTitle: {
-    fontSize: 17,
+    fontSize: fontSize(17),
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 2,
+    marginBottom: hp(2),
   },
   cardTitleDark: {
     fontSize: 17,
@@ -472,7 +536,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   cardSubtitle: {
-    fontSize: 13,
+    fontSize: fontSize(13),
     color: '#FFFFFF',
     opacity: 0.9,
     fontWeight: '500',
@@ -483,13 +547,13 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   promoBanner: {
-    marginHorizontal: 16,
-    marginTop: 12,
+    marginHorizontal: wp(16),
+    marginTop: hp(12),
   },
   bannerGradient: {
     width: '100%',
-    height: 100,
-    borderRadius: 20,
+    minHeight: hp(100),
+    borderRadius: wp(20),
     overflow: 'hidden',
     shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
@@ -504,7 +568,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: wp(20),
+    paddingVertical: hp(16),
   },
   promoLeft: {
     flexDirection: 'row',
@@ -512,13 +577,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   promoIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: wp(56),
+    height: wp(56),
+    borderRadius: wp(16),
     backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
+    marginRight: wp(14),
   },
   promoIconBlue: {
     width: 56,
@@ -533,10 +598,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   promoTitle: {
-    fontSize: 17,
+    fontSize: fontSize(17),
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 3,
+    marginBottom: hp(3),
   },
   promoTitleDark: {
     fontSize: 17,
@@ -545,7 +610,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   promoSubtitle: {
-    fontSize: 13,
+    fontSize: fontSize(13),
     color: '#FFFFFF',
     opacity: 0.9,
     fontWeight: '500',
@@ -556,18 +621,27 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   sparkleIcon: {
-    marginLeft: 12,
+    marginLeft: wp(12),
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+<<<<<<< HEAD
     marginHorizontal: 16,
     backgroundColor: '#FFFFFF',
     paddingVertical: 14,
     borderRadius: 16,
     gap: 10,
     shadowColor: '#0EA5E9',
+=======
+    marginHorizontal: wp(16),
+    backgroundColor: '#EF4444',
+    paddingVertical: hp(14),
+    borderRadius: wp(16),
+    gap: wp(10),
+    shadowColor: '#EF4444',
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -576,7 +650,7 @@ const styles = StyleSheet.create({
     borderColor: '#BAE6FD',
   },
   logoutButtonText: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     fontWeight: '600',
     color: '#0EA5E9',
   },

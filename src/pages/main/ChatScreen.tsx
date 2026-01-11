@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  Dimensions,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,9 +24,13 @@ import {
 } from '../../shared/lib/hooks';
 import { socketService } from '../../shared/lib/socket/socketService';
 import type { PrivateMessage } from '../../shared/types/message';
+<<<<<<< HEAD
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
+=======
+import { wp, hp, fontSize, sizes, responsive } from '../../shared/lib/responsive';
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT } = sizes;
 
 export const ChatScreen = () => {
   const { t } = useLanguage();
@@ -204,7 +207,27 @@ export const ChatScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}>
         {/* Фон с самолётиками */}
+<<<<<<< HEAD
         <AirplaneBackground />
+=======
+        <View style={styles.airplanesBackground}>
+          {airplanes.map((airplane) => (
+            <View
+              key={airplane.id}
+              style={[
+                styles.airplaneContainer,
+                {
+                  left: airplane.x,
+                  top: airplane.y,
+                  transform: [{ rotate: `${airplane.rotation}deg` }, { scale: airplane.scale }],
+                  opacity: airplane.opacity,
+                },
+              ]}>
+              <Plane size={wp(24)} color="#0EA5E9" strokeWidth={1.5} />
+            </View>
+          ))}
+        </View>
+>>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
         <ScrollView
           ref={scrollViewRef}
@@ -293,7 +316,7 @@ export const ChatScreen = () => {
         {/* Input */}
         <View style={styles.inputContainer}>
           <TouchableOpacity style={styles.attachButton} activeOpacity={0.7}>
-            <Paperclip size={22} color="#64748B" strokeWidth={2} />
+            <Paperclip size={wp(22)} color="#64748B" strokeWidth={2} />
           </TouchableOpacity>
           <TextInput
             style={styles.textInput}
@@ -314,7 +337,11 @@ export const ChatScreen = () => {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.sendButtonGradient}>
-              <Send size={20} color={inputText.trim() ? '#FFFFFF' : '#94A3B8'} strokeWidth={2} />
+              <Send
+                size={wp(20)}
+                color={inputText.trim() ? '#FFFFFF' : '#94A3B8'}
+                strokeWidth={2}
+              />
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -329,12 +356,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   headerGradient: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: wp(20),
+    paddingVertical: hp(16),
     shadowColor: '#0EA5E9',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: hp(4) },
     shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowRadius: wp(8),
     elevation: 8,
   },
   headerContent: {
@@ -343,60 +370,60 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     position: 'relative',
-    marginRight: 14,
+    marginRight: wp(14),
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: wp(48),
+    height: wp(48),
+    borderRadius: wp(24),
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: hp(2) },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: wp(4),
     elevation: 3,
   },
   logoImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: wp(48),
+    height: wp(48),
+    borderRadius: wp(24),
   },
   onlineIndicator: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: wp(14),
+    height: wp(14),
+    borderRadius: wp(7),
     backgroundColor: '#22C55E',
-    borderWidth: 2,
+    borderWidth: wp(2),
     borderColor: '#FFFFFF',
   },
   headerInfo: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: fontSize(18),
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: hp(4),
   },
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: wp(6),
+    height: wp(6),
+    borderRadius: wp(3),
     backgroundColor: '#22C55E',
-    marginRight: 6,
+    marginRight: wp(6),
   },
   headerSubtitle: {
-    fontSize: 13,
+    fontSize: fontSize(13),
     color: 'rgba(255, 255, 255, 0.85)',
     fontWeight: '500',
   },
@@ -419,24 +446,24 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   messagesContent: {
-    padding: 16,
-    paddingBottom: 10,
+    padding: wp(16),
+    paddingBottom: hp(10),
   },
   dateContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: hp(20),
   },
   dateText: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     color: '#94A3B8',
     fontWeight: '500',
     backgroundColor: '#F1F5F9',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: wp(12),
+    paddingVertical: hp(6),
+    borderRadius: wp(12),
   },
   messageWrapper: {
-    marginBottom: 12,
+    marginBottom: hp(12),
     flexDirection: 'row',
     alignItems: 'flex-end',
   },
@@ -447,53 +474,53 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   messageAvatarContainer: {
-    marginRight: 8,
-    marginBottom: 2,
+    marginRight: wp(8),
+    marginBottom: hp(2),
   },
   messageAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: wp(32),
+    height: wp(32),
+    borderRadius: wp(16),
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: wp(1),
     borderColor: '#E0F2FE',
     overflow: 'hidden',
   },
   messageLogoImage: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: wp(32),
+    height: wp(32),
+    borderRadius: wp(16),
   },
   messageBubble: {
     maxWidth: '75%',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 20,
+    paddingHorizontal: wp(16),
+    paddingVertical: hp(12),
+    borderRadius: wp(20),
   },
   userMessage: {
-    borderBottomRightRadius: 6,
+    borderBottomRightRadius: wp(6),
     shadowColor: '#0EA5E9',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: hp(2) },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowRadius: wp(4),
     elevation: 3,
   },
   supportMessage: {
     backgroundColor: '#FFFFFF',
-    borderBottomLeftRadius: 6,
-    borderWidth: 1,
+    borderBottomLeftRadius: wp(6),
+    borderWidth: wp(1),
     borderColor: '#E2E8F0',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: hp(1) },
     shadowOpacity: 0.05,
-    shadowRadius: 3,
+    shadowRadius: wp(3),
     elevation: 1,
   },
   messageText: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: fontSize(15),
+    lineHeight: fontSize(22),
     fontWeight: '400',
   },
   userMessageText: {
@@ -503,8 +530,8 @@ const styles = StyleSheet.create({
     color: '#1E293B',
   },
   messageTime: {
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: fontSize(11),
+    marginTop: hp(4),
     fontWeight: '500',
   },
   userMessageTime: {
@@ -517,50 +544,50 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingBottom: Platform.OS === 'ios' ? 32 : 16,
+    paddingHorizontal: wp(16),
+    paddingVertical: hp(12),
+    paddingBottom: Platform.OS === 'ios' ? hp(32) : hp(16),
     backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
+    borderTopWidth: wp(1),
     borderTopColor: '#F1F5F9',
   },
   attachButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: wp(44),
+    height: wp(44),
+    borderRadius: wp(22),
     backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
-    borderWidth: 1,
+    marginRight: wp(10),
+    borderWidth: wp(1),
     borderColor: '#E2E8F0',
   },
   textInput: {
     flex: 1,
-    minHeight: 44,
-    maxHeight: 100,
+    minHeight: hp(44),
+    maxHeight: hp(100),
     backgroundColor: '#F8FAFC',
-    borderRadius: 22,
-    paddingHorizontal: 18,
-    paddingTop: Platform.OS === 'ios' ? 12 : 10,
-    paddingBottom: Platform.OS === 'ios' ? 12 : 10,
-    fontSize: 15,
+    borderRadius: wp(22),
+    paddingHorizontal: wp(18),
+    paddingTop: Platform.OS === 'ios' ? hp(12) : hp(10),
+    paddingBottom: Platform.OS === 'ios' ? hp(12) : hp(10),
+    fontSize: fontSize(15),
     color: '#1E293B',
-    marginRight: 10,
-    borderWidth: 1,
+    marginRight: wp(10),
+    borderWidth: wp(1),
     borderColor: '#E2E8F0',
   },
   sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: wp(44),
+    height: wp(44),
+    borderRadius: wp(22),
     overflow: 'hidden',
   },
   sendButtonActive: {
     shadowColor: '#0EA5E9',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: hp(2) },
     shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowRadius: wp(4),
     elevation: 4,
   },
   sendButtonGradient: {
@@ -572,25 +599,25 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 40,
+    paddingVertical: hp(40),
   },
   messageFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
+    gap: wp(4),
+    marginTop: hp(4),
   },
   readStatus: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     color: '#E0F2FE',
     fontWeight: '600',
   },
   typingBubble: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: hp(12),
+    paddingHorizontal: wp(16),
   },
   typingText: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#64748B',
     fontStyle: 'italic',
   },

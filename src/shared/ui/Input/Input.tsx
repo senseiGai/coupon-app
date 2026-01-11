@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextInput, View, Text, TextInputProps, StyleSheet } from 'react-native';
+import { wp, hp, fontSize } from '../../lib/responsive';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -22,21 +23,21 @@ export const Input = ({ label, error, style, ...props }: InputProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 18,
+    marginBottom: hp(18),
   },
   label: {
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: hp(8),
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: fontSize(14),
   },
   input: {
     backgroundColor: '#F8FAFC',
     borderWidth: 2,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
+    borderRadius: wp(14),
+    paddingHorizontal: wp(16),
+    paddingVertical: hp(14),
+    fontSize: fontSize(16),
     color: '#1E293B',
   },
   inputNormal: {
@@ -48,8 +49,8 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#EF4444',
-    fontSize: 13,
-    marginTop: 6,
+    fontSize: fontSize(13),
+    marginTop: hp(6),
     fontWeight: '500',
   },
 });

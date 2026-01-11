@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, TouchableOpacityProps, StyleSheet } from 'react-native';
+import { wp, hp, fontSize } from '../../lib/responsive';
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
@@ -29,9 +30,9 @@ export const Button = ({ title, variant = 'primary', style, ...props }: ButtonPr
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 16,
+    paddingVertical: hp(16),
+    paddingHorizontal: wp(24),
+    borderRadius: wp(16),
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#0EA5E9',
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: fontSize(16),
   },
   primaryText: {
     color: '#FFFFFF',
