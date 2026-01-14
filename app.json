@@ -26,7 +26,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.k1ngsterr.myexpoapp"
@@ -37,6 +39,11 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.k1ngsterr.myexpoapp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "93d81310-3bcb-4f3b-b383-bc12923984cd"
+      }
     }
   }
 }

@@ -24,11 +24,8 @@ import {
 } from '../../shared/lib/hooks';
 import { socketService } from '../../shared/lib/socket/socketService';
 import type { PrivateMessage } from '../../shared/types/message';
-<<<<<<< HEAD
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
-=======
 import { wp, hp, fontSize, sizes, responsive } from '../../shared/lib/responsive';
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
 const { screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT } = sizes;
 
@@ -207,27 +204,7 @@ export const ChatScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}>
         {/* Фон с самолётиками */}
-<<<<<<< HEAD
         <AirplaneBackground />
-=======
-        <View style={styles.airplanesBackground}>
-          {airplanes.map((airplane) => (
-            <View
-              key={airplane.id}
-              style={[
-                styles.airplaneContainer,
-                {
-                  left: airplane.x,
-                  top: airplane.y,
-                  transform: [{ rotate: `${airplane.rotation}deg` }, { scale: airplane.scale }],
-                  opacity: airplane.opacity,
-                },
-              ]}>
-              <Plane size={wp(24)} color="#0EA5E9" strokeWidth={1.5} />
-            </View>
-          ))}
-        </View>
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
         <ScrollView
           ref={scrollViewRef}

@@ -16,11 +16,8 @@ import { Paths, File } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useLanguage, useDocuments } from '../../shared/lib/hooks';
 import type { Document as ApiDocument } from '../../shared/types/document';
-<<<<<<< HEAD
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
-=======
 import { wp, hp, fontSize, responsive } from '../../shared/lib/responsive';
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
 export const DocumentsScreen = () => {
   const { t, language } = useLanguage();

@@ -22,11 +22,8 @@ import { BONUS_CONFIG } from '@/shared/types/bonus';
 import { useLanguage } from '@/shared/lib/hooks';
 import { useBonus } from '@/shared/lib/hooks/useBonus';
 import { RewardedAdButton } from '@/features/ads/ui/RewardedAdButton';
-<<<<<<< HEAD
 import { AirplaneBackground } from '@/shared/ui/AirplaneBackground';
-=======
 import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
 export const BalanceScreen = () => {
   const { t } = useLanguage();

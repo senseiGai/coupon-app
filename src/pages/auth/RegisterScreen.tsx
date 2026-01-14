@@ -15,11 +15,8 @@ import { AuthStackParamList } from '../../app/navigation/AuthStack';
 import { Input } from '../../shared/ui/Input/Input';
 import { Button } from '../../shared/ui/Button/Button';
 import { useLanguage, useRegister } from '../../shared/lib/hooks';
-<<<<<<< HEAD
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
-=======
 import { wp, hp, fontSize, responsive } from '../../shared/lib/responsive';
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 

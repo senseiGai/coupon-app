@@ -5,11 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-<<<<<<< HEAD
   Image,
-=======
   useWindowDimensions,
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -24,12 +21,20 @@ import {
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage, useLogout } from '../../shared/lib/hooks';
-<<<<<<< HEAD
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
+import {
+  wp,
+  hp,
+  fontSize,
+  sizes,
+  responsive,
+  isSmallDevice,
+  isTablet,
+} from '../../shared/lib/responsive';
 
 type MainTabParamList = {
   Home: undefined;
@@ -48,29 +53,11 @@ type NavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList>
 >;
 
-const { width } = Dimensions.get('window');
-const BANNER_WIDTH = width - 32;
-const CARD_WIDTH = (width - 48) / 2;
-=======
-import {
-  wp,
-  hp,
-  fontSize,
-  sizes,
-  responsive,
-  isSmallDevice,
-  isTablet,
-} from '../../shared/lib/responsive';
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
-
 export const HomePage = () => {
   const { t, language, setLanguage } = useLanguage();
   const logoutMutation = useLogout();
-<<<<<<< HEAD
   const navigation = useNavigation<NavigationProp>();
-=======
   const { width } = useWindowDimensions();
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
   const userBalance = 2450;
 
   // Адаптивные размеры на основе текущей ширины экрана
@@ -179,33 +166,25 @@ export const HomePage = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.main.home.quickActions}</Text>
           <View style={styles.singleCardContainer}>
-<<<<<<< HEAD
-            {/* Bonuses - Blue */}
+            {/* Bonuses Card with Gifts Image */}
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.fullWidthCard}
               onPress={() => navigation.navigate('BonusShop')}>
-              <View style={styles.cardSolid}>
-                <View style={styles.cardIconWithLogo}>
-                  <Image
-                    source={require('../../../assets/logo.jpg')}
-                    style={styles.goldenLogo}
-                    resizeMode="contain"
-                  />
-=======
-            {/* Bonuses - Orange */}
-            <TouchableOpacity activeOpacity={0.8} style={styles.fullWidthCard}>
-              <LinearGradient
-                colors={['#F59E0B', '#D97706']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardGradient}>
-                <View style={styles.cardIcon}>
-                  <Gift size={iconSize} color="#FFFFFF" strokeWidth={2.5} />
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
+              <View style={styles.bonusCardWithImage}>
+                <Image
+                  source={require('../../../assets/gifts.jpg')}
+                  style={styles.bonusBackgroundImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.bonusOverlay} />
+                <View style={styles.bonusContent}>
+                  <View style={styles.cardIcon}>
+                    <Gift size={iconSize} color="#FFFFFF" strokeWidth={2.5} />
+                  </View>
+                  <Text style={styles.bonusCardTitle}>{t.main.home.bonuses}</Text>
+                  <Text style={styles.bonusCardSubtitle}>{t.main.home.daily}</Text>
                 </View>
-                <Text style={styles.cardTitle}>{t.main.home.bonuses}</Text>
-                <Text style={styles.cardSubtitle}>{t.main.home.daily}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -227,13 +206,8 @@ export const HomePage = () => {
               style={styles.bannerGradient}>
               <View style={styles.promoContent}>
                 <View style={styles.promoLeft}>
-<<<<<<< HEAD
                   <View style={styles.promoIconBlue}>
-                    <MessageCircle size={36} color="#0EA5E9" strokeWidth={2.5} />
-=======
-                  <View style={styles.promoIcon}>
-                    <Crown size={promoIconSize} color="#FFFFFF" strokeWidth={2.5} />
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
+                    <MessageCircle size={promoIconSize} color="#0EA5E9" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
                     <Text style={styles.promoTitleDark}>{t.main.home.premiumTours}</Text>
@@ -243,11 +217,7 @@ export const HomePage = () => {
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
-<<<<<<< HEAD
-                  <Sparkles size={24} color="#0EA5E9" strokeWidth={2} />
-=======
-                  <Sparkles size={sparkleSize} color="#FFFFFF" strokeWidth={2} />
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
+                  <Sparkles size={sparkleSize} color="#0EA5E9" strokeWidth={2} />
                 </View>
               </View>
             </LinearGradient>
@@ -265,13 +235,8 @@ export const HomePage = () => {
               style={styles.bannerGradient}>
               <View style={styles.promoContent}>
                 <View style={styles.promoLeft}>
-<<<<<<< HEAD
                   <View style={styles.promoIconBlue}>
-                    <FileText size={36} color="#0EA5E9" strokeWidth={2.5} />
-=======
-                  <View style={styles.promoIcon}>
-                    <Zap size={promoIconSize} color="#FFFFFF" strokeWidth={2.5} />
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
+                    <FileText size={promoIconSize} color="#0EA5E9" strokeWidth={2.5} />
                   </View>
                   <View style={styles.promoText}>
                     <Text style={styles.promoTitleDark}>{t.main.home.flashDeals}</Text>
@@ -279,11 +244,7 @@ export const HomePage = () => {
                   </View>
                 </View>
                 <View style={styles.sparkleIcon}>
-<<<<<<< HEAD
-                  <Star size={24} color="#0EA5E9" strokeWidth={2} fill="#0EA5E9" />
-=======
-                  <Star size={sparkleSize} color="#FFFFFF" strokeWidth={2} fill="#FFFFFF" />
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
+                  <Star size={sparkleSize} color="#0EA5E9" strokeWidth={2} fill="#0EA5E9" />
                 </View>
               </View>
             </LinearGradient>
@@ -293,11 +254,7 @@ export const HomePage = () => {
         {/* Logout Button */}
         <View style={styles.section}>
           <TouchableOpacity activeOpacity={0.7} onPress={handleLogout} style={styles.logoutButton}>
-<<<<<<< HEAD
-            <LogOut size={20} color="#0EA5E9" strokeWidth={2.5} />
-=======
-            <LogOut size={wp(20)} color="#FFFFFF" strokeWidth={2.5} />
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
+            <LogOut size={sizes.iconSM} color="#0EA5E9" strokeWidth={2.5} />
             <Text style={styles.logoutButtonText}>{t.common.logout}</Text>
           </TouchableOpacity>
         </View>
@@ -428,10 +385,6 @@ const styles = StyleSheet.create({
     fontSize: responsive({ xs: fontSize(32), sm: fontSize(36), default: fontSize(40) }),
     fontWeight: '700',
     color: '#FFFFFF',
-<<<<<<< HEAD
-=======
-    marginBottom: hp(6),
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
   },
   balanceBannerHint: {
     fontSize: fontSize(14),
@@ -466,6 +419,50 @@ const styles = StyleSheet.create({
   },
   fullWidthCard: {
     width: '100%',
+  },
+  bonusCardWithImage: {
+    width: '100%',
+    height: hp(160),
+    borderRadius: wp(20),
+    overflow: 'hidden',
+    shadowColor: '#F59E0B',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  bonusBackgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  bonusOverlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(245, 158, 11, 0.3)',
+  },
+  bonusContent: {
+    flex: 1,
+    padding: wp(20),
+    justifyContent: 'space-between',
+  },
+  bonusCardTitle: {
+    fontSize: fontSize(22),
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: hp(4),
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  bonusCardSubtitle: {
+    fontSize: fontSize(15),
+    color: '#FFFFFF',
+    fontWeight: '700',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   cardGradient: {
     width: '100%',
@@ -627,21 +624,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-<<<<<<< HEAD
-    marginHorizontal: 16,
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 14,
-    borderRadius: 16,
-    gap: 10,
-    shadowColor: '#0EA5E9',
-=======
     marginHorizontal: wp(16),
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FFFFFF',
     paddingVertical: hp(14),
     borderRadius: wp(16),
     gap: wp(10),
-    shadowColor: '#EF4444',
->>>>>>> 2e63c83 (Refactor styles for responsive design across multiple screens)
+    shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
