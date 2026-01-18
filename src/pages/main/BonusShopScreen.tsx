@@ -21,14 +21,14 @@ const BONUS_ITEMS = [
   {
     id: '1',
     icon: Plane,
-    colors: ['#3B82F6', '#1D4ED8'] as const,
+    colors: ['#FCD34D', '#F59E0B'] as const,
     price: 500,
     category: 'travel',
   },
   {
     id: '2',
     icon: Hotel,
-    colors: ['#8B5CF6', '#6D28D9'] as const,
+    colors: ['#FDE68A', '#FBBF24'] as const,
     price: 1000,
     category: 'travel',
   },
@@ -42,21 +42,21 @@ const BONUS_ITEMS = [
   {
     id: '4',
     icon: ShoppingBag,
-    colors: ['#EC4899', '#BE185D'] as const,
+    colors: ['#FBBF24', '#F59E0B'] as const,
     price: 300,
     category: 'shopping',
   },
   {
     id: '5',
     icon: Ticket,
-    colors: ['#10B981', '#059669'] as const,
+    colors: ['#FCD34D', '#FBBF24'] as const,
     price: 200,
     category: 'entertainment',
   },
   {
     id: '6',
     icon: Gift,
-    colors: ['#EF4444', '#DC2626'] as const,
+    colors: ['#F59E0B', '#B45309'] as const,
     price: 750,
     category: 'gifts',
   },
@@ -135,10 +135,16 @@ export const BonusShopScreen = () => {
         {/* Info Banner */}
         <View style={styles.infoBanner}>
           <LinearGradient
-            colors={['#F59E0B', '#D97706']}
+            colors={['#FFFBEB', '#FEF3C7', '#FDE68A', '#FCD34D']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.infoBannerGradient}>
+            {/* Decorative ribbons */}
+            <View style={styles.decorativeRibbonTop}>
+              <View style={styles.ribbonPiece} />
+              <View style={styles.ribbonPiece} />
+              <View style={styles.ribbonPiece} />
+            </View>
             <View style={styles.infoBannerContent}>
               <View style={styles.infoBannerIcon}>
                 <Image
@@ -151,7 +157,9 @@ export const BonusShopScreen = () => {
                 <Text style={styles.infoBannerTitle}>{t.bonusShop.spendBonuses}</Text>
                 <Text style={styles.infoBannerSubtitle}>{t.bonusShop.chooseReward}</Text>
               </View>
+              <Star size={28} color="#F59E0B" strokeWidth={2} fill="#FBBF24" />
             </View>
+            <View style={styles.decorativeRibbonBottom} />
           </LinearGradient>
         </View>
 
@@ -286,10 +294,42 @@ const styles = StyleSheet.create({
   infoBannerGradient: {
     borderRadius: 20,
     padding: 20,
+    borderWidth: 3,
+    borderColor: '#FCD34D',
+    shadowColor: '#F59E0B',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  decorativeRibbonTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 8,
+    backgroundColor: '#F59E0B',
+    flexDirection: 'row',
+  },
+  ribbonPiece: {
+    flex: 1,
+    borderRightWidth: 1,
+    borderRightColor: '#D97706',
+  },
+  decorativeRibbonBottom: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+    backgroundColor: '#F59E0B',
   },
   infoBannerContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 4,
   },
   infoBannerIcon: {
     width: 60,
@@ -300,8 +340,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 16,
     borderWidth: 3,
-    borderColor: '#FFD700',
+    borderColor: '#F59E0B',
     overflow: 'hidden',
+    shadowColor: '#D97706',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
   },
   logoImage: {
     width: 50,
@@ -313,13 +358,17 @@ const styles = StyleSheet.create({
   },
   infoBannerTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontWeight: '800',
+    color: '#92400E',
     marginBottom: 4,
+    textShadowColor: 'rgba(217, 119, 6, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   infoBannerSubtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
+    color: '#B45309',
+    fontWeight: '600',
   },
   section: {
     marginTop: 24,

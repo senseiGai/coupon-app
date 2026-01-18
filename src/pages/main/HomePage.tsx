@@ -166,26 +166,58 @@ export const HomePage = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.main.home.quickActions}</Text>
           <View style={styles.singleCardContainer}>
-            {/* Bonuses Card with Gifts Image */}
+            {/* Bonuses Card with Golden Gift Certificate Style */}
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.fullWidthCard}
               onPress={() => navigation.navigate('BonusShop')}>
-              <View style={styles.bonusCardWithImage}>
-                <Image
-                  source={require('../../../assets/gifts.jpg')}
-                  style={styles.bonusBackgroundImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.bonusOverlay} />
-                <View style={styles.bonusContent}>
-                  <View style={styles.cardIcon}>
-                    <Gift size={iconSize} color="#FFFFFF" strokeWidth={2.5} />
-                  </View>
-                  <Text style={styles.bonusCardTitle}>{t.main.home.bonuses}</Text>
-                  <Text style={styles.bonusCardSubtitle}>{t.main.home.daily}</Text>
+              <LinearGradient
+                colors={['#FFFBEB', '#FEF3C7', '#FDE68A', '#FCD34D']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.goldenCertificateCard}>
+                {/* Top Golden Ribbon */}
+                <View style={styles.goldenRibbonTop}>
+                  <View style={styles.ribbonSegment} />
+                  <View style={styles.ribbonSegment} />
+                  <View style={styles.ribbonSegment} />
                 </View>
-              </View>
+
+                {/* Main Content */}
+                <View style={styles.certificateContent}>
+                  {/* Airplane Icon Circle */}
+                  <View style={styles.goldenCircle}>
+                    <View style={styles.goldenCircleInner}>
+                      <Gift size={iconSize + 8} color="#D97706" strokeWidth={2.5} />
+                    </View>
+                  </View>
+
+                  {/* Text Content */}
+                  <View style={styles.certificateTextContainer}>
+                    <Text style={styles.certificateLabel}>Gift Certificate</Text>
+                    <Text style={styles.certificateTitle}>{t.main.home.bonuses}</Text>
+                    <Text style={styles.certificateSubtitle}>{t.main.home.daily}</Text>
+                  </View>
+                </View>
+
+                {/* Bottom Golden Ribbon with Bow */}
+                <View style={styles.goldenRibbonBottom}>
+                  <View style={styles.ribbonLine} />
+                  <View style={styles.bowContainer}>
+                    <View style={styles.bowLeft} />
+                    <View style={styles.bowCenter} />
+                    <View style={styles.bowRight} />
+                  </View>
+                </View>
+
+                {/* Sparkles decoration */}
+                <View style={styles.sparkleTopLeft}>
+                  <Sparkles size={sparkleSize} color="#F59E0B" strokeWidth={2} />
+                </View>
+                <View style={styles.sparkleBottomRight}>
+                  <Sparkles size={sparkleSize - 4} color="#FBBF24" strokeWidth={2} />
+                </View>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
@@ -420,49 +452,135 @@ const styles = StyleSheet.create({
   fullWidthCard: {
     width: '100%',
   },
-  bonusCardWithImage: {
+  goldenCertificateCard: {
     width: '100%',
-    height: hp(160),
-    borderRadius: wp(20),
+    height: hp(180),
+    borderRadius: wp(24),
     overflow: 'hidden',
     shadowColor: '#F59E0B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 12,
+    borderWidth: 3,
+    borderColor: '#FCD34D',
+    position: 'relative',
   },
-  bonusBackgroundImage: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
+  goldenRibbonTop: {
+    flexDirection: 'row',
+    height: hp(12),
+    backgroundColor: '#F59E0B',
   },
-  bonusOverlay: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(245, 158, 11, 0.3)',
-  },
-  bonusContent: {
+  ribbonSegment: {
     flex: 1,
-    padding: wp(20),
-    justifyContent: 'space-between',
+    borderRightWidth: 1,
+    borderRightColor: '#D97706',
   },
-  bonusCardTitle: {
-    fontSize: fontSize(22),
-    fontWeight: '800',
-    color: '#FFFFFF',
+  certificateContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: wp(20),
+    paddingVertical: hp(16),
+  },
+  goldenCircle: {
+    width: wp(80),
+    height: wp(80),
+    borderRadius: wp(40),
+    backgroundColor: '#FCD34D',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#F59E0B',
+    shadowColor: '#D97706',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  goldenCircleInner: {
+    width: wp(68),
+    height: wp(68),
+    borderRadius: wp(34),
+    backgroundColor: '#FFFBEB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FBBF24',
+  },
+  certificateTextContainer: {
+    flex: 1,
+    marginLeft: wp(16),
+    justifyContent: 'center',
+  },
+  certificateLabel: {
+    fontSize: fontSize(13),
+    fontWeight: '600',
+    color: '#92400E',
+    fontStyle: 'italic',
     marginBottom: hp(4),
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+    letterSpacing: 1,
   },
-  bonusCardSubtitle: {
-    fontSize: fontSize(15),
-    color: '#FFFFFF',
-    fontWeight: '700',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+  certificateTitle: {
+    fontSize: fontSize(24),
+    fontWeight: '800',
+    color: '#B45309',
+    marginBottom: hp(4),
+    textShadowColor: 'rgba(217, 119, 6, 0.2)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 2,
+  },
+  certificateSubtitle: {
+    fontSize: fontSize(14),
+    color: '#92400E',
+    fontWeight: '600',
+    opacity: 0.8,
+  },
+  goldenRibbonBottom: {
+    height: hp(12),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ribbonLine: {
+    position: 'absolute',
+    width: '100%',
+    height: 3,
+    backgroundColor: '#F59E0B',
+  },
+  bowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bowLeft: {
+    width: wp(20),
+    height: hp(20),
+    backgroundColor: '#F59E0B',
+    borderRadius: wp(10),
+    transform: [{ rotate: '-20deg' }],
+  },
+  bowCenter: {
+    width: wp(12),
+    height: hp(12),
+    backgroundColor: '#D97706',
+    borderRadius: wp(6),
+    marginHorizontal: wp(2),
+  },
+  bowRight: {
+    width: wp(20),
+    height: hp(20),
+    backgroundColor: '#F59E0B',
+    borderRadius: wp(10),
+    transform: [{ rotate: '20deg' }],
+  },
+  sparkleTopLeft: {
+    position: 'absolute',
+    top: hp(20),
+    left: wp(16),
+  },
+  sparkleBottomRight: {
+    position: 'absolute',
+    bottom: hp(20),
+    right: wp(16),
   },
   cardGradient: {
     width: '100%',
