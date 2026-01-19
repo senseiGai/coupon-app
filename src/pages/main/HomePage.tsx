@@ -18,6 +18,7 @@ import {
   LogOut,
   Languages,
   Coins,
+  Plane,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage, useLogout } from '../../shared/lib/hooks';
@@ -144,7 +145,7 @@ export const HomePage = () => {
           <View style={styles.balanceBanner}>
             <View style={styles.balanceBannerHeader}>
               <View style={styles.balanceLabelRow}>
-                <Coins size={20} color="#FFFFFF" strokeWidth={2.5} />
+                <Plane size={20} color="#FFFFFF" strokeWidth={2.5} />
                 <Text style={styles.balanceBannerLabel}>{t.main.home.balance}</Text>
               </View>
               <TouchableOpacity
@@ -155,7 +156,7 @@ export const HomePage = () => {
               </TouchableOpacity>
             </View>
             <View style={styles.balanceAmountRow}>
-              <Coins size={32} color="#FFD700" strokeWidth={2.5} />
+              <Plane size={32} color="#FFD700" strokeWidth={2.5} />
               <Text style={styles.balanceBannerAmount}>{userBalance.toLocaleString()}</Text>
             </View>
             <Text style={styles.balanceBannerHint}>{t.main.home.hint}</Text>
@@ -188,7 +189,7 @@ export const HomePage = () => {
                   {/* Airplane Icon Circle */}
                   <View style={styles.goldenCircle}>
                     <View style={styles.goldenCircleInner}>
-                      <Gift size={iconSize + 8} color="#D97706" strokeWidth={2.5} />
+                      <Plane size={iconSize + 8} color="#D97706" strokeWidth={2.5} />
                     </View>
                   </View>
 

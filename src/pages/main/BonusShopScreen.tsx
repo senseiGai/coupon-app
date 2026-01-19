@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ArrowLeft,
-  Coins,
   Gift,
   Plane,
   Hotel,
@@ -127,7 +126,7 @@ export const BonusShopScreen = () => {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t.bonusShop.title}</Text>
           <View style={styles.balanceChip}>
-            <Coins size={16} color="#FFD700" />
+            <Plane size={16} color="#FFD700" />
             <Text style={styles.balanceText}>{userBalance.toLocaleString()}</Text>
           </View>
         </View>
@@ -192,7 +191,7 @@ export const BonusShopScreen = () => {
                       {getItemDescription(item)}
                     </Text>
                     <View style={styles.itemPrice}>
-                      <Coins size={14} color="#FFD700" />
+                      <Plane size={14} color="#FFD700" />
                       <Text style={styles.itemPriceText}>{item.price}</Text>
                     </View>
                     {!canAfford && (
