@@ -186,12 +186,12 @@ export const HomePage = () => {
 
                 {/* Main Content */}
                 <View style={styles.certificateContent}>
-                  {/* Airplane Icon Circle */}
-                  <View style={styles.goldenCircle}>
-                    <View style={styles.goldenCircleInner}>
-                      <Plane size={iconSize + 8} color="#D97706" strokeWidth={2.5} />
-                    </View>
-                  </View>
+                  {/* Gold Logo Image */}
+                  <Image
+                    source={require('../../../assets/gold_logo.png')}
+                    style={styles.goldLogoImage}
+                    resizeMode="cover"
+                  />
 
                   {/* Text Content */}
                   <View style={styles.certificateTextContainer}>
@@ -513,6 +513,11 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: wp(16),
     justifyContent: 'center',
+  },
+  goldLogoImage: {
+    width: wp(80),
+    height: wp(80),
+    borderRadius: wp(40),
   },
   certificateLabel: {
     fontSize: fontSize(13),
