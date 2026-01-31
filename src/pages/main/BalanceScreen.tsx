@@ -47,7 +47,7 @@ export const BalanceScreen = () => {
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0EA5E9" />
-          <Text style={styles.loadingText}>Загрузка...</Text>
+          <Text style={styles.loadingText}>{t.common.loading}</Text>
         </View>
       </SafeAreaView>
     );
@@ -251,7 +251,7 @@ export const BalanceScreen = () => {
             ))
           ) : (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>Нет транзакций</Text>
+              <Text style={styles.emptyStateText}>{t.main.balance.noTransactions}</Text>
             </View>
           )}
         </View>

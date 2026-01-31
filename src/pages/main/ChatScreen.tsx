@@ -282,7 +282,7 @@ export const ChatScreen = () => {
                     </View>
                   </View>
                   <View style={[styles.messageBubble, styles.supportMessage, styles.typingBubble]}>
-                    <Text style={styles.typingText}>Admin is typing...</Text>
+                    <Text style={styles.typingText}>{t.main.chat.typing}</Text>
                   </View>
                 </View>
               )}

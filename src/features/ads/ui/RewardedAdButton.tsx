@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Text, Alert, ActivityIndicator, StyleSheet } fr
 import { Play } from 'lucide-react-native';
 import { admobService } from '@/shared/lib/admob';
 import { useBonus } from '@/shared/lib/hooks/useBonus';
+import { useLanguage } from '@/shared/lib/hooks';
 import { BONUS_CONFIG } from '@/shared/types/bonus';
 import { wp, hp, fontSize, responsive, sizes } from '@/shared/lib/responsive';
 
@@ -12,6 +13,7 @@ interface RewardedAdButtonProps {
 }
 
 export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, onError }) => {
+  const { t } = useLanguage();
   const { limits, earnAdViewBonus, checkCanWatchAd } = useBonus();
   const [loading, setLoading] = useState(false);
   const [adReady, setAdReady] = useState(false);
@@ -36,8 +38,8 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     const canWatch = await checkCanWatchAd();
     if (!canWatch.allowed) {
       Alert.alert(
-        'Лимит достигнут',
-        canWatch.reason || 'Вы достигли дневного лимита просмотров рекламы'
+        t.main.balance.limitReached,
+        canWatch.reason || t.main.balance.limitReachedMessage
       );
       if (onError) onError(canWatch.reason || 'Limit reached');
       return;
@@ -46,8 +48,8 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     // Проверить готовность рекламы
     if (!adReady) {
       Alert.alert(
-        'Реклама загружается',
-        'Реклама еще загружается. Попробуйте через несколько секунд.'
+        t.main.balance.adLoading,
+        t.main.balance.adLoadingMessage
       );
       admobService.preloadAd();
       return;
@@ -64,14 +66,16 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
         const bonusResult = await earnAdViewBonus();
 
         if (bonusResult.success) {
-          Alert.alert('Успех!', `Вы получили ${BONUS_CONFIG.REWARDS.AD_VIEW} бонусов!`, [
-            { text: 'Отлично!' },
-          ]);
+          Alert.alert(
+            t.common.success,
+            t.main.balance.bonusReceived.replace('{amount}', String(BONUS_CONFIG.REWARDS.AD_VIEW)),
+            [{ text: t.main.balance.great }]
+          );
           if (onSuccess) onSuccess();
         } else {
           Alert.alert(
-            'Ошибка',
-            bonusResult.error || 'Не удалось начислить бонусы. Попробуйте позже.'
+            t.common.error,
+            bonusResult.error || t.main.balance.bonusError
           );
           if (onError) onError(bonusResult.error || 'Failed to earn bonus');
         }
@@ -79,12 +83,12 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
         // Предзагрузить следующую рекламу
         admobService.preloadAd();
       } else {
-        Alert.alert('Ошибка', result.error || 'Не удалось показать рекламу. Попробуйте позже.');
+        Alert.alert(t.common.error, result.error || t.main.balance.adError);
         if (onError) onError(result.error || 'Failed to show ad');
       }
     } catch (error: any) {
       console.error('Error watching ad:', error);
-      Alert.alert('Ошибка', 'Произошла ошибка. Попробуйте позже.');
+      Alert.alert(t.common.error, t.main.balance.generalError);
       if (onError) onError(error.message);
     } finally {
       setLoading(false);
@@ -111,11 +115,11 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.buttonText} numberOfLines={1}>
-          {loading ? 'Загрузка...' : 'Смотреть рекламу'}
+          {loading ? t.common.loading : t.main.balance.watchAdBtn}
         </Text>
         <Text style={styles.buttonSubtext} numberOfLines={1}>
-          +{BONUS_CONFIG.REWARDS.AD_VIEW} бонусов
-          {limits && ` (${limits.currentAdViewsToday}/${limits.maxAdViewsPerDay} сегодня)`}
+          +{BONUS_CONFIG.REWARDS.AD_VIEW} {t.main.balance.bonusesWord}
+          {limits && ` (${limits.currentAdViewsToday}/${limits.maxAdViewsPerDay} ${t.main.balance.todayWord})`}
         </Text>
       </View>
     </TouchableOpacity>

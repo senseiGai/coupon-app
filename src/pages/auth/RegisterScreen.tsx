@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../app/navigation/AuthStack';
@@ -26,10 +27,12 @@ export default function RegisterScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
     confirmPassword?: string;
+    terms?: string;
   }>({});
 
   const validateEmail = (email: string) => {
@@ -58,6 +61,10 @@ export default function RegisterScreen({ navigation }: Props) {
       newErrors.confirmPassword = t.auth.register.errors.passwordMismatch;
     }
 
+    if (!acceptedTerms) {
+      newErrors.terms = t.auth.register.errors.termsNotAccepted;
+    }
+
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
@@ -70,12 +77,13 @@ export default function RegisterScreen({ navigation }: Props) {
         console.log('[RegisterScreen] Registration successful:', result);
         Alert.alert(t.common.success, t.auth.register.successMessage, [
           {
-            text: 'OK',
+            text: t.common.ok,
             onPress: () => {
               // Очищаем поля и переходим на LoginScreen
               setEmail('');
               setPassword('');
               setConfirmPassword('');
+              setAcceptedTerms(false);
               setErrors({});
               navigation.replace('Login');
             },
@@ -86,6 +94,14 @@ export default function RegisterScreen({ navigation }: Props) {
         Alert.alert(t.common.error, error.message || t.common.registrationFailed);
       }
     }
+  };
+
+  const openPrivacyPolicy = () => {
+    Linking.openURL('https://treavel-with-alina.vercel.app/');
+  };
+
+  const openTermsOfUse = () => {
+    Linking.openURL('https://treavel-with-alina.vercel.app/');
   };
 
   return (
@@ -135,6 +151,29 @@ export default function RegisterScreen({ navigation }: Props) {
               autoCapitalize="none"
               autoComplete="password"
             />
+
+            {/* Terms and Conditions Checkbox */}
+            <TouchableOpacity
+              style={styles.checkboxContainer}
+              onPress={() => setAcceptedTerms(!acceptedTerms)}
+              activeOpacity={0.7}>
+              <View style={[styles.checkbox, acceptedTerms ? styles.checkboxChecked : null]}>
+                {acceptedTerms && <Text style={styles.checkmark}>✓</Text>}
+              </View>
+              <View style={styles.termsTextContainer}>
+                <Text style={styles.termsText}>
+                  {t.auth.register.agreeToTerms}{' '}
+                  <Text style={styles.termsLink} onPress={openPrivacyPolicy}>
+                    {t.auth.register.privacyPolicy}
+                  </Text>{' '}
+                  {t.auth.register.and}{' '}
+                  <Text style={styles.termsLink} onPress={openTermsOfUse}>
+                    {t.auth.register.termsOfUse}
+                  </Text>
+                </Text>
+              </View>
+            </TouchableOpacity>
+            {errors.terms ? <Text style={styles.termsError}>{errors.terms}</Text> : null}
 
             {registerMutation.isPending ? (
               <View style={styles.loadingButton}>
@@ -223,6 +262,55 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     opacity: 0.8,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: hp(16),
+    paddingHorizontal: wp(4),
+  },
+  checkbox: {
+    width: wp(22),
+    height: wp(22),
+    borderRadius: wp(6),
+    borderWidth: 2,
+    borderColor: '#CBD5E1',
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: wp(12),
+    marginTop: hp(2),
+  },
+  checkboxChecked: {
+    backgroundColor: '#0EA5E9',
+    borderColor: '#0EA5E9',
+  },
+  checkmark: {
+    color: '#FFFFFF',
+    fontSize: fontSize(14),
+    fontWeight: '700',
+  },
+  termsTextContainer: {
+    flex: 1,
+    flexShrink: 1,
+  },
+  termsText: {
+    fontSize: fontSize(13),
+    color: '#64748B',
+    lineHeight: fontSize(18),
+    flexWrap: 'wrap',
+  },
+  termsLink: {
+    color: '#0EA5E9',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  termsError: {
+    fontSize: fontSize(12),
+    color: '#EF4444',
+    marginTop: hp(-12),
+    marginBottom: hp(12),
+    paddingHorizontal: wp(4),
   },
   footer: {
     alignItems: 'center',

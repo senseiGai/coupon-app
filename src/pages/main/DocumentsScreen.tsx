@@ -20,7 +20,7 @@ import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
 import { wp, hp, fontSize, responsive } from '../../shared/lib/responsive';
 
 export const DocumentsScreen = () => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Загружаем документы из API
@@ -45,10 +45,7 @@ export const DocumentsScreen = () => {
 
   const handleDownloadDocument = async (doc: ApiDocument) => {
     try {
-      const downloadMessage =
-        language === 'en'
-          ? `Downloading ${doc.originalName}...`
-          : `Скачивание ${doc.originalName}...`;
+      const downloadMessage = t.main.documents.downloading.replace('{filename}', doc.originalName);
 
       // Создаем файл в кэше
       const file = new File(Paths.cache, doc.originalName);
@@ -84,7 +81,7 @@ export const DocumentsScreen = () => {
         // Открываем системное меню "Поделиться" для сохранения файла
         await Sharing.shareAsync(file.uri, {
           mimeType: doc.mimetype,
-          dialogTitle: language === 'en' ? 'Save document' : 'Сохранить документ',
+          dialogTitle: t.main.documents.saveDocument,
         });
       } else {
       }

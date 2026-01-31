@@ -202,7 +202,7 @@ export const ToursScreen = () => {
                         <View style={[styles.tourProgressFill, { width: `${progress}%` }]} />
                       </View>
                       <Text style={styles.tourProgressText}>
-                        Осталось {(tour.price - userBalance).toLocaleString()} баллов
+                        {(tour.price - userBalance).toLocaleString()} {t.main.tours.pointsLeft}
                       </Text>
                     </View>
                   )}

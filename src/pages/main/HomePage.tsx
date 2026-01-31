@@ -195,7 +195,7 @@ export const HomePage = () => {
 
                   {/* Text Content */}
                   <View style={styles.certificateTextContainer}>
-                    <Text style={styles.certificateLabel}>Gift Certificate</Text>
+                    <Text style={styles.certificateLabel}>{t.main.home.giftCertificate}</Text>
                     <Text style={styles.certificateTitle}>{t.main.home.bonuses}</Text>
                     <Text style={styles.certificateSubtitle}>{t.main.home.daily}</Text>
                   </View>

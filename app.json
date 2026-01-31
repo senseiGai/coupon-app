@@ -26,19 +26,17 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.k1ngsterr.myexpoapp"
+      "bundleIdentifier": "com.twa"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.jpg",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.k1ngsterr.myexpoapp"
+      "package": "com.twa"
     },
     "extra": {
       "eas": {
