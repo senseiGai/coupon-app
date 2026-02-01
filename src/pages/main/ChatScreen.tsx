@@ -21,11 +21,13 @@ import {
   useMarkAsRead,
   useAdmin,
   useProfile,
+  MESSAGE_KEYS,
 } from '../../shared/lib/hooks';
 import { socketService } from '../../shared/lib/socket/socketService';
 import type { PrivateMessage } from '../../shared/types/message';
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
 import { wp, hp, fontSize, sizes, responsive } from '../../shared/lib/responsive';
+import { useQueryClient } from '@tanstack/react-query';
 
 const { screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT } = sizes;
 
@@ -35,6 +37,7 @@ export const ChatScreen = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
+  const queryClient = useQueryClient();
 
   // Получаем текущего пользователя
   const { data: profile } = useProfile();
@@ -57,35 +60,82 @@ export const ChatScreen = () => {
 
   // Подключаемся к WebSocket при монтировании
   useEffect(() => {
-    console.log('[ChatScreen] Connecting to WebSocket...');
-    socketService.connect();
+    // Обработчик новых сообщений - используем queryClient для оптимистичного обновления
+    const handleNewMessage = (message: PrivateMessage) => {
+      console.log('[ChatScreen] 📨 NEW MESSAGE EVENT RECEIVED:');
+      console.log('  - Message ID:', message.id);
+      console.log('  - From:', message.senderId);
+      console.log('  - To:', message.receiverId);
+      console.log('  - Text:', message.message);
+      console.log('  - Current ADMIN_ID:', ADMIN_ID);
+      console.log('  - Current User ID:', currentUserId);
 
-    // Подписываемся на новые сообщения
-    socketService.onNewMessage((message) => {
-      console.log('[ChatScreen] Received new message:', message);
-      refetch();
+      // Получаем текущий кеш сообщений
+      const currentMessages = queryClient.getQueryData<PrivateMessage[]>(
+        MESSAGE_KEYS.history(ADMIN_ID)
+      );
+      console.log('  - Current cached messages count:', currentMessages?.length || 0);
 
-      // Автоматически отмечаем как прочитанные если чат открыт
+      // Проверяем, не дублируется ли сообщение
+      const isDuplicate = currentMessages?.some((msg) => msg.id === message.id);
+      if (isDuplicate) {
+        console.log('  - ⚠️ DUPLICATE MESSAGE, skipping update');
+        return;
+      }
+
+      // Оптимистично обновляем кеш
+      queryClient.setQueryData<PrivateMessage[]>(MESSAGE_KEYS.history(ADMIN_ID), (old) => {
+        const updated = old ? [...old, message] : [message];
+        console.log('  - ✅ Cache updated, new count:', updated.length);
+        return updated;
+      });
+
+      // Автоматически отмечаем как прочитанные если это сообщение от админа
       if (message.senderId === ADMIN_ID) {
+        console.log('  - 📖 Marking as read (message from admin)');
         markAsReadMutation.mutate(ADMIN_ID);
       }
-    });
+    };
 
-    // Подписываемся на индикатор печати от админа
-    socketService.onUserTyping((data) => {
+    // Обработчик индикатора печати
+    const handleUserTyping = (data: { userId: number; isTyping: boolean }) => {
+      console.log('[ChatScreen] ⌨️ TYPING EVENT:', data);
       if (data.userId === ADMIN_ID) {
         setIsTyping(data.isTyping);
       }
-    });
+    };
 
-    // Отмечаем все сообщения как прочитанные при открытии чата
-    markAsReadMutation.mutate(ADMIN_ID);
+    // Async функция для подключения и подписки
+    const setupSocket = async () => {
+      try {
+        console.log('[ChatScreen] 🔌 Connecting to WebSocket...');
+        await socketService.connect();
+        console.log('[ChatScreen] ✅ Connected! Now subscribing to events...');
+
+        // Подписываемся на события ПОСЛЕ подключения
+        console.log('[ChatScreen] 🎧 Subscribing to socket events...');
+        socketService.onNewMessage(handleNewMessage);
+        socketService.onUserTyping(handleUserTyping);
+        console.log('[ChatScreen] ✅ Successfully subscribed to events');
+
+        // Отмечаем все сообщения как прочитанные при открытии чата
+        if (ADMIN_ID) {
+          console.log('[ChatScreen] 📖 Marking all messages as read on mount');
+          markAsReadMutation.mutate(ADMIN_ID);
+        }
+      } catch (error) {
+        console.error('[ChatScreen] ❌ Failed to setup socket:', error);
+      }
+    };
+
+    setupSocket();
 
     return () => {
+      console.log('[ChatScreen] 🔌 Disconnecting and cleaning up...');
       socketService.disconnect();
       socketService.removeAllListeners();
     };
-  }, [ADMIN_ID]);
+  }, [ADMIN_ID, currentUserId, queryClient]);
 
   // Автоматический скролл при новых сообщениях
   useEffect(() => {

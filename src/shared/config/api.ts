@@ -1,5 +1,6 @@
 export const API_CONFIG = {
-  BASE_URL: 'https://coupon-backend-production-4601.up.railway.app/api', // Измените на ваш production URL
+  BASE_URL: 'https://twa.su/api', // Измените на ваш production URL
+  SOCKET_URL: 'https://twa.su', // URL для WebSocket соединения
   TIMEOUT: 30000,
   ENDPOINTS: {
     // Auth

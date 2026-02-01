@@ -36,41 +36,65 @@ export const useSendMessage = () => {
 
   return useMutation({
     mutationFn: (data: SendMessageDto) => {
+      console.log('[useSendMessage] 📤 Starting to send message:', data);
       return new Promise<PrivateMessage>((resolve, reject) => {
         const timeout = setTimeout(() => {
+          console.error('[useSendMessage] ❌ Message send timeout (10s)');
           reject(new Error('Message send timeout'));
         }, 10000);
 
         // Создаем одноразовый слушатель для этого конкретного сообщения
         const handleMessageSent = (message: PrivateMessage) => {
+          console.log('[useSendMessage] 📨 Received privateMessageSent event');
+          console.log('[useSendMessage]    Expected receiverId:', data.receiverId);
+          console.log('[useSendMessage]    Actual receiverId:', message.receiverId);
+
           // Проверяем что это наше сообщение (по получателю)
           if (message.receiverId === data.receiverId) {
+            console.log('[useSendMessage] ✅ Message confirmed, resolving promise');
             clearTimeout(timeout);
             // Удаляем слушатель после использования
             socketService.off('privateMessageSent', handleMessageSent);
             resolve(message);
+          } else {
+            console.log('[useSendMessage] ⚠️ Message not for us, waiting...');
           }
         };
 
         // Подписываемся на событие
+        console.log('[useSendMessage] 🎧 Subscribing to privateMessageSent');
         socketService.on('privateMessageSent', handleMessageSent);
 
         // Отправляем через WebSocket
+        console.log('[useSendMessage] 📡 Calling socketService.sendPrivateMessage');
         socketService.sendPrivateMessage(data);
       });
     },
     onSuccess: (message, variables) => {
+      console.log('[useSendMessage] ✅ onSuccess - updating cache');
+      console.log('[useSendMessage]    Message:', message);
+
       // Добавляем сообщение в кэш истории
       queryClient.setQueryData<PrivateMessage[]>(
         MESSAGE_KEYS.history(variables.receiverId),
         (old) => {
-          if (!old) return [message];
-          return [...old, message];
+          const isDuplicate = old?.some((msg) => msg.id === message.id);
+          if (isDuplicate) {
+            console.log('[useSendMessage] ⚠️ Message already in cache, skipping');
+            return old || [];
+          }
+          const updated = old ? [...old, message] : [message];
+          console.log('[useSendMessage] ✅ Cache updated, count:', updated.length);
+          return updated;
         }
       );
 
       // Обновляем список диалогов
       queryClient.invalidateQueries({ queryKey: MESSAGE_KEYS.conversations });
+      console.log('[useSendMessage] ✅ Conversations invalidated');
+    },
+    onError: (error) => {
+      console.error('[useSendMessage] ❌ onError:', error);
     },
   });
 };

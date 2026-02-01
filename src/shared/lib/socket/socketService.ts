@@ -18,19 +18,22 @@ class SocketService {
   // Подключение к WebSocket серверу
   async connect(): Promise<void> {
     if (this.socket?.connected) {
-      console.log('[Socket] Already connected');
-      return;
+      console.log('[Socket] ⚠️ Already connected, skipping');
+      console.log('[Socket]    Socket ID:', this.socket.id);
+      return Promise.resolve();
     }
 
+    console.log('[Socket] 🔌 Starting connection...');
     const token = await apiClient.getToken();
     if (!token) {
-      console.error('[Socket] No token found, cannot connect');
-      return;
+      console.error('[Socket] ❌ No token found, cannot connect');
+      return Promise.reject(new Error('No token found'));
     }
 
-    const socketUrl = API_CONFIG.BASE_URL.replace('/api', ''); // Убираем /api для WebSocket
+    const socketUrl = API_CONFIG.SOCKET_URL;
 
-    console.log('[Socket] Connecting to:', socketUrl);
+    console.log('[Socket] 🔌 Connecting to:', socketUrl);
+    console.log('[Socket]    Token (first 20 chars):', token.substring(0, 20) + '...');
 
     this.socket = io(socketUrl, {
       auth: {
@@ -42,7 +45,28 @@ class SocketService {
       reconnectionAttempts: this.maxReconnectAttempts,
     });
 
+    console.log('[Socket] ✅ Socket instance created, setting up listeners...');
     this.setupEventListeners();
+
+    // Возвращаем промис, который резолвится при подключении
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        console.error('[Socket] ❌ Connection timeout (10s)');
+        reject(new Error('Connection timeout'));
+      }, 10000);
+
+      this.socket?.once('connect', () => {
+        clearTimeout(timeout);
+        console.log('[Socket] ✅ Connection promise resolved');
+        resolve();
+      });
+
+      this.socket?.once('connect_error', (error) => {
+        clearTimeout(timeout);
+        console.error('[Socket] ❌ Connection promise rejected:', error.message);
+        reject(error);
+      });
+    });
   }
 
   // Настройка базовых событий соединения
@@ -50,30 +74,36 @@ class SocketService {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
-      console.log('[Socket] Connected successfully');
+      console.log('[Socket] ✅ CONNECTED SUCCESSFULLY');
+      console.log('[Socket]    Socket ID:', this.socket?.id);
+      console.log('[Socket]    Transport:', this.socket?.io.engine.transport.name);
       this.reconnectAttempts = 0;
 
       // Логируем ВСЕ входящие события для отладки
       this.socket?.onAny((eventName, ...args) => {
-        console.log(`[Socket] Event received: ${eventName}`, args);
+        console.log(`[Socket] 📨 EVENT: ${eventName}`);
+        console.log(`[Socket]    Args:`, JSON.stringify(args, null, 2));
       });
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('[Socket] Disconnected:', reason);
+      console.log('[Socket] ❌ DISCONNECTED');
+      console.log('[Socket]    Reason:', reason);
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('[Socket] Connection error:', error.message);
+      console.error('[Socket] ❌ CONNECTION ERROR');
+      console.error('[Socket]    Message:', error.message);
+      console.error('[Socket]    Stack:', error.stack);
       this.reconnectAttempts++;
 
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        console.error('[Socket] Max reconnection attempts reached');
+        console.error('[Socket] ❌ MAX RECONNECTION ATTEMPTS REACHED');
       }
     });
 
     this.socket.on('error', (error) => {
-      console.error('[Socket] Error:', error);
+      console.error('[Socket] ❌ ERROR:', error);
     });
   }
 
@@ -94,18 +124,24 @@ class SocketService {
   // Отправка приватного сообщения
   sendPrivateMessage(data: SendMessageDto): void {
     if (!this.socket) {
-      console.error('[Socket] Not connected');
+      console.error('[Socket] ❌ Not connected - socket is null');
       return;
     }
 
     if (!this.socket.connected) {
-      console.error('[Socket] Socket exists but not connected');
+      console.error('[Socket] ❌ Socket exists but not connected');
+      console.log('[Socket]    Socket ID:', this.socket.id);
+      console.log('[Socket]    Connected:', this.socket.connected);
       return;
     }
 
-    console.log('[Socket] Sending private message:', data);
-    console.log('[Socket] Socket connected:', this.socket.connected);
+    console.log('[Socket] 📤 SENDING PRIVATE MESSAGE:');
+    console.log('  - To:', data.receiverId);
+    console.log('  - Message:', data.message);
+    console.log('  - Socket connected:', this.socket.connected);
+    console.log('  - Socket ID:', this.socket.id);
     this.socket.emit('sendPrivateMessage', data);
+    console.log('[Socket] ✅ Message emitted to server');
   }
 
   // Отметить сообщения как прочитанные
@@ -128,20 +164,41 @@ class SocketService {
 
   // Подписка на новые сообщения
   onNewMessage(callback: (message: PrivateMessage) => void): void {
-    if (!this.socket) return;
+    if (!this.socket) {
+      console.error('[Socket] ❌ Cannot subscribe to newPrivateMessage - socket is null');
+      return;
+    }
 
+    console.log('[Socket] ✅ Subscribing to newPrivateMessage event');
     this.socket.on('newPrivateMessage', (message: PrivateMessage) => {
-      console.log('[Socket] New private message:', message);
+      console.log('[Socket] 📨 newPrivateMessage EVENT RECEIVED:');
+      console.log('  - Raw message object:', JSON.stringify(message, null, 2));
+      console.log('  - Message ID:', message.id);
+      console.log('  - Sender ID:', message.senderId);
+      console.log('  - Receiver ID:', message.receiverId);
+      console.log('  - Text:', message.message);
+      console.log('  - Created at:', message.createdAt);
+      console.log('  - Is read:', message.isRead);
+      console.log('[Socket] 📤 Calling callback with message...');
       callback(message);
+      console.log('[Socket] ✅ Callback executed');
     });
   }
 
   // Подписка на подтверждение отправки
   onMessageSent(callback: (message: PrivateMessage) => void): void {
-    if (!this.socket) return;
+    if (!this.socket) {
+      console.error('[Socket] ❌ Cannot subscribe to privateMessageSent - socket is null');
+      return;
+    }
 
+    console.log('[Socket] ✅ Subscribing to privateMessageSent event');
     this.socket.on('privateMessageSent', (message: PrivateMessage) => {
-      console.log('[Socket] Message sent confirmed:', message);
+      console.log('[Socket] 📤 privateMessageSent EVENT RECEIVED:');
+      console.log('  - Message ID:', message.id);
+      console.log('  - Sender ID:', message.senderId);
+      console.log('  - Receiver ID:', message.receiverId);
+      console.log('  - Text:', message.message);
       callback(message);
     });
   }

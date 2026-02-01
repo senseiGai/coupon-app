@@ -7,24 +7,42 @@ import {
   TextInput,
   ActivityIndicator,
   Linking,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FileText, Download, Search } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { Paths, File } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useLanguage, useDocuments } from '../../shared/lib/hooks';
 import type { Document as ApiDocument } from '../../shared/types/document';
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
 import { wp, hp, fontSize, responsive } from '../../shared/lib/responsive';
+import { useCallback } from 'react';
 
 export const DocumentsScreen = () => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   // Загружаем документы из API
-  const { data: documents = [], isLoading, error } = useDocuments();
+  const { data: documents = [], isLoading, error, refetch } = useDocuments();
+
+  // Refetch при каждом открытии страницы
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
+  // Pull to refresh handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
 
   const filteredDocuments = documents.filter(
     (doc) =>
@@ -115,7 +133,17 @@ export const DocumentsScreen = () => {
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#0EA5E9']}
+            tintColor="#0EA5E9"
+          />
+        }>
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#0EA5E9" />
