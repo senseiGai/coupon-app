@@ -11,6 +11,7 @@ import { ChatScreen } from '../../pages/main/ChatScreen';
 import { wp, hp, getBottomSpace } from '../../shared/lib/responsive';
 import { BonusShopScreen } from '../../pages/main/BonusShopScreen';
 import { BalanceScreen } from '../../pages/main/BalanceScreen';
+import { MyPurchasesScreen } from '../../pages/main/MyPurchasesScreen';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -22,6 +23,7 @@ export type RootStackParamList = {
   MainTabs: undefined;
   BonusShop: undefined;
   Balance: undefined;
+  MyPurchases: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -89,6 +91,7 @@ export default function MainStack() {
       <Stack.Screen name="MainTabs" component={TabNavigator} />
       <Stack.Screen name="BonusShop" component={BonusShopScreen} />
       <Stack.Screen name="Balance" component={BalanceScreen} />
+      <Stack.Screen name="MyPurchases" component={MyPurchasesScreen} />
     </Stack.Navigator>
   );
 }

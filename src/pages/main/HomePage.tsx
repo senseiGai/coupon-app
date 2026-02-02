@@ -7,6 +7,7 @@ import {
   Alert,
   Image,
   useWindowDimensions,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -22,7 +23,8 @@ import {
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage, useLogout, useBonus } from '../../shared/lib/hooks';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -59,8 +61,24 @@ export const HomePage = () => {
   const logoutMutation = useLogout();
   const navigation = useNavigation<NavigationProp>();
   const { width } = useWindowDimensions();
-  const { balance } = useBonus();
+  const { balance, fetchBalance } = useBonus();
   const userBalance = balance?.available || 0;
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Обновлять баланс при возврате на экран
+  useFocusEffect(
+    useCallback(() => {
+      fetchBalance();
+    }, [fetchBalance])
+  );
+
+  // Pull-to-refresh
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchBalance();
+    setRefreshing(false);
+  }, [fetchBalance]);
 
   // Адаптивные размеры на основе текущей ширины экрана
   const BANNER_WIDTH = width - wp(32);
@@ -121,7 +139,11 @@ export const HomePage = () => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <AirplaneBackground />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#0EA5E9']} />
+          }>
         {/* Header */}
         <View style={styles.header}>
           <View>

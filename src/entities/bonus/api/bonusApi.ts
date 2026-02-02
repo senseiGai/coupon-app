@@ -4,20 +4,14 @@ import {
   BonusBalance,
   BonusLimits,
   BonusTransaction,
+  BonusShopItem,
+  BonusShopPurchase,
+  PurchaseResponse,
+  AdViewRequest,
+  AdRewardResponse,
+  CanWatchAdResponse,
+  TransactionsResponse,
 } from '@/shared/types/bonus';
-
-export interface CanWatchAdResponse {
-  allowed: boolean;
-  reason: string | null;
-  remaining: number;
-}
-
-export interface TransactionsResponse {
-  transactions: BonusTransaction[];
-  total: number;
-  limit: number;
-  offset: number;
-}
 
 export interface MaxDiscountResponse {
   maxDiscount: number;
@@ -66,10 +60,28 @@ class BonusApi {
   }
 
   /**
-   * Начислить бонусы за просмотр рекламы
+   * Начислить бонусы за просмотр рекламы (Legacy - без SSV)
    */
   async earnAdViewBonus(): Promise<BonusTransaction> {
     return apiClient.post<BonusTransaction>(API_CONFIG.ENDPOINTS.BONUS.EARN_AD_VIEW);
+  }
+
+  // ========== SSV Ad Methods ==========
+
+  /**
+   * SSV Шаг 1: Запросить просмотр рекламы
+   * Возвращает adViewId и customData для передачи в рекламный SDK
+   */
+  async requestAdView(adNetwork?: string): Promise<AdViewRequest> {
+    return apiClient.post<AdViewRequest>(API_CONFIG.ENDPOINTS.BONUS.AD_REQUEST, { adNetwork });
+  }
+
+  /**
+   * SSV Шаг 3 (Fallback): Запросить награду вручную
+   * Используется если SSV callback не сработал
+   */
+  async rewardAdView(adViewId: string): Promise<AdRewardResponse> {
+    return apiClient.post<AdRewardResponse>(`${API_CONFIG.ENDPOINTS.BONUS.AD_REWARD}/${adViewId}`);
   }
 
   /**
@@ -142,6 +154,36 @@ class BonusApi {
       file,
       onProgress
     );
+  }
+
+  // ========== Bonus Shop Methods ==========
+
+  /**
+   * Получить товары магазина
+   */
+  async getShopItems(): Promise<BonusShopItem[]> {
+    return apiClient.get<BonusShopItem[]>(API_CONFIG.ENDPOINTS.BONUS_SHOP.ITEMS);
+  }
+
+  /**
+   * Получить товар по ID
+   */
+  async getShopItemById(id: number): Promise<BonusShopItem> {
+    return apiClient.get<BonusShopItem>(`${API_CONFIG.ENDPOINTS.BONUS_SHOP.ITEMS}/${id}`);
+  }
+
+  /**
+   * Купить товар за бонусы
+   */
+  async purchaseItem(itemId: number): Promise<PurchaseResponse> {
+    return apiClient.post<PurchaseResponse>(API_CONFIG.ENDPOINTS.BONUS_SHOP.PURCHASE, { itemId });
+  }
+
+  /**
+   * Получить мои покупки
+   */
+  async getMyPurchases(): Promise<BonusShopPurchase[]> {
+    return apiClient.get<BonusShopPurchase[]>(API_CONFIG.ENDPOINTS.BONUS_SHOP.MY_PURCHASES);
   }
 }
 

@@ -12,6 +12,7 @@ import { translations, Language } from '../../config/i18n';
 
 interface LanguageContextType {
   language: Language;
+  currentLang: Language; // Alias for language
   setLanguage: (language: Language) => void;
   t: Record<string, any>;
 }
@@ -86,6 +87,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
 
   const value: LanguageContextType = {
     language,
+    currentLang: language, // Alias for language
     setLanguage,
     t: translations[language],
   };

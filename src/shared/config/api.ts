@@ -57,14 +57,26 @@ export const API_CONFIG = {
       BALANCE: '/bonus/balance',
       LIMITS: '/bonus/limits',
       CAN_WATCH_AD: '/bonus/can-watch-ad',
+      TRANSACTIONS: '/bonus/transactions',
+      // SSV Ads
+      AD_REQUEST: '/bonus/ad/request',
+      AD_REWARD: '/bonus/ad/reward',
+      // Legacy earn methods
       EARN_AD_VIEW: '/bonus/earn/ad-view',
       EARN_REGISTRATION: '/bonus/earn/registration',
       EARN_PROFILE_COMPLETE: '/bonus/earn/profile-complete',
       EARN_REFERRAL: '/bonus/earn/referral',
       APPLY: '/bonus/apply',
-      TRANSACTIONS: '/bonus/transactions',
       CALCULATE_MAX_DISCOUNT: '/bonus/calculate-max-discount',
       UPLOAD: '/bonus/upload',
+    },
+
+    // Bonus Shop
+    BONUS_SHOP: {
+      ITEMS: '/bonus-shop/items',
+      PURCHASE: '/bonus-shop/purchase',
+      MY_PURCHASES: '/bonus-shop/my-purchases',
+      SETTINGS: '/bonus-shop/settings',
     },
   },
 };

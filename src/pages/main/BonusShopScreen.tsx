@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,81 +8,102 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ArrowLeft,
   Gift,
   Plane,
-  Hotel,
   Coffee,
   ShoppingBag,
   Ticket,
   Star,
+  MapPin,
+  Clock,
+  ShoppingCart,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage, useBonus } from '@/shared/lib/hooks';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '@/app/navigation/MainStack';
 import { AirplaneBackground } from '@/shared/ui/AirplaneBackground';
+import { BonusShopItem, BonusShopItemType } from '@/shared/types/bonus';
 
-// Товары в бонусном магазине
-const BONUS_ITEMS = [
-  {
-    id: '1',
-    icon: Plane,
-    colors: ['#FCD34D', '#F59E0B'] as const,
-    price: 500,
-    category: 'travel',
-  },
-  {
-    id: '2',
-    icon: Hotel,
-    colors: ['#FDE68A', '#FBBF24'] as const,
-    price: 1000,
-    category: 'travel',
-  },
-  {
-    id: '3',
-    icon: Coffee,
-    colors: ['#F59E0B', '#D97706'] as const,
-    price: 100,
-    category: 'food',
-  },
-  {
-    id: '4',
-    icon: ShoppingBag,
-    colors: ['#FBBF24', '#F59E0B'] as const,
-    price: 300,
-    category: 'shopping',
-  },
-  {
-    id: '5',
-    icon: Ticket,
-    colors: ['#FCD34D', '#FBBF24'] as const,
-    price: 200,
-    category: 'entertainment',
-  },
-  {
-    id: '6',
-    icon: Gift,
-    colors: ['#F59E0B', '#B45309'] as const,
-    price: 750,
-    category: 'gifts',
-  },
-];
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2; // 16px padding * 2 + 16px gap
+
+// Иконки для типов товаров
+const TYPE_ICONS: Record<BonusShopItemType, typeof Plane> = {
+  TOUR_DISCOUNT: Plane,
+  DISCOUNT_COUPON: Ticket,
+  GIFT: Gift,
+  SERVICE: Coffee,
+  OTHER: ShoppingBag,
+};
+
+// Цвета для типов товаров
+const TYPE_COLORS: Record<BonusShopItemType, readonly [string, string]> = {
+  TOUR_DISCOUNT: ['#FCD34D', '#F59E0B'] as const,
+  DISCOUNT_COUPON: ['#FDE68A', '#FBBF24'] as const,
+  GIFT: ['#F59E0B', '#B45309'] as const,
+  SERVICE: ['#F59E0B', '#D97706'] as const,
+  OTHER: ['#FBBF24', '#F59E0B'] as const,
+};
+
+type Language = 'ru' | 'en' | 'uk';
+
+// Парсинг локализованного текста из JSON строки
+const getLocalizedText = (jsonString: string, lang: Language): string => {
+  try {
+    const obj = JSON.parse(jsonString);
+    return obj[lang] || obj.en || obj.ru || jsonString;
+  } catch {
+    return jsonString;
+  }
+};
+
+// Форматирование цены
+const formatPrice = (price: number): string => {
+  if (price >= 1000) {
+    return price.toLocaleString('ru-RU');
+  }
+  return price.toString();
+};
 
 export const BonusShopScreen = () => {
-  const { t } = useLanguage();
-  const navigation = useNavigation();
-  const { balance, loading, applyBonusToOrder, fetchBalance } = useBonus();
+  const { t, currentLang } = useLanguage();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const {
+    balance,
+    loading,
+    shopItems,
+    fetchShopItems,
+    fetchBalance,
+    purchaseShopItem,
+  } = useBonus();
   const userBalance = balance?.available || 0;
 
-  const handleRedeem = (item: (typeof BONUS_ITEMS)[0]) => {
+  // Обновлять данные при фокусе на экран
+  useFocusEffect(
+    useCallback(() => {
+      fetchBalance();
+      fetchShopItems();
+    }, [fetchBalance, fetchShopItems])
+  );
+
+  const handlePurchase = async (item: BonusShopItem) => {
     if (userBalance < item.price) {
       Alert.alert(
         t.bonusShop.notEnoughBonuses,
         t.bonusShop.needMore.replace('{amount}', String(item.price - userBalance))
       );
+      return;
+    }
+
+    if (item.stock !== null && item.stock !== undefined && item.stock <= 0) {
+      Alert.alert(t.common.error, t.bonusShop.outOfStock || 'Out of stock');
       return;
     }
 
@@ -93,13 +115,17 @@ export const BonusShopScreen = () => {
         {
           text: t.bonusShop.redeem,
           onPress: async () => {
-            const orderId = `bonus_shop_${item.id}_${Date.now()}`;
-            const result = await applyBonusToOrder(orderId, item.price, item.price);
+            const result = await purchaseShopItem(item.id);
             if (result.success) {
-              Alert.alert(t.common.success, t.bonusShop.redeemSuccess);
+              const code = result.data?.code || '';
+              Alert.alert(
+                t.common.success,
+                `${t.bonusShop.redeemSuccess}\n\n${t.bonusShop.purchaseCode || 'Code'}: ${code}`
+              );
               fetchBalance();
+              fetchShopItems();
             } else {
-              Alert.alert(t.common.error, result.error || 'Failed to redeem');
+              Alert.alert(t.common.error, result.error || 'Failed to purchase');
             }
           },
         },
@@ -107,31 +133,15 @@ export const BonusShopScreen = () => {
     );
   };
 
-  const getItemName = (item: (typeof BONUS_ITEMS)[0]) => {
-    const names: Record<string, string> = {
-      '1': t.bonusShop.items.tourDiscount,
-      '2': t.bonusShop.items.hotelDiscount,
-      '3': t.bonusShop.items.coffeeVoucher,
-      '4': t.bonusShop.items.shopDiscount,
-      '5': t.bonusShop.items.eventTicket,
-      '6': t.bonusShop.items.giftBox,
-    };
-    return names[item.id] || '';
+  const getItemIcon = (item: BonusShopItem) => {
+    return TYPE_ICONS[item.type] || ShoppingBag;
   };
 
-  const getItemDescription = (item: (typeof BONUS_ITEMS)[0]) => {
-    const descriptions: Record<string, string> = {
-      '1': t.bonusShop.descriptions.tourDiscount,
-      '2': t.bonusShop.descriptions.hotelDiscount,
-      '3': t.bonusShop.descriptions.coffeeVoucher,
-      '4': t.bonusShop.descriptions.shopDiscount,
-      '5': t.bonusShop.descriptions.eventTicket,
-      '6': t.bonusShop.descriptions.giftBox,
-    };
-    return descriptions[item.id] || '';
+  const getItemColors = (item: BonusShopItem): readonly [string, string] => {
+    return TYPE_COLORS[item.type] || TYPE_COLORS.OTHER;
   };
 
-  if (loading && !balance) {
+  if (loading && shopItems.length === 0) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <AirplaneBackground />
@@ -154,7 +164,7 @@ export const BonusShopScreen = () => {
           <Text style={styles.headerTitle}>{t.bonusShop.title}</Text>
           <View style={styles.balanceChip}>
             <Plane size={16} color="#FFD700" />
-            <Text style={styles.balanceText}>{userBalance.toLocaleString()}</Text>
+            <Text style={styles.balanceText}>{formatPrice(userBalance)}</Text>
           </View>
         </View>
 
@@ -165,7 +175,6 @@ export const BonusShopScreen = () => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.infoBannerGradient}>
-            {/* Decorative ribbons */}
             <View style={styles.decorativeRibbonTop}>
               <View style={styles.ribbonPiece} />
               <View style={styles.ribbonPiece} />
@@ -189,48 +198,117 @@ export const BonusShopScreen = () => {
           </LinearGradient>
         </View>
 
+        {/* My Purchases Button */}
+        <TouchableOpacity
+          style={styles.myPurchasesButton}
+          onPress={() => navigation.navigate('MyPurchases')}>
+          <ShoppingCart size={20} color="#0EA5E9" />
+          <Text style={styles.myPurchasesButtonText}>{t.bonusShop.myPurchases}</Text>
+          <ArrowLeft size={16} color="#64748B" style={{ transform: [{ rotate: '180deg' }] }} />
+        </TouchableOpacity>
+
         {/* Items Grid */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.bonusShop.availableRewards}</Text>
           <View style={styles.itemsGrid}>
-            {BONUS_ITEMS.map((item) => {
-              const IconComponent = item.icon;
+            {shopItems.map((item) => {
+              const IconComponent = getItemIcon(item);
               const canAfford = userBalance >= item.price;
+              const isOutOfStock = item.stock !== null && item.stock !== undefined && item.stock <= 0;
+              const itemName = getLocalizedText(item.name, currentLang as Language);
+              const itemDescription = getLocalizedText(item.description, currentLang as Language);
+              const isDisabled = !canAfford || isOutOfStock;
 
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[styles.itemCard, !canAfford && styles.itemCardDisabled]}
+                  style={styles.itemCard}
                   activeOpacity={0.8}
-                  onPress={() => handleRedeem(item)}>
+                  onPress={() => handlePurchase(item)}>
                   <LinearGradient
-                    colors={canAfford ? [...item.colors] : ['#94A3B8', '#64748B']}
+                    colors={!isDisabled ? [...getItemColors(item)] : ['#94A3B8', '#64748B']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.itemGradient}>
+
+                    {/* Top Row: Badges */}
+                    <View style={styles.topBadgesRow}>
+                      {item.originalValue ? (
+                        <View style={styles.worthBadge}>
+                          <Text style={styles.worthBadgeText}>
+                            {formatPrice(item.originalValue)} ₽
+                          </Text>
+                        </View>
+                      ) : (
+                        <View />
+                      )}
+                      {isOutOfStock ? (
+                        <View style={styles.statusBadge}>
+                          <Text style={styles.statusBadgeText}>
+                            {t.bonusShop.outOfStock || 'Out of stock'}
+                          </Text>
+                        </View>
+                      ) : !canAfford ? (
+                        <View style={styles.statusBadge}>
+                          <Text style={styles.statusBadgeText}>{t.bonusShop.notEnough}</Text>
+                        </View>
+                      ) : null}
+                    </View>
+
+                    {/* Icon */}
                     <View style={styles.itemIconContainer}>
-                      <IconComponent size={32} color="#FFFFFF" strokeWidth={2} />
+                      <IconComponent size={28} color="#FFFFFF" strokeWidth={2} />
                     </View>
-                    <Text style={styles.itemName} numberOfLines={2}>
-                      {getItemName(item)}
-                    </Text>
-                    <Text style={styles.itemDescription} numberOfLines={2}>
-                      {getItemDescription(item)}
-                    </Text>
-                    <View style={styles.itemPrice}>
+
+                    {/* Content */}
+                    <View style={styles.itemContent}>
+                      <Text style={styles.itemName} numberOfLines={2}>
+                        {itemName}
+                      </Text>
+                      <Text style={styles.itemDescription} numberOfLines={2}>
+                        {itemDescription}
+                      </Text>
+
+                      {/* Meta info */}
+                      {(item.location || item.duration) && (
+                        <View style={styles.metaContainer}>
+                          {item.location && (
+                            <View style={styles.metaRow}>
+                              <MapPin size={11} color="rgba(255,255,255,0.85)" />
+                              <Text style={styles.metaText} numberOfLines={1}>
+                                {item.location}
+                              </Text>
+                            </View>
+                          )}
+                          {item.duration && (
+                            <View style={styles.metaRow}>
+                              <Clock size={11} color="rgba(255,255,255,0.85)" />
+                              <Text style={styles.metaText}>{item.duration}</Text>
+                            </View>
+                          )}
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Price */}
+                    <View style={styles.priceContainer}>
                       <Plane size={14} color="#FFD700" />
-                      <Text style={styles.itemPriceText}>{item.price}</Text>
+                      <Text style={styles.priceText}>{formatPrice(item.price)}</Text>
                     </View>
-                    {!canAfford && (
-                      <View style={styles.lockedOverlay}>
-                        <Text style={styles.lockedText}>{t.bonusShop.notEnough}</Text>
-                      </View>
-                    )}
                   </LinearGradient>
                 </TouchableOpacity>
               );
             })}
           </View>
+
+          {shopItems.length === 0 && !loading && (
+            <View style={styles.emptyState}>
+              <Gift size={48} color="#94A3B8" />
+              <Text style={styles.emptyStateText}>
+                {t.bonusShop.noItems || 'No items available'}
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* How it works */}
@@ -249,7 +327,7 @@ export const BonusShopScreen = () => {
               </View>
               <Text style={styles.howItWorksText}>{t.bonusShop.step2}</Text>
             </View>
-            <View style={styles.howItWorksItem}>
+            <View style={[styles.howItWorksItem, { borderBottomWidth: 0 }]}>
               <View style={styles.stepNumber}>
                 <Text style={styles.stepNumberText}>3</Text>
               </View>
@@ -401,6 +479,29 @@ const styles = StyleSheet.create({
     color: '#B45309',
     fontWeight: '600',
   },
+  myPurchasesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginTop: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  myPurchasesButtonText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1E293B',
+    marginLeft: 12,
+  },
   section: {
     marginTop: 24,
   },
@@ -414,70 +515,110 @@ const styles = StyleSheet.create({
   itemsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 12,
-    gap: 12,
+    paddingHorizontal: 16,
+    gap: 16,
   },
   itemCard: {
-    width: '47%',
-    marginBottom: 4,
-  },
-  itemCardDisabled: {
-    opacity: 0.8,
+    width: CARD_WIDTH,
   },
   itemGradient: {
     borderRadius: 16,
-    padding: 16,
-    height: 160,
+    padding: 12,
+    minHeight: 240,
+  },
+  topBadgesRow: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    minHeight: 22,
+  },
+  worthBadge: {
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  worthBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  statusBadge: {
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  statusBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   itemIconContainer: {
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
     borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 10,
+  },
+  itemContent: {
+    flex: 1,
   },
   itemName: {
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginTop: 8,
+    lineHeight: 18,
+    marginBottom: 4,
   },
   itemDescription: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 2,
+    color: 'rgba(255,255,255,0.85)',
+    lineHeight: 14,
+    marginBottom: 6,
   },
-  itemPrice: {
+  metaContainer: {
+    marginTop: 4,
+    gap: 4,
+  },
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    marginTop: 8,
+  },
+  metaText: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.85)',
+    flex: 1,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     backgroundColor: 'rgba(0,0,0,0.2)',
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
     alignSelf: 'flex-start',
+    marginTop: 10,
   },
-  itemPriceText: {
+  priceText: {
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
   },
-  lockedOverlay: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
   },
-  lockedText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#FFFFFF',
+  emptyStateText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#94A3B8',
   },
   howItWorksCard: {
     marginHorizontal: 16,

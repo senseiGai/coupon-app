@@ -4,13 +4,14 @@
  */
 
 export type BonusTransactionType =
-  | 'earned_ad_view' // За просмотр рекламы
-  | 'earned_registration' // За регистрацию
-  | 'earned_profile_complete' // За заполнение профиля
-  | 'earned_referral' // За приглашение друга
-  | 'spent_discount' // Использовано как скидка
-  | 'expired' // Истёк срок действия
-  | 'adjustment'; // Корректировка администратором
+  | 'EARNED_AD_VIEW' // За просмотр рекламы
+  | 'EARNED_REGISTRATION' // За регистрацию
+  | 'EARNED_PROFILE_COMPLETE' // За заполнение профиля
+  | 'EARNED_REFERRAL' // За приглашение друга
+  | 'SPENT_DISCOUNT' // Использовано как скидка
+  | 'SPENT_SHOP_PURCHASE' // Покупка в магазине бонусов
+  | 'EXPIRED' // Истёк срок действия
+  | 'ADJUSTMENT'; // Корректировка администратором
 
 export interface BonusTransaction {
   id: string;
@@ -81,6 +82,101 @@ export const BONUS_CONFIG = {
 /**
  * Правила использования бонусов (для отображения пользователю)
  */
+// Bonus Shop Types
+export type BonusShopItemType =
+  | 'DISCOUNT_COUPON'
+  | 'GIFT'
+  | 'SERVICE'
+  | 'TOUR_DISCOUNT'
+  | 'OTHER';
+
+export type BonusShopPurchaseStatus =
+  | 'PENDING'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'REFUNDED';
+
+export interface BonusShopItem {
+  id: number;
+  name: string; // JSON: {"ru": "...", "en": "...", "uk": "..."}
+  description: string; // JSON: {"ru": "...", "en": "...", "uk": "..."}
+  type: BonusShopItemType;
+  price: number;
+  originalValue?: number;
+  discountPercent?: number;
+  imageUrl?: string;
+  location?: string;
+  duration?: string;
+  stock?: number;
+  maxPerUser?: number;
+  validDays?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BonusShopPurchase {
+  id: string;
+  userId: number;
+  itemId: number;
+  bonusPaid: number;
+  status: BonusShopPurchaseStatus;
+  code?: string;
+  usedAt?: string;
+  expiresAt?: string;
+  createdAt: string;
+  item: Pick<BonusShopItem, 'name' | 'description' | 'type' | 'imageUrl'>;
+}
+
+export interface PurchaseResponse {
+  success: boolean;
+  purchase: BonusShopPurchase;
+  item: {
+    name: string;
+    type: string;
+  };
+  code: string;
+  expiresAt?: string;
+  newBalance: number;
+}
+
+// ==================== SSV РЕКЛАМА ====================
+
+export type AdViewStatus =
+  | 'PENDING' // Ожидает просмотра
+  | 'VERIFIED' // Подтверждено
+  | 'REWARDED' // Бонусы начислены
+  | 'EXPIRED' // Истекло
+  | 'FAILED'; // Ошибка
+
+export interface AdViewRequest {
+  adViewId: string;
+  rewardAmount: number;
+  expiresAt: string;
+  customData: string; // Base64 для передачи в SDK
+}
+
+export interface AdRewardResponse {
+  success: boolean;
+  transaction?: BonusTransaction;
+  newBalance?: number;
+  rewardAmount?: number;
+  error?: string;
+}
+
+export interface CanWatchAdResponse {
+  allowed: boolean;
+  reason: string | null;
+  remaining: number;
+}
+
+export interface TransactionsResponse {
+  transactions: BonusTransaction[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 export const BONUS_RULES = {
   title: 'Как работает бонусная система',
   description: 'Бонусы — это виртуальная награда за активность в приложении',
