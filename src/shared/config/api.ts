@@ -51,5 +51,20 @@ export const API_CONFIG = {
       UNREAD_COUNT: '/messages/unread/count',
       CONVERSATION: '/messages/conversation',
     },
+
+    // Bonus
+    BONUS: {
+      BALANCE: '/bonus/balance',
+      LIMITS: '/bonus/limits',
+      CAN_WATCH_AD: '/bonus/can-watch-ad',
+      EARN_AD_VIEW: '/bonus/earn/ad-view',
+      EARN_REGISTRATION: '/bonus/earn/registration',
+      EARN_PROFILE_COMPLETE: '/bonus/earn/profile-complete',
+      EARN_REFERRAL: '/bonus/earn/referral',
+      APPLY: '/bonus/apply',
+      TRANSACTIONS: '/bonus/transactions',
+      CALCULATE_MAX_DISCOUNT: '/bonus/calculate-max-discount',
+      UPLOAD: '/bonus/upload',
+    },
   },
 };

@@ -1,4 +1,13 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ArrowLeft,
@@ -11,7 +20,7 @@ import {
   Star,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLanguage } from '@/shared/lib/hooks';
+import { useLanguage, useBonus } from '@/shared/lib/hooks';
 import { useNavigation } from '@react-navigation/native';
 import { AirplaneBackground } from '@/shared/ui/AirplaneBackground';
 
@@ -64,7 +73,8 @@ const BONUS_ITEMS = [
 export const BonusShopScreen = () => {
   const { t } = useLanguage();
   const navigation = useNavigation();
-  const userBalance = 2450; // TODO: получать из API
+  const { balance, loading, applyBonusToOrder, fetchBalance } = useBonus();
+  const userBalance = balance?.available || 0;
 
   const handleRedeem = (item: (typeof BONUS_ITEMS)[0]) => {
     if (userBalance < item.price) {
@@ -82,9 +92,15 @@ export const BonusShopScreen = () => {
         { text: t.common.cancel, style: 'cancel' },
         {
           text: t.bonusShop.redeem,
-          onPress: () => {
-            // TODO: API call to redeem bonus
-            Alert.alert(t.common.success, t.bonusShop.redeemSuccess);
+          onPress: async () => {
+            const orderId = `bonus_shop_${item.id}_${Date.now()}`;
+            const result = await applyBonusToOrder(orderId, item.price, item.price);
+            if (result.success) {
+              Alert.alert(t.common.success, t.bonusShop.redeemSuccess);
+              fetchBalance();
+            } else {
+              Alert.alert(t.common.error, result.error || 'Failed to redeem');
+            }
           },
         },
       ]
@@ -114,6 +130,17 @@ export const BonusShopScreen = () => {
     };
     return descriptions[item.id] || '';
   };
+
+  if (loading && !balance) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <AirplaneBackground />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#F59E0B" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -241,6 +268,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',

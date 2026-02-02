@@ -21,7 +21,7 @@ import {
   Plane,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLanguage, useLogout } from '../../shared/lib/hooks';
+import { useLanguage, useLogout, useBonus } from '../../shared/lib/hooks';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { CompositeNavigationProp } from '@react-navigation/native';
@@ -59,7 +59,8 @@ export const HomePage = () => {
   const logoutMutation = useLogout();
   const navigation = useNavigation<NavigationProp>();
   const { width } = useWindowDimensions();
-  const userBalance = 2450;
+  const { balance } = useBonus();
+  const userBalance = balance?.available || 0;
 
   // Адаптивные размеры на основе текущей ширины экрана
   const BANNER_WIDTH = width - wp(32);

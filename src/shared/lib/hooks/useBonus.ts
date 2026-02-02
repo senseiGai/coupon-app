@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { bonusApi, BonusBalance, BonusLimits, BonusTransaction } from '@/shared/api/bonus';
+import { bonusApi } from '@/entities/bonus';
+import { BonusBalance, BonusLimits, BonusTransaction } from '@/shared/types/bonus';
 
 export const useBonus = () => {
   const [balance, setBalance] = useState<BonusBalance | null>(null);
@@ -109,7 +110,9 @@ export const useBonus = () => {
   const earnReferralBonus = useCallback(
     async (referralName?: string) => {
       try {
-        const transaction = await bonusApi.earnReferralBonus(referralName);
+        const transaction = await bonusApi.earnReferralBonus(
+          referralName ? { referralName } : undefined
+        );
         await fetchBalance();
         return { success: true, transaction };
       } catch (err: any) {
@@ -125,7 +128,11 @@ export const useBonus = () => {
     async (orderId: string, orderAmount: number, bonusToUse: number) => {
       try {
         setLoading(true);
-        const transaction = await bonusApi.applyBonusToOrder(orderId, orderAmount, bonusToUse);
+        const transaction = await bonusApi.applyBonusToOrder({
+          orderId,
+          orderAmount,
+          bonusToUse,
+        });
         await fetchBalance();
         setError(null);
         return { success: true, transaction };
@@ -150,6 +157,25 @@ export const useBonus = () => {
     }
   }, []);
 
+  // Загрузить файл
+  const uploadFile = useCallback(
+    async (file: any, onProgress?: (progress: number) => void) => {
+      try {
+        setLoading(true);
+        const result = await bonusApi.uploadFile(file, onProgress);
+        setError(null);
+        return { success: true, data: result };
+      } catch (err: any) {
+        setError(err.message || 'Failed to upload file');
+        console.error('Failed to upload file:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   // Загрузить данные при монтировании
   useEffect(() => {
     fetchBalance();
@@ -173,5 +199,6 @@ export const useBonus = () => {
     earnReferralBonus,
     applyBonusToOrder,
     calculateMaxDiscount,
+    uploadFile,
   };
 };
