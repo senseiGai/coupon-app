@@ -178,7 +178,7 @@ export const ToursScreen = () => {
                         {tour.price.toLocaleString()} {t.main.tours.points}
                       </Text>
                       <Text style={styles.tourOriginalPrice}>
-                        {t.main.tours.normalPrice}: {tour.originalPrice.toLocaleString()} ₽
+                        {t.main.tours.normalPrice}: {tour.originalPrice.toLocaleString()}
                       </Text>
                     </View>
                     {canAfford ? (

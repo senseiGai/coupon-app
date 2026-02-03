@@ -137,14 +137,14 @@ export class BonusService {
       return {
         maxDiscount: 0,
         maxBonusToUse: 0,
-        reason: `Минимальная сумма заказа для использования бонусов — ${BONUS_CONFIG.MIN_ORDER_AMOUNT_FOR_BONUS} ₽`,
+        reason: `Минимальная сумма заказа для использования бонусов — ${BONUS_CONFIG.MIN_ORDER_AMOUNT_FOR_BONUS}`,
       };
     }
 
     // Максимальная скидка = 30% от суммы заказа
     const maxDiscountAmount = orderAmount * (BONUS_CONFIG.LIMITS.MAX_DISCOUNT_PERCENT / 100);
 
-    // Сколько бонусов можем использовать (1 бонус = 1 рубль)
+    // Сколько бонусов можем использовать
     const maxBonusToUse = Math.min(maxDiscountAmount, availableBonus);
 
     return {
@@ -177,7 +177,7 @@ export class BonusService {
     if (bonusToUse > maxDiscount.maxBonusToUse) {
       return {
         success: false,
-        error: `Максимальная скидка для этого заказа — ${maxDiscount.maxBonusToUse} ₽`,
+        error: `Максимальная скидка для этого заказа — ${maxDiscount.maxBonusToUse}`,
       };
     }
 

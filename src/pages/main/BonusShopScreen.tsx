@@ -236,7 +236,7 @@ export const BonusShopScreen = () => {
                       {item.originalValue ? (
                         <View style={styles.worthBadge}>
                           <Text style={styles.worthBadgeText}>
-                            {formatPrice(item.originalValue)} ₽
+                            {formatPrice(item.originalValue)}
                           </Text>
                         </View>
                       ) : (

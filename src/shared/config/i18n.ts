@@ -97,7 +97,7 @@ export const translations = {
         bonusesTitle: 'Bonuses',
         availableBonuses: 'Available bonuses',
         bonusEquivalent: 'discount',
-        bonusHint: '💡 1 bonus = 1 ruble discount when booking',
+        bonusHint: '💡 1 bonus = 1 discount when booking',
         noticeText:
           'Bonuses are a virtual reward, NOT money. Used only as a discount within the app.',
         watchAdTitle: 'Watch Ad',
@@ -212,9 +212,9 @@ export const translations = {
         {
           title: 'How to use bonuses',
           items: [
-            '1 bonus = 1 ruble discount on tour booking',
+            '1 bonus = 1 discount on tour booking',
             'You can pay maximum {maxDiscount}% of tour cost',
-            'Minimum order amount is {minOrder} rubles',
+            'Minimum order amount is {minOrder}',
             'The rest must be paid with real money',
             'Bonuses are applied automatically when placing an order',
           ],
@@ -397,7 +397,7 @@ export const translations = {
         bonusesTitle: 'Бонусы',
         availableBonuses: 'Доступно бонусов',
         bonusEquivalent: 'скидки',
-        bonusHint: '💡 1 бонус = 1 рубль скидки при бронировании',
+        bonusHint: '💡 1 бонус = 1 скидка при бронировании',
         noticeText:
           'Бонусы — виртуальная награда, НЕ деньги. Используются только как скидка внутри приложения.',
         watchAdTitle: 'Просмотр рекламы',
@@ -512,9 +512,9 @@ export const translations = {
         {
           title: 'Как использовать бонусы',
           items: [
-            '1 бонус = 1 рубль скидки на бронирование тура',
+            '1 бонус = 1 скидка на бронирование тура',
             'Можно оплатить максимум {maxDiscount}% стоимости тура',
-            'Минимальная сумма заказа — {minOrder} рублей',
+            'Минимальная сумма заказа — {minOrder}',
             'Остальную часть нужно оплатить реальными деньгами',
             'Бонусы применяются автоматически при оформлении заказа',
           ],
@@ -698,7 +698,7 @@ export const translations = {
         bonusesTitle: 'Бонуси',
         availableBonuses: 'Доступно бонусів',
         bonusEquivalent: 'знижки',
-        bonusHint: '💡 1 бонус = 1 рубль знижки при бронюванні',
+        bonusHint: '💡 1 бонус = 1 знижка при бронюванні',
         noticeText:
           'Бонуси — віртуальна винагорода, НЕ гроші. Використовуються тільки як знижка всередині додатку.',
         watchAdTitle: 'Перегляд реклами',
@@ -813,9 +813,9 @@ export const translations = {
         {
           title: 'Як використовувати бонуси',
           items: [
-            '1 бонус = 1 рубль знижки на бронювання туру',
+            '1 бонус = 1 знижка на бронювання туру',
             'Можна оплатити максимум {maxDiscount}% вартості туру',
-            'Мінімальна сума замовлення — {minOrder} рублів',
+            'Мінімальна сума замовлення — {minOrder}',
             'Решту потрібно оплатити реальними грошима',
             'Бонуси застосовуються автоматично при оформленні замовлення',
           ],

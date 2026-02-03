@@ -707,7 +707,7 @@ export default {
     myPurchases: 'Мои покупки',
     buy: 'Купить',
     price: '{price} бонусов',
-    originalPrice: 'Стоимость: {price} ₽',
+    originalPrice: 'Стоимость: {price}',
     location: 'Локация',
     duration: 'Длительность',
     outOfStock: 'Нет в наличии',

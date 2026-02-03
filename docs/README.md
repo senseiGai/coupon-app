@@ -169,7 +169,7 @@ export const BONUS_CONFIG = {
     MAX_DISCOUNT_PERCENT: 30,
     BONUS_EXPIRATION_DAYS: 365,
   },
-  CONVERSION_RATE: 1, // 1 бонус = 1 рубль
+  CONVERSION_RATE: 1, // 1 бонус = 1 скидка
   MIN_ORDER_AMOUNT_FOR_BONUS: 1000,
 };
 ```
