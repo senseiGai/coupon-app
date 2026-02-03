@@ -231,7 +231,7 @@ export const ChatScreen = () => {
           {/* Avatar с логотипом */}
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
-              <Image source={require('../../../assets/logo.jpg')} style={styles.logoImage} />
+              <Image source={require('../../../assets/logo.png')} style={styles.logoImage} />
             </View>
             <View style={styles.onlineIndicator} />
           </View>
@@ -284,7 +284,7 @@ export const ChatScreen = () => {
                     <View style={styles.messageAvatarContainer}>
                       <View style={styles.messageAvatar}>
                         <Image
-                          source={require('../../../assets/logo.jpg')}
+                          source={require('../../../assets/logo.png')}
                           style={styles.messageLogoImage}
                         />
                       </View>
@@ -326,7 +326,7 @@ export const ChatScreen = () => {
                   <View style={styles.messageAvatarContainer}>
                     <View style={styles.messageAvatar}>
                       <Image
-                        source={require('../../../assets/logo.jpg')}
+                        source={require('../../../assets/logo.png')}
                         style={styles.messageLogoImage}
                       />
                     </View>

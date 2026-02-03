@@ -183,7 +183,7 @@ export const BonusShopScreen = () => {
             <View style={styles.infoBannerContent}>
               <View style={styles.infoBannerIcon}>
                 <Image
-                  source={require('../../../assets/logo.jpg')}
+                  source={require('../../../assets/logo.png')}
                   style={styles.logoImage}
                   resizeMode="contain"
                 />
