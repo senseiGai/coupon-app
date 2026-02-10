@@ -9,10 +9,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  Play,
-  TrendingUp,
-  ShoppingCart,
-  ChevronRight,
   Info,
   AlertCircle,
 } from 'lucide-react-native';
@@ -28,7 +24,7 @@ import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
 export const BalanceScreen = () => {
   const { t } = useLanguage();
   const [showRules, setShowRules] = useState(false);
-  const { balance, limits, transactions, loading, fetchBalance, fetchLimits, fetchTransactions } =
+  const { balance, limits, loading, fetchBalance, fetchLimits } =
     useBonus();
 
   const handleShowRules = () => {
@@ -39,7 +35,6 @@ export const BalanceScreen = () => {
     // Обновить данные после успешного просмотра рекламы
     fetchBalance();
     fetchLimits();
-    fetchTransactions();
   };
 
   if (loading && !balance) {
@@ -90,14 +85,14 @@ export const BalanceScreen = () => {
           <RewardedAdButton onSuccess={handleAdSuccess} />
           <View style={styles.adLimitInfo}>
             <Text style={styles.adLimitText}>
-              {t.main.balance.today}: {limits.currentAdViewsToday}/{limits.maxAdViewsPerDay}{' '}
+              {t.main.balance.today}: {limits?.currentAdViewsToday ?? 0}/{limits?.maxAdViewsPerDay ?? BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY}{' '}
               {t.main.balance.views}
             </Text>
             <View style={styles.adLimitBar}>
               <View
                 style={[
                   styles.adLimitFill,
-                  { width: `${(limits.currentAdViewsToday / limits.maxAdViewsPerDay) * 100}%` },
+                  { width: `${limits?.maxAdViewsPerDay ? (limits.currentAdViewsToday / limits.maxAdViewsPerDay) * 100 : 0}%` },
                 ]}
               />
             </View>
@@ -159,102 +154,6 @@ export const BalanceScreen = () => {
             </View>
           </View>
         )}
-
-        {/* How to Earn */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.main.balance.howToEarn}</Text>
-          <View style={styles.earnCard}>
-            <View style={styles.earnItem}>
-              <Text style={styles.earnEmoji}>🎉</Text>
-              <View style={styles.earnInfo}>
-                <Text style={styles.earnTitle}>{t.main.balance.registration}</Text>
-                <Text style={styles.earnAmount}>
-                  +{BONUS_CONFIG.REWARDS.REGISTRATION} {t.main.home.bonuses.toLowerCase()}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.earnItem}>
-              <Text style={styles.earnEmoji}>✅</Text>
-              <View style={styles.earnInfo}>
-                <Text style={styles.earnTitle}>{t.main.balance.completeProfile}</Text>
-                <Text style={styles.earnAmount}>
-                  +{BONUS_CONFIG.REWARDS.PROFILE_COMPLETE} {t.main.home.bonuses.toLowerCase()}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.earnItem}>
-              <Text style={styles.earnEmoji}>📺</Text>
-              <View style={styles.earnInfo}>
-                <Text style={styles.earnTitle}>{t.main.balance.watchAd}</Text>
-                <Text style={styles.earnAmount}>
-                  +{BONUS_CONFIG.REWARDS.AD_VIEW} {t.main.home.bonuses.toLowerCase()} (
-                  {t.main.tours.from} {BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY}/
-                  {t.main.balance.perDay})
-                </Text>
-              </View>
-            </View>
-            <View style={styles.earnItem}>
-              <Text style={styles.earnEmoji}>👥</Text>
-              <View style={styles.earnInfo}>
-                <Text style={styles.earnTitle}>{t.main.balance.inviteFriend}</Text>
-                <Text style={styles.earnAmount}>
-                  +{BONUS_CONFIG.REWARDS.REFERRAL} {t.main.home.bonuses.toLowerCase()}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* History */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{t.main.balance.history}</Text>
-          </View>
-
-          {transactions && transactions.length > 0 ? (
-            transactions.map((transaction) => (
-              <View key={transaction.id} style={styles.historyItem}>
-                <View
-                  style={[
-                    styles.historyIcon,
-                    { backgroundColor: transaction.amount > 0 ? '#DCFCE7' : '#FEE2E2' },
-                  ]}>
-                  {transaction.amount > 0 ? (
-                    <TrendingUp size={wp(20)} color="#16A34A" strokeWidth={2} />
-                  ) : (
-                    <ShoppingCart size={wp(20)} color="#DC2626" strokeWidth={2} />
-                  )}
-                </View>
-                <View style={styles.historyInfo}>
-                  <Text style={styles.historyTitle}>
-                    {BonusService.getTransactionTitle(transaction.type as any)}
-                  </Text>
-                  <Text style={styles.historyDescription}>{transaction.description}</Text>
-                  <Text style={styles.historyDate}>
-                    {new Date(transaction.createdAt).toLocaleString('ru-RU', {
-                      day: 'numeric',
-                      month: 'short',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </Text>
-                </View>
-                <Text
-                  style={[
-                    styles.historyAmount,
-                    { color: transaction.amount > 0 ? '#16A34A' : '#DC2626' },
-                  ]}>
-                  {transaction.amount > 0 ? '+' : ''}
-                  {Math.abs(transaction.amount)}
-                </Text>
-              </View>
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>{t.main.balance.noTransactions}</Text>
-            </View>
-          )}
-        </View>
 
         {/* Footer spacing */}
         <View style={{ height: hp(40) }} />
@@ -459,92 +358,7 @@ const styles = StyleSheet.create({
     color: '#9A3412',
     lineHeight: fontSize(18),
   },
-  // Earn section
-  earnCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: wp(16),
-    padding: wp(16),
-    marginTop: hp(12),
-    marginBottom: hp(20),
-  },
-  earnItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: hp(12),
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-  },
-  earnEmoji: {
-    fontSize: fontSize(32),
-    marginRight: wp(16),
-  },
-  earnInfo: {
-    flex: 1,
-  },
-  earnTitle: {
-    fontSize: fontSize(15),
-    fontWeight: '500',
-    color: '#0F172A',
-    marginBottom: hp(2),
-  },
-  earnAmount: {
-    fontSize: fontSize(13),
-    color: '#10B981',
-    fontWeight: '600',
-  },
-  section: {
-    paddingHorizontal: wp(20),
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: hp(16),
-  },
-  sectionTitle: {
-    fontSize: fontSize(18),
-    fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: hp(12),
-  },
-  historyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: wp(14),
-    padding: wp(14),
-    marginBottom: hp(10),
-  },
-  historyIcon: {
-    width: wp(44),
-    height: wp(44),
-    borderRadius: wp(12),
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: wp(14),
-  },
-  historyInfo: {
-    flex: 1,
-  },
-  historyTitle: {
-    fontSize: fontSize(15),
-    fontWeight: '600',
-    color: '#0F172A',
-    marginBottom: hp(2),
-  },
-  historyDescription: {
-    fontSize: fontSize(13),
-    color: '#64748B',
-    marginBottom: hp(2),
-  },
-  historyDate: {
-    fontSize: fontSize(12),
-    color: '#94A3B8',
-  },
-  historyAmount: {
-    fontSize: fontSize(16),
-    fontWeight: '700',
-  },
+
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -554,15 +368,5 @@ const styles = StyleSheet.create({
     marginTop: hp(16),
     fontSize: fontSize(16),
     color: '#64748B',
-  },
-  emptyState: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: wp(14),
-    padding: wp(32),
-    alignItems: 'center',
-  },
-  emptyStateText: {
-    fontSize: fontSize(15),
-    color: '#94A3B8',
   },
 });
