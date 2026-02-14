@@ -9,11 +9,13 @@ import {
   Platform,
   Image,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Send, Paperclip } from 'lucide-react-native';
 import { useState, useRef, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
 import {
   useLanguage,
   useMessageHistory,
@@ -24,6 +26,8 @@ import {
   MESSAGE_KEYS,
 } from '../../shared/lib/hooks';
 import { socketService } from '../../shared/lib/socket/socketService';
+import { apiClient } from '../../shared/lib/api/apiClient';
+import { API_CONFIG } from '../../shared/config/api';
 import type { PrivateMessage } from '../../shared/types/message';
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
 import { wp, hp, fontSize, sizes, responsive } from '../../shared/lib/responsive';
@@ -36,6 +40,7 @@ export const ChatScreen = () => {
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const queryClient = useQueryClient();
 
@@ -175,6 +180,76 @@ export const ChatScreen = () => {
     }
   };
 
+  // Выбор и отправка изображения
+  const pickAndSendImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        Alert.alert(
+          t.main.chat.permissionRequired || 'Permission required',
+          t.main.chat.galleryPermission || 'Please allow access to your photo library to send images.',
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.7,
+        allowsEditing: false,
+      });
+
+      if (result.canceled || !result.assets?.[0]) return;
+
+      const asset = result.assets[0];
+      setIsUploading(true);
+
+      // Подготавливаем файл для загрузки
+      const uri = asset.uri;
+      const filename = uri.split('/').pop() || 'image.jpg';
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+      const formData = new FormData();
+      formData.append('file', {
+        uri,
+        name: filename,
+        type,
+      } as any);
+
+      // Загружаем на сервер
+      const uploadResponse = await apiClient.getInstance().post<{ imageUrl: string }>(
+        API_CONFIG.ENDPOINTS.MESSAGES.UPLOAD_IMAGE,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+      );
+
+      const imageUrl = uploadResponse.data.imageUrl;
+
+      // Отправляем сообщение с картинкой
+      await sendMessageMutation.mutateAsync({
+        receiverId: ADMIN_ID,
+        message: '',
+        imageUrl,
+      });
+
+      // Скроллим вниз
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    } catch (error) {
+      console.error('[ChatScreen] Failed to send image:', error);
+      Alert.alert(
+        t.main.chat.error || 'Error',
+        t.main.chat.imageSendError || 'Failed to send image. Please try again.',
+      );
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   // Обработка ввода текста с индикатором печати
   const handleTextChange = (text: string) => {
     setInputText(text);
@@ -208,6 +283,7 @@ export const ChatScreen = () => {
     return messages.map((msg) => ({
       id: msg.id,
       text: msg.message,
+      imageUrl: msg.imageUrl,
       isUser: msg.senderId !== ADMIN_ID,
       time: new Date(msg.createdAt).toLocaleTimeString([], {
         hour: '2-digit',
@@ -218,6 +294,12 @@ export const ChatScreen = () => {
   };
 
   const formattedMessages = formatMessages();
+
+  // Полный URL для изображения
+  const getImageFullUrl = (imageUrl: string) => {
+    if (imageUrl.startsWith('http')) return imageUrl;
+    return `${API_CONFIG.BASE_URL.replace('/api', '')}${imageUrl}`;
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -297,9 +379,18 @@ export const ChatScreen = () => {
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
                       style={[styles.messageBubble, styles.userMessage]}>
-                      <Text style={[styles.messageText, styles.userMessageText]}>
-                        {message.text}
-                      </Text>
+                      {message.imageUrl && (
+                        <Image
+                          source={{ uri: getImageFullUrl(message.imageUrl) }}
+                          style={styles.messageImage}
+                          resizeMode="cover"
+                        />
+                      )}
+                      {message.text ? (
+                        <Text style={[styles.messageText, styles.userMessageText]}>
+                          {message.text}
+                        </Text>
+                      ) : null}
                       <View style={styles.messageFooter}>
                         <Text style={[styles.messageTime, styles.userMessageTime]}>
                           {message.time}
@@ -309,9 +400,18 @@ export const ChatScreen = () => {
                     </LinearGradient>
                   ) : (
                     <View style={[styles.messageBubble, styles.supportMessage]}>
-                      <Text style={[styles.messageText, styles.supportMessageText]}>
-                        {message.text}
-                      </Text>
+                      {message.imageUrl && (
+                        <Image
+                          source={{ uri: getImageFullUrl(message.imageUrl) }}
+                          style={styles.messageImage}
+                          resizeMode="cover"
+                        />
+                      )}
+                      {message.text ? (
+                        <Text style={[styles.messageText, styles.supportMessageText]}>
+                          {message.text}
+                        </Text>
+                      ) : null}
                       <Text style={[styles.messageTime, styles.supportMessageTime]}>
                         {message.time}
                       </Text>
@@ -342,8 +442,16 @@ export const ChatScreen = () => {
 
         {/* Input */}
         <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.attachButton} activeOpacity={0.7}>
-            <Paperclip size={wp(22)} color="#64748B" strokeWidth={2} />
+          <TouchableOpacity
+            style={[styles.attachButton, isUploading && styles.attachButtonDisabled]}
+            activeOpacity={0.7}
+            onPress={pickAndSendImage}
+            disabled={isUploading}>
+            {isUploading ? (
+              <ActivityIndicator size="small" color="#0EA5E9" />
+            ) : (
+              <Paperclip size={wp(22)} color="#64748B" strokeWidth={2} />
+            )}
           </TouchableOpacity>
           <TextInput
             style={styles.textInput}
@@ -556,6 +664,12 @@ const styles = StyleSheet.create({
   supportMessageText: {
     color: '#1E293B',
   },
+  messageImage: {
+    width: wp(200),
+    height: wp(200),
+    borderRadius: wp(12),
+    marginBottom: hp(6),
+  },
   messageTime: {
     fontSize: fontSize(11),
     marginTop: hp(4),
@@ -588,6 +702,9 @@ const styles = StyleSheet.create({
     marginRight: wp(10),
     borderWidth: wp(1),
     borderColor: '#E2E8F0',
+  },
+  attachButtonDisabled: {
+    opacity: 0.6,
   },
   textInput: {
     flex: 1,

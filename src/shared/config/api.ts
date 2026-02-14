@@ -9,6 +9,7 @@ export const API_CONFIG = {
     AUTH_LOGIN: '/auth/login',
     AUTH_ADMIN_LOGIN: '/auth/admin/login',
     AUTH_PROFILE: '/auth/profile',
+    AUTH_REFRESH: '/auth/refresh',
 
     // Users
     USERS_BALANCE: '/users/balance',
@@ -50,6 +51,7 @@ export const API_CONFIG = {
       READ: '/messages/read',
       UNREAD_COUNT: '/messages/unread/count',
       CONVERSATION: '/messages/conversation',
+      UPLOAD_IMAGE: '/messages/upload-image',
     },
 
     // Bonus

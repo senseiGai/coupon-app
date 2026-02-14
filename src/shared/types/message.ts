@@ -12,6 +12,7 @@ export interface PrivateMessage {
   senderId: number;
   receiverId: number;
   message: string;
+  imageUrl?: string;
   isRead: boolean;
   createdAt: string;
   sender: User;
@@ -27,6 +28,7 @@ export interface Conversation {
 export interface SendMessageDto {
   receiverId: number;
   message: string;
+  imageUrl?: string;
 }
 
 export interface MarkAsReadDto {

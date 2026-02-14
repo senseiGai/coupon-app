@@ -69,6 +69,26 @@ class AuthService {
     return apiClient.get<ProfileResponse>(API_CONFIG.ENDPOINTS.AUTH_PROFILE);
   }
 
+  async refreshToken(): Promise<boolean> {
+    try {
+      const token = await this.getToken();
+      if (!token) return false;
+
+      const response = await apiClient.post<AuthResponse>(
+        API_CONFIG.ENDPOINTS.AUTH_REFRESH,
+      );
+
+      if (response.access_token) {
+        await apiClient.setToken(response.access_token);
+        return true;
+      }
+      return false;
+    } catch {
+      await apiClient.clearToken();
+      return false;
+    }
+  }
+
   async logout(): Promise<void> {
     await apiClient.clearToken();
   }

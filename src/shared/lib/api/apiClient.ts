@@ -63,9 +63,8 @@ class ApiClient {
         });
 
         if (error.response?.status === 401) {
-          // Токен истек или невалиден
+          // Токен истек или невалиден — очищаем
           await this.clearToken();
-          // Здесь можно добавить редирект на экран логина
         }
 
         const apiError: ApiError = {
