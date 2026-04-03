@@ -183,6 +183,10 @@ export const translations = {
       logoutFailed: 'Logout failed. Please try again.',
       loginFailed: 'Login failed. Please try again.',
       registrationFailed: 'Registration failed. Please try again.',
+      deleteAccount: 'Delete Account',
+      deleteAccountConfirm: 'Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently removed.',
+      deleteAccountSuccess: 'Your account has been deleted.',
+      deleteAccountFailed: 'Failed to delete account. Please try again.',
     },
 
     // Bonus Rules
@@ -483,6 +487,10 @@ export const translations = {
       logoutFailed: 'Не удалось выйти. Попробуйте снова.',
       loginFailed: 'Не удалось войти. Попробуйте снова.',
       registrationFailed: 'Не удалось зарегистрироваться. Попробуйте снова.',
+      deleteAccount: 'Удалить аккаунт',
+      deleteAccountConfirm: 'Вы уверены, что хотите удалить аккаунт? Это действие необратимо. Все ваши данные будут удалены.',
+      deleteAccountSuccess: 'Ваш аккаунт был удалён.',
+      deleteAccountFailed: 'Не удалось удалить аккаунт. Попробуйте снова.',
     },
 
     // Bonus Rules
@@ -784,6 +792,10 @@ export const translations = {
       logoutFailed: 'Не вдалося вийти. Спробуйте ще раз.',
       loginFailed: 'Не вдалося увійти. Спробуйте ще раз.',
       registrationFailed: 'Не вдалося зареєструватися. Спробуйте ще раз.',
+      deleteAccount: 'Видалити акаунт',
+      deleteAccountConfirm: 'Ви впевнені, що хочете видалити акаунт? Цю дію не можна скасувати. Усі ваші дані буде видалено.',
+      deleteAccountSuccess: 'Ваш акаунт було видалено.',
+      deleteAccountFailed: 'Не вдалося видалити акаунт. Спробуйте ще раз.',
     },
 
     // Bonus Rules

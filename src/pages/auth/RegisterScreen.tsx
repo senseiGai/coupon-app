@@ -97,11 +97,11 @@ export default function RegisterScreen({ navigation }: Props) {
   };
 
   const openPrivacyPolicy = () => {
-    Linking.openURL('https://treavel-with-alina.vercel.app/');
+    Linking.openURL('https://twa.su/privacy-policy');
   };
 
   const openTermsOfUse = () => {
-    Linking.openURL('https://treavel-with-alina.vercel.app/');
+    Linking.openURL('https://twa.su/terms');
   };
 
   return (

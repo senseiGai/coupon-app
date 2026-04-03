@@ -71,9 +71,20 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: () => authService.logout(),
     onSuccess: async () => {
-      // Очищаем весь кэш
       queryClient.clear();
-      // Явно инвалидируем и перезапрашиваем статус авторизации
+      await queryClient.invalidateQueries({ queryKey: AUTH_KEYS.token });
+      await queryClient.refetchQueries({ queryKey: AUTH_KEYS.token });
+    },
+  });
+};
+
+export const useDeleteAccount = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => authService.deleteAccount(),
+    onSuccess: async () => {
+      queryClient.clear();
       await queryClient.invalidateQueries({ queryKey: AUTH_KEYS.token });
       await queryClient.refetchQueries({ queryKey: AUTH_KEYS.token });
     },

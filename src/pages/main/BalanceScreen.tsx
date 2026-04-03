@@ -17,7 +17,6 @@ import { BonusService } from '@/entities/bonus/model/bonusService';
 import { BONUS_CONFIG } from '@/shared/types/bonus';
 import { useLanguage } from '@/shared/lib/hooks';
 import { useBonus } from '@/shared/lib/hooks/useBonus';
-import { RewardedAdButton } from '@/features/ads/ui/RewardedAdButton';
 import { AirplaneBackground } from '@/shared/ui/AirplaneBackground';
 import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
 
@@ -29,12 +28,6 @@ export const BalanceScreen = () => {
 
   const handleShowRules = () => {
     setShowRules(!showRules);
-  };
-
-  const handleAdSuccess = () => {
-    // Обновить данные после успешного просмотра рекламы
-    fetchBalance();
-    fetchLimits();
   };
 
   if (loading && !balance) {
@@ -80,9 +73,8 @@ export const BalanceScreen = () => {
           </View>
         </View>
 
-        {/* Watch Ad Button */}
+        {/* Ad limit info */}
         <View style={styles.adSection}>
-          <RewardedAdButton onSuccess={handleAdSuccess} />
           <View style={styles.adLimitInfo}>
             <Text style={styles.adLimitText}>
               {t.main.balance.today}: {limits?.currentAdViewsToday ?? 0}/{limits?.maxAdViewsPerDay ?? BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY}{' '}

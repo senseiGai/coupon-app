@@ -89,6 +89,11 @@ class AuthService {
     }
   }
 
+  async deleteAccount(): Promise<void> {
+    await apiClient.delete(API_CONFIG.ENDPOINTS.USERS_DELETE_ACCOUNT);
+    await apiClient.clearToken();
+  }
+
   async logout(): Promise<void> {
     await apiClient.clearToken();
   }
