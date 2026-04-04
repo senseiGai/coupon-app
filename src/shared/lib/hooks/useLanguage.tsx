@@ -65,7 +65,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
           await AsyncStorage.setItem(LANGUAGE_KEY, 'en');
         }
       } catch (error) {
-        console.error('Error loading language:', error);
+        if (__DEV__) console.error('Error loading language:', error);
         // В случае ошибки используем английский
         setLanguageState('en');
       } finally {
@@ -81,7 +81,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       AsyncStorage.setItem(LANGUAGE_KEY, newLanguage);
       setLanguageState(newLanguage);
     } catch (error) {
-      console.error('Error saving language:', error);
+      if (__DEV__) console.error('Error saving language:', error);
     }
   }, []);
 

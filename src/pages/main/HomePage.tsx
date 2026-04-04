@@ -20,9 +20,10 @@ import {
   Languages,
   Coins,
   Plane,
+  Trash2,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLanguage, useLogout, useBonus } from '../../shared/lib/hooks';
+import { useLanguage, useLogout, useDeleteAccount, useBonus } from '../../shared/lib/hooks';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -59,6 +60,7 @@ type NavigationProp = CompositeNavigationProp<
 export const HomePage = () => {
   const { t, language, setLanguage } = useLanguage();
   const logoutMutation = useLogout();
+  const deleteAccountMutation = useDeleteAccount();
   const navigation = useNavigation<NavigationProp>();
   const { width } = useWindowDimensions();
   const { balance, fetchBalance } = useBonus();
@@ -109,25 +111,40 @@ export const HomePage = () => {
     }
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(t.common.deleteAccount, t.common.deleteAccountConfirm, [
+      {
+        text: t.common.cancel,
+        style: 'cancel',
+      },
+      {
+        text: t.common.delete,
+        onPress: async () => {
+          try {
+            await deleteAccountMutation.mutateAsync();
+          } catch (error: any) {
+            Alert.alert(t.common.error, t.common.deleteAccountFailed);
+          }
+        },
+        style: 'destructive',
+      },
+    ]);
+  };
+
   const handleLogout = async () => {
     Alert.alert(t.common.logout, t.common.logoutConfirm, [
       {
         text: t.common.cancel,
-        onPress: () => console.log('Logout cancelled'),
+        onPress: () => {},
         style: 'cancel',
       },
       {
         text: t.common.logout,
         onPress: async () => {
           try {
-            console.log('[HomePage] Logging out...');
             await logoutMutation.mutateAsync();
-            console.log(
-              '[HomePage] Logout successful, QueryClient cleared, RootNavigator will automatically switch to AuthStack'
-            );
-            // RootNavigator автоматически переключится на AuthStack когда увидит отсутствие токена
           } catch (error) {
-            console.error('[HomePage] Logout error:', error);
+            if (__DEV__) console.error('[HomePage] Logout error:', error);
             Alert.alert(t.common.error, t.common.logoutFailed);
           }
         },
@@ -307,11 +324,19 @@ export const HomePage = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Logout Button */}
+        {/* Logout & Delete Account */}
         <View style={styles.section}>
           <TouchableOpacity activeOpacity={0.7} onPress={handleLogout} style={styles.logoutButton}>
             <LogOut size={sizes.iconSM} color="#0EA5E9" strokeWidth={2.5} />
             <Text style={styles.logoutButtonText}>{t.common.logout}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleDeleteAccount}
+            style={styles.deleteAccountButton}>
+            <Trash2 size={sizes.iconSM} color="#EF4444" strokeWidth={2.5} />
+            <Text style={styles.deleteAccountButtonText}>{t.common.deleteAccount}</Text>
           </TouchableOpacity>
         </View>
 
@@ -788,5 +813,20 @@ const styles = StyleSheet.create({
     fontSize: fontSize(16),
     fontWeight: '600',
     color: '#0EA5E9',
+  },
+  deleteAccountButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: wp(16),
+    marginTop: hp(12),
+    paddingVertical: hp(14),
+    borderRadius: wp(16),
+    gap: wp(10),
+  },
+  deleteAccountButtonText: {
+    fontSize: fontSize(14),
+    fontWeight: '500',
+    color: '#EF4444',
   },
 });

@@ -9,13 +9,13 @@ import type {
 class MessageService {
   // Получить список всех диалогов
   async getConversations(): Promise<Conversation[]> {
-    console.log('[MessageService] Getting conversations');
+    if (__DEV__) console.log('[MessageService] Getting conversations');
     return await apiClient.get<Conversation[]>(API_CONFIG.ENDPOINTS.MESSAGES.CONVERSATIONS);
   }
 
   // Получить историю сообщений с конкретным пользователем
   async getHistory(partnerId: number): Promise<PrivateMessage[]> {
-    console.log(`[MessageService] Getting history with partner ${partnerId}`);
+    if (__DEV__) console.log(`[MessageService] Getting history with partner ${partnerId}`);
     return await apiClient.get<PrivateMessage[]>(
       `${API_CONFIG.ENDPOINTS.MESSAGES.HISTORY}/${partnerId}`
     );
@@ -23,7 +23,7 @@ class MessageService {
 
   // Отметить все сообщения от пользователя как прочитанные
   async markAsRead(partnerId: number): Promise<{ success: boolean }> {
-    console.log(`[MessageService] Marking messages as read from partner ${partnerId}`);
+    if (__DEV__) console.log(`[MessageService] Marking messages as read from partner ${partnerId}`);
     return await apiClient.post<{ success: boolean }>(
       `${API_CONFIG.ENDPOINTS.MESSAGES.READ}/${partnerId}`
     );
@@ -31,7 +31,7 @@ class MessageService {
 
   // Получить количество непрочитанных сообщений
   async getUnreadCount(): Promise<number> {
-    console.log('[MessageService] Getting unread count');
+    if (__DEV__) console.log('[MessageService] Getting unread count');
     const response = await apiClient.get<UnreadCountResponse>(
       API_CONFIG.ENDPOINTS.MESSAGES.UNREAD_COUNT
     );
@@ -40,7 +40,7 @@ class MessageService {
 
   // Удалить всю переписку с пользователем
   async deleteConversation(partnerId: number): Promise<{ success: boolean }> {
-    console.log(`[MessageService] Deleting conversation with partner ${partnerId}`);
+    if (__DEV__) console.log(`[MessageService] Deleting conversation with partner ${partnerId}`);
     return await apiClient.delete<{ success: boolean }>(
       `${API_CONFIG.ENDPOINTS.MESSAGES.CONVERSATION}/${partnerId}`
     );

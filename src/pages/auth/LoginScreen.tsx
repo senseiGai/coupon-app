@@ -54,12 +54,12 @@ export default function LoginScreen({ navigation }: Props) {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        console.log('[LoginScreen] Logging in with:', { email, password });
+        if (__DEV__) console.log('[LoginScreen] Logging in with:', { email });
         const result = await loginMutation.mutateAsync({ email, password });
-        console.log('[LoginScreen] Login successful:', result);
+        if (__DEV__) console.log('[LoginScreen] Login successful');
         // RootNavigator автоматически переведет на MainStack когда увидит токен
       } catch (error: any) {
-        console.error('[LoginScreen] Login error:', error);
+        if (__DEV__) console.error('[LoginScreen] Login error:', error);
         Alert.alert(t.common.error, error.message || t.common.loginFailed);
       }
     }

@@ -67,44 +67,46 @@ export const ChatScreen = () => {
   useEffect(() => {
     // Обработчик новых сообщений - используем queryClient для оптимистичного обновления
     const handleNewMessage = (message: PrivateMessage) => {
-      console.log('[ChatScreen] 📨 NEW MESSAGE EVENT RECEIVED:');
-      console.log('  - Message ID:', message.id);
-      console.log('  - From:', message.senderId);
-      console.log('  - To:', message.receiverId);
-      console.log('  - Text:', message.message);
-      console.log('  - Current ADMIN_ID:', ADMIN_ID);
-      console.log('  - Current User ID:', currentUserId);
+      if (__DEV__) {
+        console.log('[ChatScreen] 📨 NEW MESSAGE EVENT RECEIVED:');
+        console.log('  - Message ID:', message.id);
+        console.log('  - From:', message.senderId);
+        console.log('  - To:', message.receiverId);
+        console.log('  - Text:', message.message);
+        console.log('  - Current ADMIN_ID:', ADMIN_ID);
+        console.log('  - Current User ID:', currentUserId);
+      }
 
       // Получаем текущий кеш сообщений
       const currentMessages = queryClient.getQueryData<PrivateMessage[]>(
         MESSAGE_KEYS.history(ADMIN_ID)
       );
-      console.log('  - Current cached messages count:', currentMessages?.length || 0);
+      if (__DEV__) console.log('  - Current cached messages count:', currentMessages?.length || 0);
 
       // Проверяем, не дублируется ли сообщение
       const isDuplicate = currentMessages?.some((msg) => msg.id === message.id);
       if (isDuplicate) {
-        console.log('  - ⚠️ DUPLICATE MESSAGE, skipping update');
+        if (__DEV__) console.log('  - ⚠️ DUPLICATE MESSAGE, skipping update');
         return;
       }
 
       // Оптимистично обновляем кеш
       queryClient.setQueryData<PrivateMessage[]>(MESSAGE_KEYS.history(ADMIN_ID), (old) => {
         const updated = old ? [...old, message] : [message];
-        console.log('  - ✅ Cache updated, new count:', updated.length);
+        if (__DEV__) console.log('  - ✅ Cache updated, new count:', updated.length);
         return updated;
       });
 
       // Автоматически отмечаем как прочитанные если это сообщение от админа
       if (message.senderId === ADMIN_ID) {
-        console.log('  - 📖 Marking as read (message from admin)');
+        if (__DEV__) console.log('  - 📖 Marking as read (message from admin)');
         markAsReadMutation.mutate(ADMIN_ID);
       }
     };
 
     // Обработчик индикатора печати
     const handleUserTyping = (data: { userId: number; isTyping: boolean }) => {
-      console.log('[ChatScreen] ⌨️ TYPING EVENT:', data);
+      if (__DEV__) console.log('[ChatScreen] ⌨️ TYPING EVENT:', data);
       if (data.userId === ADMIN_ID) {
         setIsTyping(data.isTyping);
       }
@@ -113,30 +115,30 @@ export const ChatScreen = () => {
     // Async функция для подключения и подписки
     const setupSocket = async () => {
       try {
-        console.log('[ChatScreen] 🔌 Connecting to WebSocket...');
+        if (__DEV__) console.log('[ChatScreen] 🔌 Connecting to WebSocket...');
         await socketService.connect();
-        console.log('[ChatScreen] ✅ Connected! Now subscribing to events...');
+        if (__DEV__) console.log('[ChatScreen] ✅ Connected! Now subscribing to events...');
 
         // Подписываемся на события ПОСЛЕ подключения
-        console.log('[ChatScreen] 🎧 Subscribing to socket events...');
+        if (__DEV__) console.log('[ChatScreen] 🎧 Subscribing to socket events...');
         socketService.onNewMessage(handleNewMessage);
         socketService.onUserTyping(handleUserTyping);
-        console.log('[ChatScreen] ✅ Successfully subscribed to events');
+        if (__DEV__) console.log('[ChatScreen] ✅ Successfully subscribed to events');
 
         // Отмечаем все сообщения как прочитанные при открытии чата
         if (ADMIN_ID) {
-          console.log('[ChatScreen] 📖 Marking all messages as read on mount');
+          if (__DEV__) console.log('[ChatScreen] 📖 Marking all messages as read on mount');
           markAsReadMutation.mutate(ADMIN_ID);
         }
       } catch (error) {
-        console.error('[ChatScreen] ❌ Failed to setup socket:', error);
+        if (__DEV__) console.error('[ChatScreen] ❌ Failed to setup socket:', error);
       }
     };
 
     setupSocket();
 
     return () => {
-      console.log('[ChatScreen] 🔌 Disconnecting and cleaning up...');
+      if (__DEV__) console.log('[ChatScreen] 🔌 Disconnecting and cleaning up...');
       socketService.disconnect();
       socketService.removeAllListeners();
     };
@@ -176,7 +178,7 @@ export const ChatScreen = () => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
     } catch (error) {
-      console.error('[ChatScreen] Failed to send message:', error);
+      if (__DEV__) console.error('[ChatScreen] Failed to send message:', error);
     }
   };
 
@@ -240,7 +242,7 @@ export const ChatScreen = () => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
     } catch (error) {
-      console.error('[ChatScreen] Failed to send image:', error);
+      if (__DEV__) console.error('[ChatScreen] Failed to send image:', error);
       Alert.alert(
         t.main.chat.error || 'Error',
         t.main.chat.imageSendError || 'Failed to send image. Please try again.',

@@ -90,7 +90,7 @@ export const DocumentsScreen = () => {
       // Записываем в файл
       await file.write(downloadedData);
 
-      console.log('File downloaded to:', file.uri);
+      if (__DEV__) console.log('File downloaded to:', file.uri);
 
       // Проверяем доступность Sharing API
       const isAvailable = await Sharing.isAvailableAsync();
@@ -104,7 +104,7 @@ export const DocumentsScreen = () => {
       } else {
       }
     } catch (error) {
-      console.error('Download error:', error);
+      if (__DEV__) console.error('Download error:', error);
     }
   };
 

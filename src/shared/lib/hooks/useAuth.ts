@@ -79,3 +79,16 @@ export const useLogout = () => {
     },
   });
 };
+
+export const useDeleteAccount = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => authService.deleteAccount(),
+    onSuccess: async () => {
+      queryClient.clear();
+      await queryClient.invalidateQueries({ queryKey: AUTH_KEYS.token });
+      await queryClient.refetchQueries({ queryKey: AUTH_KEYS.token });
+    },
+  });
+};

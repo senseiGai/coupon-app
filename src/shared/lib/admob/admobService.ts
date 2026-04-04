@@ -31,13 +31,13 @@ class AdMobService {
 
     // Слушатели событий
     this.rewardedAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
-      console.log('[AdMob] Rewarded ad loaded');
+      if (__DEV__) console.log('[AdMob] Rewarded ad loaded');
       this.isLoaded = true;
       this.isLoading = false;
     });
 
     this.rewardedAd.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
-      console.log('[AdMob] User earned reward:', reward);
+      if (__DEV__) console.log('[AdMob] User earned reward:', reward);
     });
 
     this.loadAd();
@@ -71,7 +71,7 @@ class AdMobService {
 
       return { success: true };
     } catch (error: any) {
-      console.error('[AdMob] Error showing rewarded ad:', error);
+      if (__DEV__) console.error('[AdMob] Error showing rewarded ad:', error);
 
       // Пытаемся загрузить рекламу снова
       this.isLoaded = false;

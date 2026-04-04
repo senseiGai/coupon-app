@@ -10,17 +10,14 @@ import {
 
 class AuthService {
   async register(data: RegisterDto): Promise<RegisterResponse> {
-    console.log('[AuthService] Register called with:', data);
+    if (__DEV__) console.log('[AuthService] Register called');
     const response = await apiClient.post<RegisterResponse>(
       API_CONFIG.ENDPOINTS.AUTH_REGISTER,
       data
     );
-    console.log('[AuthService] Register response:', response);
 
     // НЕ сохраняем токен после регистрации - пусть войдет через логин
-    // После регистрации пользователь должен логинитсся заново
     await apiClient.clearToken();
-    console.log('[AuthService] Token cleared after registration');
 
     return response;
   }
@@ -39,14 +36,12 @@ class AuthService {
   }
 
   async login(data: LoginDto): Promise<AuthResponse> {
-    console.log('[AuthService] Login called with:', data);
+    if (__DEV__) console.log('[AuthService] Login called');
     const response = await apiClient.post<AuthResponse>(API_CONFIG.ENDPOINTS.AUTH_LOGIN, data);
-    console.log('[AuthService] Login response:', response);
 
     // Сохраняем токен после входа
     if (response.access_token) {
       await apiClient.setToken(response.access_token);
-      console.log('[AuthService] Token saved');
     }
 
     return response;
@@ -90,6 +85,11 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
+    await apiClient.clearToken();
+  }
+
+  async deleteAccount(): Promise<void> {
+    await apiClient.delete('/users/account');
     await apiClient.clearToken();
   }
 

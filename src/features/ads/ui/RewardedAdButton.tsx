@@ -87,7 +87,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
         if (onError) onError(result.error || 'Failed to show ad');
       }
     } catch (error: any) {
-      console.error('Error watching ad:', error);
+      if (__DEV__) console.error('Error watching ad:', error);
       Alert.alert(t.common.error, t.main.balance.generalError);
       if (onError) onError(error.message);
     } finally {

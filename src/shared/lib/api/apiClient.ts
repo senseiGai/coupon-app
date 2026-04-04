@@ -29,19 +29,16 @@ class ApiClient {
           if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
           }
-          console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-            baseURL: config.baseURL,
-            fullURL: `${config.baseURL}${config.url}`,
-            headers: config.headers,
-            data: config.data,
-          });
+          if (__DEV__) {
+            console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+          }
         } catch (error) {
-          console.error('Error getting token from storage:', error);
+          if (__DEV__) console.error('Error getting token from storage:', error);
         }
         return config;
       },
       (error) => {
-        console.error('[API Request Error]', error);
+        if (__DEV__) console.error('[API Request Error]', error);
         return Promise.reject(error);
       }
     );
@@ -49,18 +46,13 @@ class ApiClient {
     // Response interceptor для обработки ошибок
     this.axiosInstance.interceptors.response.use(
       (response) => {
-        console.log(`[API Response] ${response.status} ${response.config.url}`, {
-          data: response.data,
-        });
+        if (__DEV__) console.log(`[API Response] ${response.status} ${response.config.url}`);
         return response;
       },
       async (error: AxiosError<ApiError>) => {
-        console.error(`[API Error] ${error.response?.status} ${error.config?.url}`, {
-          statusCode: error.response?.status,
-          message: error.message,
-          data: error.response?.data,
-          config: error.config,
-        });
+        if (__DEV__) {
+          console.error(`[API Error] ${error.response?.status} ${error.config?.url}`, error.message);
+        }
 
         if (error.response?.status === 401) {
           // Токен истек или невалиден — очищаем
@@ -82,7 +74,7 @@ class ApiClient {
     try {
       await AsyncStorage.setItem(TOKEN_KEY, token);
     } catch (error) {
-      console.error('Error saving token:', error);
+      if (__DEV__) console.error('Error saving token:', error);
     }
   }
 
@@ -90,7 +82,7 @@ class ApiClient {
     try {
       return await AsyncStorage.getItem(TOKEN_KEY);
     } catch (error) {
-      console.error('Error getting token:', error);
+      if (__DEV__) console.error('Error getting token:', error);
       return null;
     }
   }
@@ -99,7 +91,7 @@ class ApiClient {
     try {
       await AsyncStorage.removeItem(TOKEN_KEY);
     } catch (error) {
-      console.error('Error clearing token:', error);
+      if (__DEV__) console.error('Error clearing token:', error);
     }
   }
 
@@ -114,7 +106,7 @@ class ApiClient {
   }
 
   async post<T>(url: string, data?: any, config = {}) {
-    console.log(`[API Post] ${url}`, { data });
+    if (__DEV__) console.log(`[API Post] ${url}`);
     const response = await this.axiosInstance.post<T>(url, data, config);
     return response.data;
   }
