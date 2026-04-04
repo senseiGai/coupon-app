@@ -16,6 +16,7 @@ export const API_CONFIG = {
     USERS_BALANCE_ADD: '/users/balance/add',
     USERS_BALANCE_SET: '/users/balance/set',
     USERS_ADMIN: '/users/admin', // Получить ID админа
+    USERS_DELETE_ACCOUNT: '/users/account',
 
     // Tours
     TOURS: '/tours',

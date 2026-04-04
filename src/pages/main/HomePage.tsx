@@ -4,10 +4,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   Image,
   useWindowDimensions,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -16,14 +16,14 @@ import {
   MessageCircle,
   FileText,
   Sparkles,
-  LogOut,
+  Settings,
   Languages,
   Coins,
   Plane,
   Trash2,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLanguage, useLogout, useDeleteAccount, useBonus } from '../../shared/lib/hooks';
+import { useLanguage, useDeleteAccount, useBonus } from '../../shared/lib/hooks';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -50,6 +50,7 @@ type RootStackParamList = {
   MainTabs: undefined;
   BonusShop: undefined;
   Balance: undefined;
+  Settings: undefined;
 };
 
 type NavigationProp = CompositeNavigationProp<
@@ -59,7 +60,6 @@ type NavigationProp = CompositeNavigationProp<
 
 export const HomePage = () => {
   const { t, language, setLanguage } = useLanguage();
-  const logoutMutation = useLogout();
   const deleteAccountMutation = useDeleteAccount();
   const navigation = useNavigation<NavigationProp>();
   const { width } = useWindowDimensions();
@@ -131,26 +131,8 @@ export const HomePage = () => {
     ]);
   };
 
-  const handleLogout = async () => {
-    Alert.alert(t.common.logout, t.common.logoutConfirm, [
-      {
-        text: t.common.cancel,
-        onPress: () => {},
-        style: 'cancel',
-      },
-      {
-        text: t.common.logout,
-        onPress: async () => {
-          try {
-            await logoutMutation.mutateAsync();
-          } catch (error) {
-            if (__DEV__) console.error('[HomePage] Logout error:', error);
-            Alert.alert(t.common.error, t.common.logoutFailed);
-          }
-        },
-        style: 'destructive',
-      },
-    ]);
+  const handleOpenSettings = () => {
+    navigation.navigate('Settings');
   };
 
   return (
@@ -324,11 +306,11 @@ export const HomePage = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Logout & Delete Account */}
+        {/* Settings & Delete Account */}
         <View style={styles.section}>
-          <TouchableOpacity activeOpacity={0.7} onPress={handleLogout} style={styles.logoutButton}>
-            <LogOut size={sizes.iconSM} color="#0EA5E9" strokeWidth={2.5} />
-            <Text style={styles.logoutButtonText}>{t.common.logout}</Text>
+          <TouchableOpacity activeOpacity={0.7} onPress={handleOpenSettings} style={styles.logoutButton}>
+            <Settings size={sizes.iconSM} color="#0EA5E9" strokeWidth={2.5} />
+            <Text style={styles.logoutButtonText}>{t.common.settings}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

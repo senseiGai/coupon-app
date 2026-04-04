@@ -9,14 +9,7 @@
     "experiments": {
       "tsconfigPaths": true
     },
-    "plugins": [
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713"
-        }
-      ]
-    ],
+    "plugins": [],
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
@@ -31,7 +24,8 @@
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.travelwithalina.app"
+      "package": "com.travelwithalina.app",
+      "privacyPolicyUrl": "https://twa.su/privacy-policy"
     },
     "extra": {
       "eas": {

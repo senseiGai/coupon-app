@@ -184,8 +184,8 @@ export const translations = {
       loginFailed: 'Login failed. Please try again.',
       registrationFailed: 'Registration failed. Please try again.',
       deleteAccount: 'Delete Account',
-      deleteAccountConfirm: 'Are you sure you want to delete your account? This action cannot be undone. All your data, bonuses, and purchase history will be permanently deleted.',
-      deleteAccountSuccess: 'Your account has been successfully deleted.',
+      deleteAccountConfirm: 'Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently removed.',
+      deleteAccountSuccess: 'Your account has been deleted.',
       deleteAccountFailed: 'Failed to delete account. Please try again.',
     },
 
@@ -489,8 +489,8 @@ export const translations = {
       loginFailed: 'Не удалось войти. Попробуйте снова.',
       registrationFailed: 'Не удалось зарегистрироваться. Попробуйте снова.',
       deleteAccount: 'Удалить аккаунт',
-      deleteAccountConfirm: 'Вы уверены, что хотите удалить аккаунт? Это действие необратимо. Все ваши данные, бонусы и история покупок будут удалены навсегда.',
-      deleteAccountSuccess: 'Ваш аккаунт успешно удалён.',
+      deleteAccountConfirm: 'Вы уверены, что хотите удалить аккаунт? Это действие необратимо. Все ваши данные будут удалены.',
+      deleteAccountSuccess: 'Ваш аккаунт был удалён.',
       deleteAccountFailed: 'Не удалось удалить аккаунт. Попробуйте снова.',
     },
 
@@ -795,8 +795,8 @@ export const translations = {
       loginFailed: 'Не вдалося увійти. Спробуйте ще раз.',
       registrationFailed: 'Не вдалося зареєструватися. Спробуйте ще раз.',
       deleteAccount: 'Видалити акаунт',
-      deleteAccountConfirm: 'Ви впевнені, що хочете видалити акаунт? Цю дію не можна скасувати. Усі ваші дані, бонуси та історія покупок будуть видалені назавжди.',
-      deleteAccountSuccess: 'Ваш акаунт успішно видалено.',
+      deleteAccountConfirm: 'Ви впевнені, що хочете видалити акаунт? Цю дію не можна скасувати. Усі ваші дані буде видалено.',
+      deleteAccountSuccess: 'Ваш акаунт було видалено.',
       deleteAccountFailed: 'Не вдалося видалити акаунт. Спробуйте ще раз.',
     },
 
