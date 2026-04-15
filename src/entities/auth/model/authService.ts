@@ -78,8 +78,10 @@ class AuthService {
         return true;
       }
       return false;
-    } catch {
-      await apiClient.clearToken();
+    } catch (error) {
+      // Не чистим токен при ошибке: сеть могла упасть, endpoint мог быть
+      // недоступен. Пусть текущий токен продолжает работать до реального 401.
+      console.warn('[AuthService] Token refresh failed, keeping current token:', error);
       return false;
     }
   }
@@ -90,11 +92,6 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
-    await apiClient.clearToken();
-  }
-
-  async deleteAccount(): Promise<void> {
-    await apiClient.delete('/users/account');
     await apiClient.clearToken();
   }
 
