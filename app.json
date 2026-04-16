@@ -2,7 +2,7 @@
   "expo": {
     "name": "Travel with Alina",
     "slug": "travel-with-alina",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -11,7 +11,7 @@
     },
     "plugins": [],
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/app_icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -21,12 +21,18 @@
     "assetBundlePatterns": ["**/*"],
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
+        "foregroundImage": "./assets/app_icon.png",
         "backgroundColor": "#ffffff"
       },
       "blockedPermissions": ["com.google.android.gms.permission.AD_ID"],
       "package": "com.travelwithalina.app",
-      "privacyPolicyUrl": "https://twa.su/privacy-policy"
+      "privacyPolicyUrl": "https://twa.su/privacy-policy",
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "extra": {
       "eas": {

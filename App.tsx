@@ -3,8 +3,6 @@
 //   Montserrat_500Medium,
 //   Montserrat_600SemiBold,
 // } from '@expo-google-fonts/montserrat';
-import { useFonts } from 'expo-font';
-// import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { NavigationContainer } from '@react-navigation/native';

@@ -5,8 +5,18 @@ import { ApiError } from '../../types/api';
 
 const TOKEN_KEY = '@auth_token';
 
+// Endpoint'ы, для которых 401 означает "неверные креденшалы при попытке входа",
+// а не "протухший токен" — для них не надо пытаться refresh'ить.
+const AUTH_ENDPOINTS = ['/auth/login', '/auth/register', '/auth/admin/login', '/auth/refresh'];
+
+const isAuthEndpoint = (url?: string): boolean => {
+  if (!url) return false;
+  return AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+};
+
 class ApiClient {
   private axiosInstance: AxiosInstance;
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -18,6 +28,41 @@ class ApiClient {
     });
 
     this.setupInterceptors();
+  }
+
+  // Выполнить refresh-токена. Параллельные вызовы объединяются.
+  private async performTokenRefresh(): Promise<string | null> {
+    if (this.refreshPromise) return this.refreshPromise;
+
+    this.refreshPromise = (async () => {
+      try {
+        const currentToken = await AsyncStorage.getItem(TOKEN_KEY);
+        if (!currentToken) return null;
+
+        const response = await axios.post<{ access_token?: string }>(
+          `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH_REFRESH}`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${currentToken}` },
+            timeout: API_CONFIG.TIMEOUT,
+          },
+        );
+
+        const newToken = response.data.access_token;
+        if (newToken) {
+          await AsyncStorage.setItem(TOKEN_KEY, newToken);
+          return newToken;
+        }
+        return null;
+      } catch (error) {
+        console.warn('[ApiClient] Token refresh failed:', error);
+        return null;
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
   }
 
   private setupInterceptors() {
@@ -50,12 +95,38 @@ class ApiClient {
         return response;
       },
       async (error: AxiosError<ApiError>) => {
+        const originalRequest = error.config as InternalAxiosRequestConfig & {
+          _retry?: boolean;
+        };
+
         if (__DEV__) {
-          console.error(`[API Error] ${error.response?.status} ${error.config?.url}`, error.message);
+          console.error(
+            `[API Error] ${error.response?.status} ${error.config?.url}`,
+            error.message,
+          );
         }
 
-        if (error.response?.status === 401) {
-          // Токен истек или невалиден — очищаем
+        // 401 на любом НЕ-auth endpoint'е:
+        // 1) Пытаемся refresh
+        // 2) Успешно — повторяем оригинальный запрос с новым токеном
+        // 3) Не получилось — чистим токен (реально протух)
+        if (
+          error.response?.status === 401 &&
+          originalRequest &&
+          !originalRequest._retry &&
+          !isAuthEndpoint(originalRequest.url)
+        ) {
+          originalRequest._retry = true;
+          const newToken = await this.performTokenRefresh();
+
+          if (newToken) {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            }
+            return this.axiosInstance(originalRequest);
+          }
+
+          // Refresh не удался — токен протух, чистим
           await this.clearToken();
         }
 
