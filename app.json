@@ -24,6 +24,7 @@
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#ffffff"
       },
+      "blockedPermissions": ["com.google.android.gms.permission.AD_ID"],
       "package": "com.travelwithalina.app",
       "privacyPolicyUrl": "https://twa.su/privacy-policy"
     },
