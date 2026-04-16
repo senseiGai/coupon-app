@@ -11,7 +11,7 @@
     },
     "plugins": [],
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/app_icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -21,11 +21,17 @@
     "assetBundlePatterns": ["**/*"],
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
+        "foregroundImage": "./assets/app_icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.travelwithalina.app",
-      "privacyPolicyUrl": "https://twa.su/privacy-policy"
+      "privacyPolicyUrl": "https://twa.su/privacy-policy",
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "extra": {
       "eas": {
