@@ -3,15 +3,10 @@
 //   Montserrat_500Medium,
 //   Montserrat_600SemiBold,
 // } from '@expo-google-fonts/montserrat';
-import { useFonts } from 'expo-font';
-// import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import MobileAds from 'react-native-google-mobile-ads';
-
 import './global.css';
 
 import RootNavigator from '@/app/navigation/RootNavigator';
@@ -37,15 +32,6 @@ export default function App() {
   // if (!fontsLoaded) {
   //   return null;
   // }
-
-  useEffect(() => {
-    MobileAds()
-      .initialize()
-      .then((adapterStatuses) => {
-        // Initialization complete!
-        console.log('AdMob initialized:', adapterStatuses);
-      });
-  }, []);
 
   return (
     <LanguageProvider>
