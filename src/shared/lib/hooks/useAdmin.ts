@@ -17,7 +17,7 @@ export const useAdmin = () => {
   return useQuery({
     queryKey: ADMIN_KEYS.admin,
     queryFn: async (): Promise<AdminUser> => {
-      console.log('[useAdmin] Fetching admin info');
+      if (__DEV__) console.log('[useAdmin] Fetching admin info');
       return await apiClient.get<AdminUser>(API_CONFIG.ENDPOINTS.USERS_ADMIN);
     },
     staleTime: 1000 * 60 * 60, // 1 час - админ не меняется часто

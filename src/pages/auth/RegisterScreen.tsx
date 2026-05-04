@@ -69,12 +69,12 @@ export default function RegisterScreen({ navigation }: Props) {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        console.log('[RegisterScreen] Submitting registration with:', { email, password });
+        if (__DEV__) console.log('[RegisterScreen] Submitting registration for:', email);
         const result = await registerMutation.mutateAsync({
           email,
           password,
         });
-        console.log('[RegisterScreen] Registration successful:', result);
+        if (__DEV__) console.log('[RegisterScreen] Registration successful');
         Alert.alert(t.common.success, t.auth.register.successMessage, [
           {
             text: t.common.ok,
@@ -90,7 +90,7 @@ export default function RegisterScreen({ navigation }: Props) {
           },
         ]);
       } catch (error: any) {
-        console.error('[RegisterScreen] Registration error:', error);
+        if (__DEV__) console.error('[RegisterScreen] Registration error:', error);
         Alert.alert(t.common.error, error.message || t.common.registrationFailed);
       }
     }

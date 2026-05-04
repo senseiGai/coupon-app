@@ -36,43 +36,47 @@ export const useSendMessage = () => {
 
   return useMutation({
     mutationFn: (data: SendMessageDto) => {
-      console.log('[useSendMessage] 📤 Starting to send message:', data);
+      if (__DEV__) console.log('[useSendMessage] 📤 Starting to send message:', data);
       return new Promise<PrivateMessage>((resolve, reject) => {
         const timeout = setTimeout(() => {
-          console.error('[useSendMessage] ❌ Message send timeout (10s)');
+          if (__DEV__) console.error('[useSendMessage] ❌ Message send timeout (10s)');
           reject(new Error('Message send timeout'));
         }, 10000);
 
         // Создаем одноразовый слушатель для этого конкретного сообщения
         const handleMessageSent = (message: PrivateMessage) => {
-          console.log('[useSendMessage] 📨 Received privateMessageSent event');
-          console.log('[useSendMessage]    Expected receiverId:', data.receiverId);
-          console.log('[useSendMessage]    Actual receiverId:', message.receiverId);
+          if (__DEV__) {
+            console.log('[useSendMessage] 📨 Received privateMessageSent event');
+            console.log('[useSendMessage]    Expected receiverId:', data.receiverId);
+            console.log('[useSendMessage]    Actual receiverId:', message.receiverId);
+          }
 
           // Проверяем что это наше сообщение (по получателю)
           if (message.receiverId === data.receiverId) {
-            console.log('[useSendMessage] ✅ Message confirmed, resolving promise');
+            if (__DEV__) console.log('[useSendMessage] ✅ Message confirmed, resolving promise');
             clearTimeout(timeout);
             // Удаляем слушатель после использования
             socketService.off('privateMessageSent', handleMessageSent);
             resolve(message);
           } else {
-            console.log('[useSendMessage] ⚠️ Message not for us, waiting...');
+            if (__DEV__) console.log('[useSendMessage] ⚠️ Message not for us, waiting...');
           }
         };
 
         // Подписываемся на событие
-        console.log('[useSendMessage] 🎧 Subscribing to privateMessageSent');
+        if (__DEV__) console.log('[useSendMessage] 🎧 Subscribing to privateMessageSent');
         socketService.on('privateMessageSent', handleMessageSent);
 
         // Отправляем через WebSocket
-        console.log('[useSendMessage] 📡 Calling socketService.sendPrivateMessage');
+        if (__DEV__) console.log('[useSendMessage] 📡 Calling socketService.sendPrivateMessage');
         socketService.sendPrivateMessage(data);
       });
     },
     onSuccess: (message, variables) => {
-      console.log('[useSendMessage] ✅ onSuccess - updating cache');
-      console.log('[useSendMessage]    Message:', message);
+      if (__DEV__) {
+        console.log('[useSendMessage] ✅ onSuccess - updating cache');
+        console.log('[useSendMessage]    Message:', message);
+      }
 
       // Добавляем сообщение в кэш истории
       queryClient.setQueryData<PrivateMessage[]>(
@@ -80,21 +84,21 @@ export const useSendMessage = () => {
         (old) => {
           const isDuplicate = old?.some((msg) => msg.id === message.id);
           if (isDuplicate) {
-            console.log('[useSendMessage] ⚠️ Message already in cache, skipping');
+            if (__DEV__) console.log('[useSendMessage] ⚠️ Message already in cache, skipping');
             return old || [];
           }
           const updated = old ? [...old, message] : [message];
-          console.log('[useSendMessage] ✅ Cache updated, count:', updated.length);
+          if (__DEV__) console.log('[useSendMessage] ✅ Cache updated, count:', updated.length);
           return updated;
         }
       );
 
       // Обновляем список диалогов
       queryClient.invalidateQueries({ queryKey: MESSAGE_KEYS.conversations });
-      console.log('[useSendMessage] ✅ Conversations invalidated');
+      if (__DEV__) console.log('[useSendMessage] ✅ Conversations invalidated');
     },
     onError: (error) => {
-      console.error('[useSendMessage] ❌ onError:', error);
+      if (__DEV__) console.error('[useSendMessage] ❌ onError:', error);
     },
   });
 };

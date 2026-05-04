@@ -21,8 +21,7 @@ export const useIsAuthenticated = () => {
   return useQuery({
     queryKey: AUTH_KEYS.token,
     queryFn: () => authService.isAuthenticated(),
-    staleTime: 0, // Всегда проверять актуальность
-    refetchInterval: 1000, // Проверять каждую секунду
+    staleTime: Infinity,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });

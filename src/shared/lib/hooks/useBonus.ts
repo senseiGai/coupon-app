@@ -28,7 +28,7 @@ export const useBonus = () => {
       setError(null);
     } catch (err: any) {
       setError(err.message || 'Failed to load balance');
-      console.error('Failed to load balance:', err);
+      if (__DEV__) console.error('Failed to load balance:', err);
     } finally {
       setLoading(false);
     }
@@ -43,7 +43,7 @@ export const useBonus = () => {
       setError(null);
     } catch (err: any) {
       setError(err.message || 'Failed to load limits');
-      console.error('Failed to load limits:', err);
+      if (__DEV__) console.error('Failed to load limits:', err);
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ export const useBonus = () => {
       setError(null);
     } catch (err: any) {
       setError(err.message || 'Failed to load transactions');
-      console.error('Failed to load transactions:', err);
+      if (__DEV__) console.error('Failed to load transactions:', err);
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,7 @@ export const useBonus = () => {
     try {
       return await bonusApi.canWatchAd();
     } catch (err: any) {
-      console.error('Failed to check ad availability:', err);
+      if (__DEV__) console.error('Failed to check ad availability:', err);
       return { allowed: false, reason: 'Failed to check', remaining: 0 };
     }
   }, []);
@@ -85,7 +85,7 @@ export const useBonus = () => {
       return { success: true, transaction };
     } catch (err: any) {
       setError(err.message || 'Failed to earn bonus');
-      console.error('Failed to earn ad view bonus:', err);
+      if (__DEV__) console.error('Failed to earn ad view bonus:', err);
       return { success: false, error: err.message };
     } finally {
       setLoading(false);
@@ -103,7 +103,7 @@ export const useBonus = () => {
       return result;
     } catch (err: any) {
       setError(err.message || 'Failed to request ad view');
-      console.error('Failed to request ad view:', err);
+      if (__DEV__) console.error('Failed to request ad view:', err);
       return null;
     } finally {
       setLoading(false);
@@ -124,7 +124,7 @@ export const useBonus = () => {
         return result;
       } catch (err: any) {
         setError(err.message || 'Failed to claim ad reward');
-        console.error('Failed to claim ad reward:', err);
+        if (__DEV__) console.error('Failed to claim ad reward:', err);
         return { success: false, error: err.message };
       } finally {
         setLoading(false);
@@ -140,7 +140,7 @@ export const useBonus = () => {
       await fetchBalance();
       return { success: true, transaction };
     } catch (err: any) {
-      console.error('Failed to earn registration bonus:', err);
+      if (__DEV__) console.error('Failed to earn registration bonus:', err);
       return { success: false, error: err.message };
     }
   }, [fetchBalance]);
@@ -152,7 +152,7 @@ export const useBonus = () => {
       await fetchBalance();
       return { success: true, transaction };
     } catch (err: any) {
-      console.error('Failed to earn profile complete bonus:', err);
+      if (__DEV__) console.error('Failed to earn profile complete bonus:', err);
       return { success: false, error: err.message };
     }
   }, [fetchBalance]);
@@ -167,7 +167,7 @@ export const useBonus = () => {
         await fetchBalance();
         return { success: true, transaction };
       } catch (err: any) {
-        console.error('Failed to earn referral bonus:', err);
+        if (__DEV__) console.error('Failed to earn referral bonus:', err);
         return { success: false, error: err.message };
       }
     },
@@ -189,7 +189,7 @@ export const useBonus = () => {
         return { success: true, transaction };
       } catch (err: any) {
         setError(err.message || 'Failed to apply bonus');
-        console.error('Failed to apply bonus to order:', err);
+        if (__DEV__) console.error('Failed to apply bonus to order:', err);
         return { success: false, error: err.message };
       } finally {
         setLoading(false);
@@ -203,7 +203,7 @@ export const useBonus = () => {
     try {
       return await bonusApi.calculateMaxDiscount(orderAmount);
     } catch (err: any) {
-      console.error('Failed to calculate max discount:', err);
+      if (__DEV__) console.error('Failed to calculate max discount:', err);
       return { maxDiscount: 0, maxBonusToUse: 0, reason: 'Failed to calculate' };
     }
   }, []);
@@ -218,7 +218,7 @@ export const useBonus = () => {
         return { success: true, data: result };
       } catch (err: any) {
         setError(err.message || 'Failed to upload file');
-        console.error('Failed to upload file:', err);
+        if (__DEV__) console.error('Failed to upload file:', err);
         return { success: false, error: err.message };
       } finally {
         setLoading(false);
@@ -238,7 +238,7 @@ export const useBonus = () => {
       setError(null);
     } catch (err: any) {
       setError(err.message || 'Failed to load shop items');
-      console.error('Failed to load shop items:', err);
+      if (__DEV__) console.error('Failed to load shop items:', err);
     } finally {
       setLoading(false);
     }
@@ -253,7 +253,7 @@ export const useBonus = () => {
       setError(null);
     } catch (err: any) {
       setError(err.message || 'Failed to load purchases');
-      console.error('Failed to load purchases:', err);
+      if (__DEV__) console.error('Failed to load purchases:', err);
     } finally {
       setLoading(false);
     }
@@ -271,7 +271,7 @@ export const useBonus = () => {
         return { success: true, data: result };
       } catch (err: any) {
         setError(err.message || 'Failed to purchase item');
-        console.error('Failed to purchase item:', err);
+        if (__DEV__) console.error('Failed to purchase item:', err);
         return { success: false, error: err.message };
       } finally {
         setLoading(false);

@@ -5,8 +5,18 @@ import { ApiError } from '../../types/api';
 
 const TOKEN_KEY = '@auth_token';
 
+// Endpoint'ы, для которых 401 означает "неверные креденшалы при попытке входа",
+// а не "протухший токен" — для них не надо пытаться refresh'ить.
+const AUTH_ENDPOINTS = ['/auth/login', '/auth/register', '/auth/admin/login', '/auth/refresh'];
+
+const isAuthEndpoint = (url?: string): boolean => {
+  if (!url) return false;
+  return AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+};
+
 class ApiClient {
   private axiosInstance: AxiosInstance;
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -20,6 +30,41 @@ class ApiClient {
     this.setupInterceptors();
   }
 
+  // Выполнить refresh-токена. Параллельные вызовы объединяются.
+  private async performTokenRefresh(): Promise<string | null> {
+    if (this.refreshPromise) return this.refreshPromise;
+
+    this.refreshPromise = (async () => {
+      try {
+        const currentToken = await AsyncStorage.getItem(TOKEN_KEY);
+        if (!currentToken) return null;
+
+        const response = await axios.post<{ access_token?: string }>(
+          `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH_REFRESH}`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${currentToken}` },
+            timeout: API_CONFIG.TIMEOUT,
+          },
+        );
+
+        const newToken = response.data.access_token;
+        if (newToken) {
+          await AsyncStorage.setItem(TOKEN_KEY, newToken);
+          return newToken;
+        }
+        return null;
+      } catch (error) {
+        console.warn('[ApiClient] Token refresh failed:', error);
+        return null;
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
+  }
+
   private setupInterceptors() {
     // Request interceptor для добавления токена
     this.axiosInstance.interceptors.request.use(
@@ -29,19 +74,16 @@ class ApiClient {
           if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
           }
-          console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-            baseURL: config.baseURL,
-            fullURL: `${config.baseURL}${config.url}`,
-            headers: config.headers,
-            data: config.data,
-          });
+          if (__DEV__) {
+            console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+          }
         } catch (error) {
-          console.error('Error getting token from storage:', error);
+          if (__DEV__) console.error('Error getting token from storage:', error);
         }
         return config;
       },
       (error) => {
-        console.error('[API Request Error]', error);
+        if (__DEV__) console.error('[API Request Error]', error);
         return Promise.reject(error);
       }
     );
@@ -49,21 +91,42 @@ class ApiClient {
     // Response interceptor для обработки ошибок
     this.axiosInstance.interceptors.response.use(
       (response) => {
-        console.log(`[API Response] ${response.status} ${response.config.url}`, {
-          data: response.data,
-        });
+        if (__DEV__) console.log(`[API Response] ${response.status} ${response.config.url}`);
         return response;
       },
       async (error: AxiosError<ApiError>) => {
-        console.error(`[API Error] ${error.response?.status} ${error.config?.url}`, {
-          statusCode: error.response?.status,
-          message: error.message,
-          data: error.response?.data,
-          config: error.config,
-        });
+        const originalRequest = error.config as InternalAxiosRequestConfig & {
+          _retry?: boolean;
+        };
 
-        if (error.response?.status === 401) {
-          // Токен истек или невалиден — очищаем
+        if (__DEV__) {
+          console.error(
+            `[API Error] ${error.response?.status} ${error.config?.url}`,
+            error.message,
+          );
+        }
+
+        // 401 на любом НЕ-auth endpoint'е:
+        // 1) Пытаемся refresh
+        // 2) Успешно — повторяем оригинальный запрос с новым токеном
+        // 3) Не получилось — чистим токен (реально протух)
+        if (
+          error.response?.status === 401 &&
+          originalRequest &&
+          !originalRequest._retry &&
+          !isAuthEndpoint(originalRequest.url)
+        ) {
+          originalRequest._retry = true;
+          const newToken = await this.performTokenRefresh();
+
+          if (newToken) {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            }
+            return this.axiosInstance(originalRequest);
+          }
+
+          // Refresh не удался — токен протух, чистим
           await this.clearToken();
         }
 
@@ -82,7 +145,7 @@ class ApiClient {
     try {
       await AsyncStorage.setItem(TOKEN_KEY, token);
     } catch (error) {
-      console.error('Error saving token:', error);
+      if (__DEV__) console.error('Error saving token:', error);
     }
   }
 
@@ -90,7 +153,7 @@ class ApiClient {
     try {
       return await AsyncStorage.getItem(TOKEN_KEY);
     } catch (error) {
-      console.error('Error getting token:', error);
+      if (__DEV__) console.error('Error getting token:', error);
       return null;
     }
   }
@@ -99,7 +162,7 @@ class ApiClient {
     try {
       await AsyncStorage.removeItem(TOKEN_KEY);
     } catch (error) {
-      console.error('Error clearing token:', error);
+      if (__DEV__) console.error('Error clearing token:', error);
     }
   }
 
@@ -114,7 +177,7 @@ class ApiClient {
   }
 
   async post<T>(url: string, data?: any, config = {}) {
-    console.log(`[API Post] ${url}`, { data });
+    if (__DEV__) console.log(`[API Post] ${url}`);
     const response = await this.axiosInstance.post<T>(url, data, config);
     return response.data;
   }

@@ -7,6 +7,7 @@ import {
   Image,
   useWindowDimensions,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -19,9 +20,10 @@ import {
   Languages,
   Coins,
   Plane,
+  Trash2,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLanguage, useBonus } from '../../shared/lib/hooks';
+import { useLanguage, useDeleteAccount, useBonus } from '../../shared/lib/hooks';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -58,6 +60,7 @@ type NavigationProp = CompositeNavigationProp<
 
 export const HomePage = () => {
   const { t, language, setLanguage } = useLanguage();
+  const deleteAccountMutation = useDeleteAccount();
   const navigation = useNavigation<NavigationProp>();
   const { width } = useWindowDimensions();
   const { balance, fetchBalance } = useBonus();
@@ -106,6 +109,26 @@ export const HomePage = () => {
       default:
         return 'EN';
     }
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(t.common.deleteAccount, t.common.deleteAccountConfirm, [
+      {
+        text: t.common.cancel,
+        style: 'cancel',
+      },
+      {
+        text: t.common.delete,
+        onPress: async () => {
+          try {
+            await deleteAccountMutation.mutateAsync();
+          } catch (error: any) {
+            Alert.alert(t.common.error, t.common.deleteAccountFailed);
+          }
+        },
+        style: 'destructive',
+      },
+    ]);
   };
 
   const handleOpenSettings = () => {
@@ -283,11 +306,19 @@ export const HomePage = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Settings Button */}
+        {/* Settings & Delete Account */}
         <View style={styles.section}>
           <TouchableOpacity activeOpacity={0.7} onPress={handleOpenSettings} style={styles.logoutButton}>
             <Settings size={sizes.iconSM} color="#0EA5E9" strokeWidth={2.5} />
             <Text style={styles.logoutButtonText}>{t.common.settings}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleDeleteAccount}
+            style={styles.deleteAccountButton}>
+            <Trash2 size={sizes.iconSM} color="#EF4444" strokeWidth={2.5} />
+            <Text style={styles.deleteAccountButtonText}>{t.common.deleteAccount}</Text>
           </TouchableOpacity>
         </View>
 
@@ -764,5 +795,20 @@ const styles = StyleSheet.create({
     fontSize: fontSize(16),
     fontWeight: '600',
     color: '#0EA5E9',
+  },
+  deleteAccountButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: wp(16),
+    marginTop: hp(12),
+    paddingVertical: hp(14),
+    borderRadius: wp(16),
+    gap: wp(10),
+  },
+  deleteAccountButtonText: {
+    fontSize: fontSize(14),
+    fontWeight: '500',
+    color: '#EF4444',
   },
 });
