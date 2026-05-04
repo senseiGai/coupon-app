@@ -10,8 +10,9 @@ npm-debug.*
 *.orig.*
 web-build/
 
-
-
+_tpl_extract/
+_repro_tpl/
+_t/
 
 ios
 android

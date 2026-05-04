@@ -53,7 +53,7 @@ export class BonusService {
     const transaction: BonusTransaction = {
       id: this.generateId(),
       userId,
-      type: 'earned_ad_view',
+      type: 'EARNED_AD_VIEW',
       amount,
       balanceBefore: currentBalance.total,
       balanceAfter: currentBalance.total + amount,
@@ -73,7 +73,7 @@ export class BonusService {
     return {
       id: this.generateId(),
       userId,
-      type: 'earned_registration',
+      type: 'EARNED_REGISTRATION',
       amount,
       balanceBefore: 0,
       balanceAfter: amount,
@@ -91,7 +91,7 @@ export class BonusService {
     return {
       id: this.generateId(),
       userId,
-      type: 'earned_profile_complete',
+      type: 'EARNED_PROFILE_COMPLETE',
       amount,
       balanceBefore: currentBalance,
       balanceAfter: currentBalance + amount,
@@ -113,7 +113,7 @@ export class BonusService {
     return {
       id: this.generateId(),
       userId,
-      type: 'earned_referral',
+      type: 'EARNED_REFERRAL',
       amount,
       balanceBefore: currentBalance,
       balanceAfter: currentBalance + amount,
@@ -185,7 +185,7 @@ export class BonusService {
     const transaction: BonusTransaction = {
       id: this.generateId(),
       userId,
-      type: 'spent_discount',
+      type: 'SPENT_DISCOUNT',
       amount: -bonusToUse,
       balanceBefore: currentBalance,
       balanceAfter: currentBalance - bonusToUse,
@@ -208,7 +208,7 @@ export class BonusService {
     return {
       id: this.generateId(),
       userId,
-      type: 'expired',
+      type: 'EXPIRED',
       amount: -expiredAmount,
       balanceBefore: currentBalance,
       balanceAfter: currentBalance - expiredAmount,
@@ -280,13 +280,14 @@ export class BonusService {
    */
   static getTransactionTitle(type: BonusTransactionType): string {
     const titles: Record<BonusTransactionType, string> = {
-      earned_ad_view: '📺 Просмотр рекламы',
-      earned_registration: '🎉 Приветственный бонус',
-      earned_profile_complete: '✅ Профиль заполнен',
-      earned_referral: '👥 Приглашён друг',
-      spent_discount: '🎫 Использовано как скидка',
-      expired: '⏰ Срок истёк',
-      adjustment: '⚙️ Корректировка',
+      EARNED_AD_VIEW: '📺 Просмотр рекламы',
+      EARNED_REGISTRATION: '🎉 Приветственный бонус',
+      EARNED_PROFILE_COMPLETE: '✅ Профиль заполнен',
+      EARNED_REFERRAL: '👥 Приглашён друг',
+      SPENT_DISCOUNT: '🎫 Использовано как скидка',
+      SPENT_SHOP_PURCHASE: '🛍 Покупка в магазине',
+      EXPIRED: '⏰ Срок истёк',
+      ADJUSTMENT: '⚙️ Корректировка',
     };
     return titles[type] || 'Операция';
   }
