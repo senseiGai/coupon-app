@@ -1,0 +1,32 @@
+diff --git a/node_modules/@expo/cli/build/src/prebuild/copyTemplateFiles.js b/node_modules/@expo/cli/build/src/prebuild/copyTemplateFiles.js
+index 0fa6464..63c00a3 100644
+--- a/node_modules/@expo/cli/build/src/prebuild/copyTemplateFiles.js
++++ b/node_modules/@expo/cli/build/src/prebuild/copyTemplateFiles.js
+@@ -45,6 +45,13 @@ function _interop_require_default(obj) {
+     };
+ }
+ const debug = require('debug')('expo:prebuild:copyTemplateFiles');
++function isIncompleteAndroidNative(androidProjectPath) {
++    if (!_fs().default.existsSync(androidProjectPath)) {
++        return false;
++    }
++    const javaRoot = _path().default.join(androidProjectPath, 'app', 'src', 'main', 'java');
++    return !_fs().default.existsSync(javaRoot);
++}
+ /**
+  * Return true if the given platforms all have an internal `.gitignore` file.
+  *
+@@ -74,6 +81,13 @@ function copyTemplateFiles(projectRoot, { templateDirectory, platforms }) {
+     const skippedPaths = [];
+     platforms.forEach((copyFilePath)=>{
+         const projectPath = _path().default.join(projectRoot, copyFilePath);
++        if (copyFilePath === 'android' && isIncompleteAndroidNative(projectPath)) {
++            debug('Removing incomplete android folder (missing app/src/main/java) before copying template');
++            _fs().default.rmSync(projectPath, {
++                recursive: true,
++                force: true
++            });
++        }
+         if (_fs().default.existsSync(projectPath)) {
+             skippedPaths.push(copyFilePath);
+         } else {

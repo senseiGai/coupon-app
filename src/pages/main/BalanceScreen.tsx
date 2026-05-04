@@ -4,14 +4,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Info,
-  AlertCircle,
-} from 'lucide-react-native';
+import { Info, AlertCircle } from 'lucide-react-native';
 import { useState } from 'react';
 import { BonusService } from '@/entities/bonus/model/bonusService';
 import { BONUS_CONFIG } from '@/shared/types/bonus';
@@ -19,12 +15,12 @@ import { useLanguage } from '@/shared/lib/hooks';
 import { useBonus } from '@/shared/lib/hooks/useBonus';
 import { AirplaneBackground } from '@/shared/ui/AirplaneBackground';
 import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
+import { RewardedAdButton } from '@/features/ads/ui/RewardedAdButton';
 
 export const BalanceScreen = () => {
   const { t } = useLanguage();
   const [showRules, setShowRules] = useState(false);
-  const { balance, limits, loading, fetchBalance, fetchLimits } =
-    useBonus();
+  const { balance, limits, loading, fetchBalance, fetchLimits } = useBonus();
 
   const handleShowRules = () => {
     setShowRules(!showRules);
@@ -77,17 +73,28 @@ export const BalanceScreen = () => {
         <View style={styles.adSection}>
           <View style={styles.adLimitInfo}>
             <Text style={styles.adLimitText}>
-              {t.main.balance.today}: {limits?.currentAdViewsToday ?? 0}/{limits?.maxAdViewsPerDay ?? BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY}{' '}
+              {t.main.balance.today}: {limits?.currentAdViewsToday ?? 0}/
+              {limits?.maxAdViewsPerDay ?? BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY}{' '}
               {t.main.balance.views}
             </Text>
             <View style={styles.adLimitBar}>
               <View
                 style={[
                   styles.adLimitFill,
-                  { width: `${limits?.maxAdViewsPerDay ? (limits.currentAdViewsToday / limits.maxAdViewsPerDay) * 100 : 0}%` },
+                  {
+                    width: `${limits?.maxAdViewsPerDay ? (limits.currentAdViewsToday / limits.maxAdViewsPerDay) * 100 : 0}%`,
+                  },
                 ]}
               />
             </View>
+          </View>
+          <View style={{ marginTop: hp(14) }}>
+            <RewardedAdButton
+              onSuccess={() => {
+                void fetchBalance();
+                void fetchLimits();
+              }}
+            />
           </View>
         </View>
 
@@ -97,49 +104,51 @@ export const BalanceScreen = () => {
             <Text style={styles.rulesTitle}>{t.bonusRules.title}</Text>
             <Text style={styles.rulesDescription}>{t.bonusRules.description}</Text>
 
-            {t.bonusRules.sections.map((section, index) => (
-              <View key={index} style={styles.ruleSection}>
-                <Text style={styles.ruleSectionTitle}>{section.title}</Text>
-                {section.items.map((item, itemIndex) => {
-                  // Заменяем плейсхолдеры на реальные значения
-                  let itemText = item;
-                  if (index === 1) {
-                    // "Как получить бонусы" - добавляем количество бонусов
-                    const rewards = [
-                      BONUS_CONFIG.REWARDS.REGISTRATION,
-                      BONUS_CONFIG.REWARDS.PROFILE_COMPLETE,
-                      BONUS_CONFIG.REWARDS.AD_VIEW,
-                      BONUS_CONFIG.REWARDS.REFERRAL,
-                    ];
-                    itemText = `${rewards[itemIndex]} ${item}`;
-                    itemText = itemText.replace(
-                      '{maxAds}',
-                      String(BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY)
-                    );
-                  } else if (index === 2) {
-                    // "Как использовать бонусы"
-                    itemText = itemText
-                      .replace('{maxDiscount}', String(BONUS_CONFIG.LIMITS.MAX_DISCOUNT_PERCENT))
-                      .replace('{minOrder}', String(BONUS_CONFIG.MIN_ORDER_AMOUNT_FOR_BONUS));
-                  } else if (index === 3) {
-                    // "Ограничения"
-                    itemText = itemText
-                      .replace('{maxAds}', String(BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY))
-                      .replace(
-                        '{expirationDays}',
-                        String(BONUS_CONFIG.LIMITS.BONUS_EXPIRATION_DAYS)
+            {t.bonusRules.sections.map(
+              (section: { title: string; items: string[] }, index: number) => (
+                <View key={index} style={styles.ruleSection}>
+                  <Text style={styles.ruleSectionTitle}>{section.title}</Text>
+                  {section.items.map((item: string, itemIndex: number) => {
+                    // Заменяем плейсхолдеры на реальные значения
+                    let itemText = item;
+                    if (index === 1) {
+                      // "Как получить бонусы" - добавляем количество бонусов
+                      const rewards = [
+                        BONUS_CONFIG.REWARDS.REGISTRATION,
+                        BONUS_CONFIG.REWARDS.PROFILE_COMPLETE,
+                        BONUS_CONFIG.REWARDS.AD_VIEW,
+                        BONUS_CONFIG.REWARDS.REFERRAL,
+                      ];
+                      itemText = `${rewards[itemIndex]} ${item}`;
+                      itemText = itemText.replace(
+                        '{maxAds}',
+                        String(BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY)
                       );
-                  }
+                    } else if (index === 2) {
+                      // "Как использовать бонусы"
+                      itemText = itemText
+                        .replace('{maxDiscount}', String(BONUS_CONFIG.LIMITS.MAX_DISCOUNT_PERCENT))
+                        .replace('{minOrder}', String(BONUS_CONFIG.MIN_ORDER_AMOUNT_FOR_BONUS));
+                    } else if (index === 3) {
+                      // "Ограничения"
+                      itemText = itemText
+                        .replace('{maxAds}', String(BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY))
+                        .replace(
+                          '{expirationDays}',
+                          String(BONUS_CONFIG.LIMITS.BONUS_EXPIRATION_DAYS)
+                        );
+                    }
 
-                  return (
-                    <View key={itemIndex} style={styles.ruleItem}>
-                      <Text style={styles.ruleBullet}>•</Text>
-                      <Text style={styles.ruleText}>{itemText}</Text>
-                    </View>
-                  );
-                })}
-              </View>
-            ))}
+                    return (
+                      <View key={itemIndex} style={styles.ruleItem}>
+                        <Text style={styles.ruleBullet}>•</Text>
+                        <Text style={styles.ruleText}>{itemText}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              )
+            )}
 
             <View style={styles.disclaimer}>
               <Text style={styles.disclaimerText}>{t.bonusRules.disclaimer}</Text>
