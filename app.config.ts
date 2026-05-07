@@ -6,10 +6,10 @@ const withAdMobMediationAndroid = require('./plugins/withAdMobMediationAndroid')
 ) => ExpoConfig;
 
 const ADMOB_ANDROID_APP_ID =
-  process.env.EXPO_PUBLIC_ADMOB_APP_ID_ANDROID ?? 'ca-app-pub-3940256099942544~3347511713';
+  process.env.EXPO_PUBLIC_ADMOB_APP_ID_ANDROID || 'ca-app-pub-3940256099942544~3347511713';
 
 const ADMOB_IOS_APP_ID =
-  process.env.EXPO_PUBLIC_ADMOB_APP_ID_IOS ?? 'ca-app-pub-3940256099942544~1458002511';
+  process.env.EXPO_PUBLIC_ADMOB_APP_ID_IOS || 'ca-app-pub-3940256099942544~1458002511';
 
 export default (): ExpoConfig =>
   ({
