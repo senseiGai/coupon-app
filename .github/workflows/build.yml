@@ -1,0 +1,51 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup EAS
+        run: npm install -g eas-cli
+      
+      - name: Install dependencies (skip postinstall scripts)
+        run: |
+          npm install --ignore-scripts
+          npm install --no-save react-native-google-mobile-ads expo-build-properties
+          npx expo install --fix
+      
+      - name: Create .env from secrets
+        run: |
+          echo "EXPO_PUBLIC_ADMOB_APP_ID_ANDROID=${{ secrets.EXPO_PUBLIC_ADMOB_APP_ID_ANDROID }}" >> .env
+          echo "EXPO_PUBLIC_ADMOB_REWARDED_ANDROID_ID=${{ secrets.EXPO_PUBLIC_ADMOB_REWARDED_ANDROID_ID }}" >> .env
+          echo "EXPO_PUBLIC_ADMOB_INTERSTITIAL_ANDROID_ID=${{ secrets.EXPO_PUBLIC_ADMOB_INTERSTITIAL_ANDROID_ID }}" >> .env
+          echo "EXPO_PUBLIC_ADMOB_APP_ID_IOS=${{ secrets.EXPO_PUBLIC_ADMOB_APP_ID_IOS }}" >> .env
+          echo "EXPO_PUBLIC_ADMOB_REWARDED_IOS_ID=${{ secrets.EXPO_PUBLIC_ADMOB_REWARDED_IOS_ID }}" >> .env
+          echo "EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS_ID=${{ secrets.EXPO_PUBLIC_ADMOB_INTERSTITIAL_IOS_ID }}" >> .env
+      
+      - name: Build Android APK
+        run: |
+          eas build --platform android --profile development --non-interactive --local --output=app.apk
+      
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: app.apk
