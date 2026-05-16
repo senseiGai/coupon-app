@@ -32,9 +32,8 @@ async function isPastCooldown(): Promise<boolean> {
 }
 
 async function scheduleNextCooldownWindow(): Promise<void> {
-  const minMs = 2 * 60 * 1000;
-  const maxMs = 3 * 60 * 1000;
-  const next = Date.now() + minMs + Math.random() * (maxMs - minMs);
+  const minMs = 3 * 60 * 1000;
+  const next = Date.now() + minMs;
   await AsyncStorage.setItem(STORAGE_NEXT_ELIGIBLE_MS, String(next));
 }
 

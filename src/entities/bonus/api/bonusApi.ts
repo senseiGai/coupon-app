@@ -73,7 +73,11 @@ class BonusApi {
    * Возвращает adViewId и customData для передачи в рекламный SDK
    */
   async requestAdView(adNetwork?: string): Promise<AdViewRequest> {
-    return apiClient.post<AdViewRequest>(API_CONFIG.ENDPOINTS.BONUS.AD_REQUEST, { adNetwork });
+    const timezoneOffsetMinutes = -new Date().getTimezoneOffset();
+    return apiClient.post<AdViewRequest>(API_CONFIG.ENDPOINTS.BONUS.AD_REQUEST, {
+      adNetwork,
+      timezoneOffsetMinutes,
+    });
   }
 
   /**
