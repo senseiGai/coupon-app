@@ -16,21 +16,12 @@ export class BonusService {
    * Проверка дневного лимита на просмотр рекламы
    */
   static canWatchAd(limits: BonusLimits): { allowed: boolean; reason?: string } {
-    const today = new Date().toISOString().split('T')[0];
-
-    // Сброс счётчика если новый день
-    if (limits.lastAdViewDate !== today) {
-      return { allowed: true };
-    }
-
-    // Проверка лимита
     if (limits.currentAdViewsToday >= limits.maxAdViewsPerDay) {
       return {
         allowed: false,
         reason: `Достигнут дневной лимит просмотров (${limits.maxAdViewsPerDay} в день)`,
       };
     }
-
     return { allowed: true };
   }
 

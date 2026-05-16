@@ -35,16 +35,21 @@ export interface BonusBalance {
 }
 
 export interface BonusLimits {
-  // Дневные лимиты на просмотр рекламы
   maxAdViewsPerDay: number;
   currentAdViewsToday: number;
-  lastAdViewDate: string; // ISO date
-
-  // Максимальный процент скидки от стоимости заказа
-  maxDiscountPercent: number; // По умолчанию 30%
-
-  // Срок действия бонусов (в днях)
-  bonusExpirationDays: number; // По умолчанию 365
+  lastAdViewDate: string;
+  maxDiscountPercent: number;
+  bonusExpirationDays: number;
+  lastBatchCompletedAt?: string | null;
+  adsPerBatch?: number;
+  batchesPerDay?: number;
+  batchRemaining?: number;
+  batchCooldownUntil?: string | null;
+  nextPeriodResetAt?: string | null;
+  rewardPerView?: number;
+  viewsPerTwa?: number;
+  viewsTowardOneTwa?: number;
+  progressToOneTwa?: number;
 }
 
 export interface BonusReward {
@@ -57,17 +62,19 @@ export interface BonusReward {
  * Константы бонусной системы
  */
 export const BONUS_CONFIG = {
-  // Начисления
   REWARDS: {
-    AD_VIEW: 10, // За просмотр рекламы
-    REGISTRATION: 100, // За регистрацию
-    PROFILE_COMPLETE: 50, // За заполнение профиля
-    REFERRAL: 200, // За приглашенного друга
+    AD_VIEW: 0.001,
+    REGISTRATION: 100,
+    PROFILE_COMPLETE: 50,
+    REFERRAL: 200,
   },
 
-  // Лимиты
   LIMITS: {
-    MAX_AD_VIEWS_PER_DAY: 5, // Максимум 5 рекламных роликов в день
+    MAX_AD_VIEWS_PER_DAY: 60,
+    ADS_PER_BATCH: 12,
+    BATCHES_PER_DAY: 5,
+    BATCH_COOLDOWN_MINUTES: 30,
+    VIEWS_PER_TWA: 1000,
     MAX_DISCOUNT_PERCENT: 30, // Максимум 30% скидки
     BONUS_EXPIRATION_DAYS: 365, // Бонусы действуют 1 год
   },
@@ -168,6 +175,16 @@ export interface CanWatchAdResponse {
   allowed: boolean;
   reason: string | null;
   remaining: number;
+  batchRemaining?: number;
+  batchCooldownUntil?: string | null;
+  currentAdViewsToday?: number;
+  maxAdViewsPerDay?: number;
+  adsPerBatch?: number;
+  batchesPerDay?: number;
+  rewardPerView?: number;
+  viewsPerTwa?: number;
+  viewsTowardOneTwa?: number;
+  progressToOneTwa?: number;
 }
 
 export interface TransactionsResponse {

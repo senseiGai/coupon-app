@@ -16,6 +16,14 @@ import { useBonus } from '@/shared/lib/hooks/useBonus';
 import { AirplaneBackground } from '@/shared/ui/AirplaneBackground';
 import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
 import { RewardedAdButton } from '@/features/ads/ui/RewardedAdButton';
+import {
+  formatTwaAmount,
+  getProgressTowardOneTwa,
+  REWARD_PER_AD_VIEW,
+  VIEWS_PER_TWA,
+  ADS_PER_BATCH,
+  BATCHES_PER_DAY,
+} from '@/shared/constants/adRewards';
 
 export const BalanceScreen = () => {
   const { t } = useLanguage();
@@ -25,6 +33,19 @@ export const BalanceScreen = () => {
   const handleShowRules = () => {
     setShowRules(!showRules);
   };
+
+  const rewardPerView = limits?.rewardPerView ?? BONUS_CONFIG.REWARDS.AD_VIEW ?? REWARD_PER_AD_VIEW;
+  const twaProgress =
+    limits?.progressToOneTwa !== undefined && limits?.viewsTowardOneTwa !== undefined
+      ? {
+          progress: limits.progressToOneTwa,
+          viewsTowardOneTwa: limits.viewsTowardOneTwa,
+          viewsPerTwa: limits.viewsPerTwa ?? VIEWS_PER_TWA,
+        }
+      : getProgressTowardOneTwa(balance?.available ?? 0);
+  const progressPercent = Math.min(100, Math.round(twaProgress.progress * 100));
+  const currentViews = limits?.currentAdViewsToday ?? 0;
+  const maxViews = limits?.maxAdViewsPerDay ?? BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY;
 
   if (loading && !balance) {
     return (
@@ -57,10 +78,8 @@ export const BalanceScreen = () => {
 
         {/* Balance Card */}
         <View style={styles.balanceCard}>
-          <Text style={styles.balanceLabel}>{t.main.balance.availableBonuses}</Text>
-          <Text style={styles.balanceAmount}>
-            {BonusService.formatBonus(balance?.available || 0)}
-          </Text>
+          <Text style={styles.balanceLabel}>{t.main.balance.twaBalanceLabel}</Text>
+          <Text style={styles.balanceAmount}>{formatTwaAmount(balance?.available || 0)}</Text>
           <Text style={styles.balanceEquivalent}>
             = {(balance?.available || 0).toLocaleString('ru-RU')} {t.main.balance.bonusEquivalent}
           </Text>
@@ -69,20 +88,37 @@ export const BalanceScreen = () => {
           </View>
         </View>
 
-        {/* Ad limit info */}
+        {/* Progress toward 1 TWA */}
         <View style={styles.adSection}>
+          <View style={styles.twaProgressCard}>
+            <Text style={styles.twaProgressTitle}>{t.main.balance.twaProgressTitle}</Text>
+            <Text style={styles.twaProgressHint}>
+              {t.main.balance.twaProgressHint
+                .replace('{current}', String(twaProgress.viewsTowardOneTwa))
+                .replace('{total}', String(twaProgress.viewsPerTwa))
+                .replace('{reward}', formatTwaAmount(rewardPerView))}
+            </Text>
+            <View style={styles.twaProgressBar}>
+              <View style={[styles.twaProgressFill, { width: `${progressPercent}%` }]} />
+            </View>
+            <Text style={styles.twaProgressPercent}>{progressPercent}% → 1 TWA</Text>
+          </View>
+
           <View style={styles.adLimitInfo}>
             <Text style={styles.adLimitText}>
-              {t.main.balance.today}: {limits?.currentAdViewsToday ?? 0}/
-              {limits?.maxAdViewsPerDay ?? BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY}{' '}
-              {t.main.balance.views}
+              {t.main.balance.dailyQuota
+                .replace('{current}', String(currentViews))
+                .replace('{max}', String(maxViews))}
+            </Text>
+            <Text style={styles.adLimitSubtext}>
+              {ADS_PER_BATCH} × {BATCHES_PER_DAY} · {t.main.balance.periodResetsAt}
             </Text>
             <View style={styles.adLimitBar}>
               <View
                 style={[
                   styles.adLimitFill,
                   {
-                    width: `${limits?.maxAdViewsPerDay ? (limits.currentAdViewsToday / limits.maxAdViewsPerDay) * 100 : 0}%`,
+                    width: `${maxViews ? (currentViews / maxViews) * 100 : 0}%`,
                   },
                 ]}
               />
@@ -299,8 +335,48 @@ const styles = StyleSheet.create({
   },
   adLimitFill: {
     height: hp(4),
-    backgroundColor: '#0EA5E9',
+    backgroundColor: '#94A3B8',
     borderRadius: wp(2),
+  },
+  twaProgressCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: wp(12),
+    padding: wp(14),
+    marginBottom: hp(12),
+  },
+  twaProgressTitle: {
+    fontSize: fontSize(15),
+    fontWeight: '600',
+    color: '#0F172A',
+    marginBottom: hp(6),
+  },
+  twaProgressHint: {
+    fontSize: fontSize(13),
+    color: '#64748B',
+    marginBottom: hp(10),
+    lineHeight: fontSize(18),
+  },
+  twaProgressBar: {
+    height: hp(10),
+    backgroundColor: '#DCFCE7',
+    borderRadius: wp(6),
+    overflow: 'hidden',
+  },
+  twaProgressFill: {
+    height: hp(10),
+    backgroundColor: '#22C55E',
+    borderRadius: wp(6),
+  },
+  twaProgressPercent: {
+    marginTop: hp(8),
+    fontSize: fontSize(12),
+    fontWeight: '600',
+    color: '#15803D',
+  },
+  adLimitSubtext: {
+    fontSize: fontSize(12),
+    color: '#94A3B8',
+    marginBottom: hp(8),
   },
   // Rules section
   rulesCard: {

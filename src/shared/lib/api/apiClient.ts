@@ -74,6 +74,10 @@ class ApiClient {
           if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
           }
+          if (config.headers) {
+            const offset = -new Date().getTimezoneOffset();
+            config.headers['X-Timezone-Offset'] = String(offset);
+          }
           if (__DEV__) {
             console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
           }
