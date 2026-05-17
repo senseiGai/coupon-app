@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Gift, FolderOpen, MessageCircle } from 'lucide-react-native';
@@ -16,12 +17,12 @@ import { SettingsScreen } from '../../pages/main/SettingsScreen';
 
 export type MainTabParamList = {
   Home: undefined;
-  Chat: undefined;
+  Chat: { draftMessage?: string } | undefined;
   Documents: undefined;
 };
 
 export type RootStackParamList = {
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   BonusShop: undefined;
   Balance: undefined;
   MyPurchases: undefined;

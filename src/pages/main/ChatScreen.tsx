@@ -32,11 +32,16 @@ import type { PrivateMessage } from '../../shared/types/message';
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
 import { wp, hp, fontSize, sizes, responsive } from '../../shared/lib/responsive';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import type { MainTabParamList } from '@/app/navigation/MainStack';
 
 const { screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT } = sizes;
 
+type ChatRouteProp = RouteProp<MainTabParamList, 'Chat'>;
+
 export const ChatScreen = () => {
   const { t } = useLanguage();
+  const route = useRoute<ChatRouteProp>();
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -62,6 +67,13 @@ export const ChatScreen = () => {
   const markAsReadMutation = useMarkAsRead();
 
   const isLoading = isLoadingAdmin || isLoadingMessages;
+
+  useEffect(() => {
+    const draft = route.params?.draftMessage;
+    if (draft) {
+      setInputText(draft);
+    }
+  }, [route.params?.draftMessage]);
 
   // Подключаемся к WebSocket при монтировании
   useEffect(() => {

@@ -3,9 +3,17 @@ export const ADS_PER_BATCH = 12;
 export const BATCHES_PER_DAY = 5;
 export const BATCH_COOLDOWN_MS = 30 * 60 * 1000;
 export const MAX_AD_VIEWS_PER_DAY = ADS_PER_BATCH * BATCHES_PER_DAY;
-export const VIEWS_PER_TWA = 1000;
-export const REWARD_PER_AD_VIEW = 0.001;
+/** 100 просмотров × 0.01 TWA = 1 TWA */
+export const VIEWS_PER_TWA = 100;
+export const REWARD_PER_AD_VIEW = 0.01;
 export const AD_PERIOD_RESET_HOUR = 12;
+
+export function formatRewardPerViewLabel(locale = 'ru-RU'): string {
+  return `+${REWARD_PER_AD_VIEW.toLocaleString(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} TWA`;
+}
 
 export function formatTwaAmount(amount: number, locale = 'ru-RU'): string {
   const abs = Math.abs(amount);
