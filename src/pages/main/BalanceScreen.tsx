@@ -18,12 +18,14 @@ import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
 import { RewardedAdButton } from '@/features/ads/ui/RewardedAdButton';
 import {
   formatTwaAmount,
+  formatRewardPerViewLabel,
   getProgressTowardOneTwa,
   REWARD_PER_AD_VIEW,
   VIEWS_PER_TWA,
   ADS_PER_BATCH,
   BATCHES_PER_DAY,
 } from '@/shared/constants/adRewards';
+import { TwaRewardsGrid } from '@/features/twa-rewards/ui/TwaRewardsGrid';
 
 export const BalanceScreen = () => {
   const { t } = useLanguage();
@@ -93,10 +95,10 @@ export const BalanceScreen = () => {
           <View style={styles.twaProgressCard}>
             <Text style={styles.twaProgressTitle}>{t.main.balance.twaProgressTitle}</Text>
             <Text style={styles.twaProgressHint}>
-              {t.main.balance.twaProgressHint
-                .replace('{current}', String(twaProgress.viewsTowardOneTwa))
-                .replace('{total}', String(twaProgress.viewsPerTwa))
-                .replace('{reward}', formatTwaAmount(rewardPerView))}
+              {t.main.balance.twaProgressHint.replace(
+                '{reward}',
+                formatRewardPerViewLabel(),
+              )}
             </Text>
             <View style={styles.twaProgressBar}>
               <View style={[styles.twaProgressFill, { width: `${progressPercent}%` }]} />
@@ -132,6 +134,10 @@ export const BalanceScreen = () => {
               }}
             />
           </View>
+        </View>
+
+        <View style={styles.rewardsSection}>
+          <TwaRewardsGrid balance={balance?.available ?? 0} />
         </View>
 
         {/* Bonus Rules (collapsible) */}
@@ -273,6 +279,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   adSection: {
+    paddingHorizontal: wp(20),
+    marginBottom: hp(12),
+  },
+  rewardsSection: {
     paddingHorizontal: wp(20),
     marginBottom: hp(20),
   },

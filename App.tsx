@@ -11,7 +11,7 @@ import './global.css';
 import RootNavigator from '@/app/navigation/RootNavigator';
 import { ApiProvider } from '@/app/providers/ApiProvider';
 import { LanguageProvider } from '@/shared/lib/hooks';
-import { handleRootNavigationState } from '@/shared/lib/admob';
+import { handleRootNavigationState, preloadRewardedAd } from '@/shared/lib/admob';
 
 export default function App() {
   useEffect(() => {
@@ -22,6 +22,7 @@ export default function App() {
       .initialize()
       .then((adapterStatuses) => {
         console.log('AdMob initialized:', adapterStatuses);
+        preloadRewardedAd();
       })
       .catch((e: unknown) => {
         console.warn('AdMob init failed:', e);

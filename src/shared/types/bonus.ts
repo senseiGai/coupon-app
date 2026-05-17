@@ -63,7 +63,7 @@ export interface BonusReward {
  */
 export const BONUS_CONFIG = {
   REWARDS: {
-    AD_VIEW: 0.001,
+    AD_VIEW: 0.01,
     REGISTRATION: 100,
     PROFILE_COMPLETE: 50,
     REFERRAL: 200,
@@ -74,7 +74,7 @@ export const BONUS_CONFIG = {
     ADS_PER_BATCH: 12,
     BATCHES_PER_DAY: 5,
     BATCH_COOLDOWN_MINUTES: 30,
-    VIEWS_PER_TWA: 1000,
+    VIEWS_PER_TWA: 100,
     MAX_DISCOUNT_PERCENT: 30, // Максимум 30% скидки
     BONUS_EXPIRATION_DAYS: 365, // Бонусы действуют 1 год
   },

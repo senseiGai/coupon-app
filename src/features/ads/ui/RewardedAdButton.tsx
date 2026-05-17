@@ -15,10 +15,12 @@ import { useLanguage } from '@/shared/lib/hooks';
 import { BONUS_CONFIG } from '@/shared/types/bonus';
 import {
   formatTwaAmount,
+  formatRewardPerViewLabel,
   REWARD_PER_AD_VIEW,
   ADS_PER_BATCH,
   BATCHES_PER_DAY,
 } from '@/shared/constants/adRewards';
+import { useProfile } from '@/shared/lib/hooks';
 import type { CanWatchAdResponse } from '@/shared/types/bonus';
 import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
 
@@ -54,6 +56,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const { t } = useLanguage();
   const { limits, checkCanWatchAd, requestAdView, claimAdReward, fetchBalance, fetchLimits } =
     useBonus();
+  const { data: profile } = useProfile();
   const [loading, setLoading] = useState(false);
   const [quota, setQuota] = useState<CanWatchAdResponse | null>(null);
 
@@ -99,7 +102,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
         return;
       }
 
-      const adResult = await showRewardedAd(adReq.customData);
+      const adResult = await showRewardedAd(adReq.customData, profile?.id ? String(profile.id) : undefined);
       if (!adResult.success) {
         Alert.alert(t.common.error, adResult.error || t.main.balance.adError);
         onError?.(adResult.error || 'Ad failed');
@@ -143,7 +146,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
   let subtitle = t.main.balance.watchAdDescription.replace(
     '{amount}',
-    formatRewardAmount(rewardPerView)
+    formatRewardPerViewLabel(),
   );
   subtitle += `\n${t.main.balance.dailyQuota
     .replace('{current}', String(currentViews))
