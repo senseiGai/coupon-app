@@ -8,29 +8,31 @@ import {
   Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Plane, MapPin, Clock } from 'lucide-react-native';
+import { Gift, Plane, MapPin, Clock } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/MainStack';
 import { useLanguage } from '@/shared/lib/hooks';
 import { TWA_REWARDS_CATALOG, type TwaRewardItem } from '@/shared/constants/twaRewardsCatalog';
-import { wp, hp, fontSize } from '@/shared/lib/responsive';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = (SCREEN_WIDTH - wp(40) - wp(12)) / 2;
+const H_PADDING = 16;
+const GAP = 16;
+const CARD_WIDTH = (SCREEN_WIDTH - H_PADDING * 2 - GAP) / 2;
 
 type Props = {
   balance: number;
+  showTitle?: boolean;
 };
 
-const CARD_GRADIENT = ['#64748B', '#475569'] as const;
-const CARD_GRADIENT_ACTIVE = ['#FCD34D', '#F59E0B'] as const;
+const CARD_GRADIENT_GREY = ['#94A3B8', '#64748B'] as const;
+const CARD_GRADIENT_GOLD = ['#FCD34D', '#F59E0B'] as const;
 
 function formatTwaPrice(price: number): string {
   return `${price.toLocaleString('ru-RU')} TWA`;
 }
 
-export const TwaRewardsGrid: React.FC<Props> = ({ balance }) => {
+export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true }) => {
   const { t } = useLanguage();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -43,10 +45,10 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance }) => {
       return;
     }
 
-    Alert.alert(t.main.balance.applyRewardTitle, t.main.balance.applyRewardMessage, [
+    Alert.alert(t.bonusShop.applyRewardTitle, t.bonusShop.applyRewardMessage, [
       { text: t.common.cancel, style: 'cancel' },
       {
-        text: t.main.balance.applyRewardButton,
+        text: t.bonusShop.applyRewardButton,
         onPress: () => {
           navigation.navigate('MainTabs', {
             screen: 'Chat',
@@ -59,11 +61,13 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance }) => {
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{t.bonusShop.availableRewards}</Text>
+      {showTitle ? (
+        <Text style={styles.sectionTitle}>{t.bonusShop.availableRewards}</Text>
+      ) : null}
       <View style={styles.grid}>
         {TWA_REWARDS_CATALOG.map((item) => {
           const canAfford = balance >= item.price;
-          const colors = canAfford ? CARD_GRADIENT_ACTIVE : CARD_GRADIENT;
+          const colors = canAfford ? CARD_GRADIENT_GOLD : CARD_GRADIENT_GREY;
 
           return (
             <TouchableOpacity
@@ -71,8 +75,12 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance }) => {
               style={styles.card}
               activeOpacity={0.85}
               onPress={() => handleApply(item)}>
-              <LinearGradient colors={[...colors]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.gradient}>
-                <View style={styles.topRow}>
+              <LinearGradient
+                colors={[...colors]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.gradient}>
+                <View style={styles.topBadgesRow}>
                   <View style={styles.priceBadge}>
                     <Text style={styles.priceBadgeText}>{formatTwaPrice(item.price)}</Text>
                   </View>
@@ -80,40 +88,46 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance }) => {
                     <View style={styles.statusBadge}>
                       <Text style={styles.statusBadgeText}>{t.bonusShop.notEnough}</Text>
                     </View>
-                  ) : null}
+                  ) : (
+                    <View style={styles.statusBadgePlaceholder} />
+                  )}
                 </View>
 
-                <View style={styles.iconWrap}>
-                  <Plane size={28} color="#FFFFFF" strokeWidth={2} />
+                <View style={styles.iconContainer}>
+                  <Gift size={28} color="#FFFFFF" strokeWidth={2} />
                 </View>
 
-                <Text style={styles.title} numberOfLines={2}>
-                  {item.title}
-                </Text>
-                <Text style={styles.description} numberOfLines={3}>
-                  {item.description}
-                </Text>
+                <View style={styles.itemContent}>
+                  <Text style={styles.itemName} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                  <Text style={styles.itemDescription} numberOfLines={3}>
+                    {item.description}
+                  </Text>
 
-                <View style={styles.meta}>
-                  {item.location ? (
-                    <View style={styles.metaRow}>
-                      <MapPin size={11} color="rgba(255,255,255,0.9)" />
-                      <Text style={styles.metaText} numberOfLines={1}>
-                        {item.location}
-                      </Text>
+                  {(item.location || item.duration) && (
+                    <View style={styles.metaContainer}>
+                      {item.location ? (
+                        <View style={styles.metaRow}>
+                          <MapPin size={11} color="rgba(255,255,255,0.85)" />
+                          <Text style={styles.metaText} numberOfLines={1}>
+                            {item.location}
+                          </Text>
+                        </View>
+                      ) : null}
+                      {item.duration ? (
+                        <View style={styles.metaRow}>
+                          <Clock size={11} color="rgba(255,255,255,0.85)" />
+                          <Text style={styles.metaText}>{item.duration}</Text>
+                        </View>
+                      ) : null}
                     </View>
-                  ) : null}
-                  {item.duration ? (
-                    <View style={styles.metaRow}>
-                      <Clock size={11} color="rgba(255,255,255,0.9)" />
-                      <Text style={styles.metaText}>{item.duration}</Text>
-                    </View>
-                  ) : null}
+                  )}
                 </View>
 
-                <View style={styles.applyBtn}>
+                <View style={styles.priceContainer}>
                   <Plane size={14} color="#FFD700" />
-                  <Text style={styles.applyBtnText}>{t.main.balance.applyRewardButton}</Text>
+                  <Text style={styles.priceText}>{formatTwaPrice(item.price)}</Text>
                 </View>
               </LinearGradient>
             </TouchableOpacity>
@@ -126,106 +140,113 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance }) => {
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: hp(20),
+    marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: fontSize(18),
+    fontSize: 18,
     fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: hp(12),
+    color: '#1E293B',
+    marginBottom: 12,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: wp(12),
+    gap: GAP,
   },
   card: {
     width: CARD_WIDTH,
-    borderRadius: wp(16),
-    overflow: 'hidden',
   },
   gradient: {
-    padding: wp(12),
-    minHeight: hp(220),
-    justifyContent: 'space-between',
+    borderRadius: 16,
+    padding: 12,
+    minHeight: 240,
   },
-  topRow: {
+  topBadgesRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    gap: wp(4),
+    marginBottom: 8,
+    minHeight: 22,
   },
   priceBadge: {
     backgroundColor: 'rgba(255,255,255,0.95)',
-    paddingHorizontal: wp(8),
-    paddingVertical: hp(4),
-    borderRadius: wp(8),
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
   priceBadgeText: {
-    fontSize: fontSize(12),
+    fontSize: 11,
     fontWeight: '700',
     color: '#0F172A',
   },
   statusBadge: {
-    backgroundColor: 'rgba(15,23,42,0.75)',
-    paddingHorizontal: wp(6),
-    paddingVertical: hp(3),
-    borderRadius: wp(6),
-    maxWidth: '55%',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    maxWidth: '52%',
+  },
+  statusBadgePlaceholder: {
+    width: 1,
+    height: 1,
   },
   statusBadgeText: {
-    fontSize: fontSize(9),
+    fontSize: 9,
     fontWeight: '600',
     color: '#FFFFFF',
   },
-  iconWrap: {
-    alignSelf: 'center',
-    width: wp(52),
-    height: wp(52),
-    borderRadius: wp(12),
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
+  iconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: hp(8),
+    marginBottom: 10,
   },
-  title: {
-    fontSize: fontSize(14),
+  itemContent: {
+    flex: 1,
+  },
+  itemName: {
+    fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: hp(4),
+    lineHeight: 18,
+    marginBottom: 4,
   },
-  description: {
-    fontSize: fontSize(11),
-    color: 'rgba(255,255,255,0.92)',
-    lineHeight: fontSize(15),
-    marginBottom: hp(6),
+  itemDescription: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.85)',
+    lineHeight: 14,
+    marginBottom: 6,
   },
-  meta: {
-    gap: hp(4),
-    marginBottom: hp(8),
+  metaContainer: {
+    marginTop: 4,
+    gap: 4,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: wp(4),
+    gap: 4,
   },
   metaText: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.85)',
     flex: 1,
-    fontSize: fontSize(10),
-    color: 'rgba(255,255,255,0.88)',
   },
-  applyBtn: {
+  priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: wp(6),
-    backgroundColor: 'rgba(15,23,42,0.85)',
-    paddingVertical: hp(10),
-    borderRadius: wp(12),
+    gap: 5,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    alignSelf: 'flex-start',
+    marginTop: 10,
   },
-  applyBtnText: {
-    fontSize: fontSize(11),
+  priceText: {
+    fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
   },

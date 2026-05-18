@@ -10,6 +10,16 @@ export type TwaRewardItem = {
 
 export const TWA_REWARDS_CATALOG: TwaRewardItem[] = [
   {
+    id: 'tour-discount-1',
+    price: 1,
+    title: 'Скидка на тур',
+    description: 'Бонус-приз: скидка 5–10 € на тур',
+    location: 'любое направление',
+    duration: 'по запросу',
+    chatMessage:
+      'Здравствуйте! Хочу применить бонус 1 TWA: прошу скидку 5–10 € на тур.',
+  },
+  {
     id: 'egypt-tours-3',
     price: 3,
     title: 'Экскурсии по Египту',

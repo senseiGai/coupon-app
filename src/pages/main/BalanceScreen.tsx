@@ -134,10 +134,6 @@ export const BalanceScreen = () => {
           </View>
         </View>
 
-        <View style={styles.rewardsSection}>
-          <TwaRewardsGrid balance={balance?.available ?? 0} />
-        </View>
-
         {/* Bonus Rules (collapsible) */}
         {showRules && (
           <View style={styles.rulesCard}>
