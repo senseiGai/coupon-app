@@ -27,6 +27,25 @@ function usesProductionAppId(): boolean {
   return androidAppId.includes('3928197299796226');
 }
 
+/** Если в AdMob перепутаны типы блоков — задайте true в .env */
+function shouldSwapRewardedAndInterstitial(): boolean {
+  return process.env.EXPO_PUBLIC_ADMOB_SWAP_UNITS === 'true';
+}
+
+function pickRewardedId(android: string, ios: string): string {
+  if (shouldSwapRewardedAndInterstitial()) {
+    return Platform.OS === 'ios' ? PRODUCTION_UNITS.ios.interstitial : PRODUCTION_UNITS.android.interstitial;
+  }
+  return Platform.OS === 'ios' ? ios : android;
+}
+
+function pickInterstitialId(android: string, ios: string): string {
+  if (shouldSwapRewardedAndInterstitial()) {
+    return Platform.OS === 'ios' ? PRODUCTION_UNITS.ios.rewarded : PRODUCTION_UNITS.android.rewarded;
+  }
+  return Platform.OS === 'ios' ? ios : android;
+}
+
 function rewardedFromEnv(): string | undefined {
   if (Platform.OS === 'android') {
     return trimId(process.env.EXPO_PUBLIC_ADMOB_REWARDED_ANDROID_ID);
@@ -50,12 +69,16 @@ function interstitialFromEnv(): string | undefined {
 export function getRewardedAdUnitId(): string {
   const fromEnv = rewardedFromEnv();
   if (fromEnv && isAdUnitId(fromEnv)) {
+    if (shouldSwapRewardedAndInterstitial()) {
+      const swapped = interstitialFromEnv();
+      if (swapped && isAdUnitId(swapped)) {
+        return swapped;
+      }
+    }
     return fromEnv;
   }
   if (usesProductionAppId()) {
-    return Platform.OS === 'ios'
-      ? PRODUCTION_UNITS.ios.rewarded
-      : PRODUCTION_UNITS.android.rewarded;
+    return pickRewardedId(PRODUCTION_UNITS.android.rewarded, PRODUCTION_UNITS.ios.rewarded);
   }
   return TestIds.REWARDED;
 }
@@ -63,12 +86,19 @@ export function getRewardedAdUnitId(): string {
 export function getInterstitialAdUnitId(): string {
   const fromEnv = interstitialFromEnv();
   if (fromEnv && isAdUnitId(fromEnv)) {
+    if (shouldSwapRewardedAndInterstitial()) {
+      const swapped = rewardedFromEnv();
+      if (swapped && isAdUnitId(swapped)) {
+        return swapped;
+      }
+    }
     return fromEnv;
   }
   if (usesProductionAppId()) {
-    return Platform.OS === 'ios'
-      ? PRODUCTION_UNITS.ios.interstitial
-      : PRODUCTION_UNITS.android.interstitial;
+    return pickInterstitialId(
+      PRODUCTION_UNITS.android.interstitial,
+      PRODUCTION_UNITS.ios.interstitial,
+    );
   }
   return TestIds.INTERSTITIAL;
 }

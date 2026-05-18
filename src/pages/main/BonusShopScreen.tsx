@@ -30,6 +30,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/MainStack';
 import { AirplaneBackground } from '@/shared/ui/AirplaneBackground';
 import { BonusShopItem, BonusShopItemType } from '@/shared/types/bonus';
+import { TwaRewardsGrid } from '@/features/twa-rewards/ui/TwaRewardsGrid';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2; // 16px padding * 2 + 16px gap
@@ -207,9 +208,15 @@ export const BonusShopScreen = () => {
           <ArrowLeft size={16} color="#64748B" style={{ transform: [{ rotate: '180deg' }] }} />
         </TouchableOpacity>
 
-        {/* Items Grid */}
+        {/* TWA rewards catalog */}
+        <View style={styles.twaRewardsSection}>
+          <TwaRewardsGrid balance={userBalance} />
+        </View>
+
+        {/* Legacy API shop items (if any) */}
+        {shopItems.length > 0 ? (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.bonusShop.availableRewards}</Text>
+          <Text style={styles.sectionTitle}>{t.bonusShop.otherOffers || t.bonusShop.availableRewards}</Text>
           <View style={styles.itemsGrid}>
             {shopItems.map((item) => {
               const IconComponent = getItemIcon(item);
@@ -301,15 +308,8 @@ export const BonusShopScreen = () => {
             })}
           </View>
 
-          {shopItems.length === 0 && !loading && (
-            <View style={styles.emptyState}>
-              <Gift size={48} color="#94A3B8" />
-              <Text style={styles.emptyStateText}>
-                {t.bonusShop.noItems || 'No items available'}
-              </Text>
-            </View>
-          )}
         </View>
+        ) : null}
 
         {/* How it works */}
         <View style={styles.section}>
@@ -501,6 +501,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1E293B',
     marginLeft: 12,
+  },
+  twaRewardsSection: {
+    marginTop: 16,
+    paddingHorizontal: 16,
   },
   section: {
     marginTop: 24,

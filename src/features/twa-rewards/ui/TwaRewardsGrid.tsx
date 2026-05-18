@@ -26,8 +26,8 @@ type Props = {
 const CARD_GRADIENT = ['#64748B', '#475569'] as const;
 const CARD_GRADIENT_ACTIVE = ['#FCD34D', '#F59E0B'] as const;
 
-function formatPrice(price: number): string {
-  return price.toLocaleString('ru-RU');
+function formatTwaPrice(price: number): string {
+  return `${price.toLocaleString('ru-RU')} TWA`;
 }
 
 export const TwaRewardsGrid: React.FC<Props> = ({ balance }) => {
@@ -59,7 +59,7 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance }) => {
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{t.main.balance.availableRewards}</Text>
+      <Text style={styles.sectionTitle}>{t.bonusShop.availableRewards}</Text>
       <View style={styles.grid}>
         {TWA_REWARDS_CATALOG.map((item) => {
           const canAfford = balance >= item.price;
@@ -74,7 +74,7 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance }) => {
               <LinearGradient colors={[...colors]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.gradient}>
                 <View style={styles.topRow}>
                   <View style={styles.priceBadge}>
-                    <Text style={styles.priceBadgeText}>{formatPrice(item.price)}</Text>
+                    <Text style={styles.priceBadgeText}>{formatTwaPrice(item.price)}</Text>
                   </View>
                   {!canAfford ? (
                     <View style={styles.statusBadge}>

@@ -25,8 +25,6 @@ import {
   ADS_PER_BATCH,
   BATCHES_PER_DAY,
 } from '@/shared/constants/adRewards';
-import { TwaRewardsGrid } from '@/features/twa-rewards/ui/TwaRewardsGrid';
-
 export const BalanceScreen = () => {
   const { t } = useLanguage();
   const [showRules, setShowRules] = useState(false);
@@ -279,10 +277,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   adSection: {
-    paddingHorizontal: wp(20),
-    marginBottom: hp(12),
-  },
-  rewardsSection: {
     paddingHorizontal: wp(20),
     marginBottom: hp(20),
   },
