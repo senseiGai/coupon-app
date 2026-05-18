@@ -3,11 +3,11 @@ import { TestIds } from 'react-native-google-mobile-ads';
 
 const PRODUCTION_UNITS = {
   android: {
-    rewarded: 'ca-app-pub-3928197299796226/1992115423',
+    rewarded: 'ca-app-pub-3928197299796226/5368412750',
     interstitial: 'ca-app-pub-3928197299796226/6164354211',
   },
   ios: {
-    rewarded: 'ca-app-pub-3928197299796226/1992115423',
+    rewarded: 'ca-app-pub-3928197299796226/5368412750',
     interstitial: 'ca-app-pub-3928197299796226/6164354211',
   },
 } as const;
