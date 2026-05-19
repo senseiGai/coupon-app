@@ -64,13 +64,24 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     if (!cooldownUntilIso) {
       return;
     }
-    const id = setInterval(() => setTick((n) => n + 1), 1000);
+    const id = setInterval(() => {
+      setTick((n) => n + 1);
+      const left = formatCooldownCountdown(cooldownUntilIso);
+      if (!left) {
+        void refreshQuota();
+        void fetchLimits();
+      }
+    }, 1000);
     return () => clearInterval(id);
-  }, [cooldownUntilIso]);
+  }, [cooldownUntilIso, refreshQuota, fetchLimits]);
 
   const rewardPerView =
     limits?.rewardPerView ?? quota?.rewardPerView ?? BONUS_CONFIG.REWARDS.AD_VIEW ?? REWARD_PER_AD_VIEW;
-  const atDailyLimit = quota ? !quota.allowed && !inCooldown : false;
+  const adsPerBatch = quota?.adsPerBatch ?? limits?.adsPerBatch ?? ADS_PER_BATCH;
+  const batchesPerDay = quota?.batchesPerDay ?? limits?.batchesPerDay ?? BATCHES_PER_DAY;
+  const expectedMax = adsPerBatch * batchesPerDay;
+  const atDailyLimit =
+    quota != null && !quota.allowed && !inCooldown && (quota.remaining ?? 0) <= 0;
   const isDisabled = loading || inCooldown || (quota !== null && !quota.allowed);
 
   const handleWatchAd = async () => {
@@ -140,22 +151,31 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   };
 
   const iconSize = responsive({ xs: 20, sm: 22, default: 24 });
-  const batchLeft = quota?.batchRemaining ?? limits?.batchRemaining ?? ADS_PER_BATCH;
+  const batchLeft = quota?.batchRemaining ?? limits?.batchRemaining ?? adsPerBatch;
   const currentViews = quota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? 0;
-  const maxViews = quota?.maxAdViewsPerDay ?? limits?.maxAdViewsPerDay ?? BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY;
+  const maxViews = Math.max(
+    quota?.maxAdViewsPerDay ?? limits?.maxAdViewsPerDay ?? expectedMax,
+    expectedMax,
+  );
+  const batchNum = Math.min(
+    batchesPerDay,
+    currentViews > 0 && currentViews % adsPerBatch === 0
+      ? Math.floor(currentViews / adsPerBatch)
+      : Math.floor(currentViews / adsPerBatch) + 1,
+  );
 
   let subtitle = t.main.balance.watchAdDescription.replace('{amount}', formatRewardPerViewLabel());
   subtitle += `\n${t.main.balance.dailyQuota
     .replace('{current}', String(currentViews))
-    .replace('{max}', String(maxViews))}`;
+    .replace('{max}', String(maxViews))
+    .replace('{perBatch}', String(adsPerBatch))
+    .replace('{batches}', String(batchesPerDay))}`;
+  subtitle += `\n${t.main.balance.batchProgress
+    .replace('{batch}', String(batchNum))
+    .replace('{totalBatches}', String(batchesPerDay))
+    .replace('{left}', String(batchLeft))}`;
   if (inCooldown && countdown) {
     subtitle += `\n${t.main.balance.nextAdCooldown.replace('{time}', countdown)}`;
-  } else if (batchLeft > 0 && batchLeft < ADS_PER_BATCH) {
-    const batchNum = Math.min(BATCHES_PER_DAY, Math.floor(currentViews / ADS_PER_BATCH) + 1);
-    subtitle += `\n${t.main.balance.batchProgress
-      .replace('{batch}', String(batchNum))
-      .replace('{totalBatches}', String(BATCHES_PER_DAY))
-      .replace('{left}', String(batchLeft))}`;
   }
 
   const buttonTitle = loading

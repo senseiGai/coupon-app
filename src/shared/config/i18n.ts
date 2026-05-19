@@ -140,7 +140,7 @@ export const translations = {
         batchProgress: 'Block {batch} of {totalBatches}: {left} views left',
         batchCooldown: 'Break between blocks: ~{minutes} min',
         nextAdCooldown: 'Next ad in {time} (30 min break)',
-        dailyQuota: 'Today: {current}/{max} views (12×5 blocks, 30 min break)',
+        dailyQuota: 'Today: {current}/{max} views ({perBatch}×{batches} blocks, 30 min break)',
         periodResetsAt: 'Quota renews at 12:00',
         transactionTypes: {
           EARNED_AD_VIEW: 'Activity reward',
@@ -464,7 +464,7 @@ export const translations = {
         batchProgress: 'Блок {batch} из {totalBatches}: осталось {left} просмотров',
         batchCooldown: 'Перерыв между блоками: ~{minutes} мин',
         nextAdCooldown: 'Следующая реклама через {time} (пауза 30 мин)',
-        dailyQuota: 'Сегодня: {current}/{max} просмотров (12×5 блоков, пауза 30 мин)',
+        dailyQuota: 'Сегодня: {current}/{max} просмотров ({perBatch}×{batches} блоков, пауза 30 мин)',
         periodResetsAt: 'Лимит обновится в 12:00',
         transactionTypes: {
           EARNED_AD_VIEW: 'Награда за активность',
@@ -789,7 +789,7 @@ export const translations = {
         batchProgress: 'Блок {batch} з {totalBatches}: залишилось {left} переглядів',
         batchCooldown: 'Перерва між блоками: ~{minutes} хв',
         nextAdCooldown: 'Наступна реклама через {time} (пауза 30 хв)',
-        dailyQuota: 'Сьогодні: {current}/{max} переглядів (12×5 блоків, пауза 30 хв)',
+        dailyQuota: 'Сьогодні: {current}/{max} переглядів ({perBatch}×{batches} блоків, пауза 30 хв)',
         periodResetsAt: 'Ліміт оновиться о 12:00',
         transactionTypes: {
           EARNED_AD_VIEW: 'Винагорода за активність',

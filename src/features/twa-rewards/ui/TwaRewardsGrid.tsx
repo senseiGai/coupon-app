@@ -100,6 +100,9 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true }) =
 
                 {item.isSurprise ? (
                   <View style={styles.surpriseBody}>
+                    <View style={styles.iconContainer}>
+                      <Gift size={28} color="#FFFFFF" strokeWidth={2} />
+                    </View>
                     <Text style={styles.surpriseQuestion}>?</Text>
                   </View>
                 ) : (
@@ -215,6 +218,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 100,
+    gap: 4,
   },
   surpriseQuestion: {
     fontSize: 56,

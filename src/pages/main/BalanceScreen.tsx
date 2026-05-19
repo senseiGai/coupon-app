@@ -108,10 +108,12 @@ export const BalanceScreen = () => {
             <Text style={styles.adLimitText}>
               {t.main.balance.dailyQuota
                 .replace('{current}', String(currentViews))
-                .replace('{max}', String(maxViews))}
+                .replace('{max}', String(Math.max(maxViews, ADS_PER_BATCH * BATCHES_PER_DAY)))
+                .replace('{perBatch}', String(ADS_PER_BATCH))
+                .replace('{batches}', String(BATCHES_PER_DAY))}
             </Text>
             <Text style={styles.adLimitSubtext}>
-              {ADS_PER_BATCH} × {BATCHES_PER_DAY} · {t.main.balance.periodResetsAt}
+              {t.main.balance.periodResetsAt}
             </Text>
             <View style={styles.adLimitBar}>
               <View
