@@ -16,6 +16,7 @@ import { BONUS_CONFIG } from '@/shared/types/bonus';
 import {
   formatTwaAmount,
   formatRewardPerViewLabel,
+  formatCooldownCountdown,
   REWARD_PER_AD_VIEW,
   ADS_PER_BATCH,
   BATCHES_PER_DAY,
@@ -37,21 +38,6 @@ function isAlreadyRewardedMessage(msg: string | undefined): boolean {
   return m.includes('already rewarded') || m.includes('уже') || m.includes('вже');
 }
 
-function formatRewardAmount(amount: number): string {
-  return formatTwaAmount(amount);
-}
-
-function getCooldownMinutes(untilIso: string | null | undefined): number | null {
-  if (!untilIso) {
-    return null;
-  }
-  const ms = new Date(untilIso).getTime() - Date.now();
-  if (ms <= 0) {
-    return null;
-  }
-  return Math.max(1, Math.ceil(ms / 60000));
-}
-
 export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, onError }) => {
   const { t } = useLanguage();
   const { limits, checkCanWatchAd, requestAdView, claimAdReward, fetchBalance, fetchLimits } =
@@ -59,6 +45,11 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const { data: profile } = useProfile();
   const [loading, setLoading] = useState(false);
   const [quota, setQuota] = useState<CanWatchAdResponse | null>(null);
+  const [, setTick] = useState(0);
+
+  const cooldownUntilIso = quota?.batchCooldownUntil ?? limits?.batchCooldownUntil ?? null;
+  const countdown = formatCooldownCountdown(cooldownUntilIso);
+  const inCooldown = !!countdown;
 
   const refreshQuota = useCallback(async () => {
     const result = await checkCanWatchAd();
@@ -69,11 +60,17 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     void refreshQuota();
   }, [refreshQuota, limits?.currentAdViewsToday, limits?.batchCooldownUntil]);
 
+  useEffect(() => {
+    if (!cooldownUntilIso) {
+      return;
+    }
+    const id = setInterval(() => setTick((n) => n + 1), 1000);
+    return () => clearInterval(id);
+  }, [cooldownUntilIso]);
+
   const rewardPerView =
     limits?.rewardPerView ?? quota?.rewardPerView ?? BONUS_CONFIG.REWARDS.AD_VIEW ?? REWARD_PER_AD_VIEW;
-  const cooldownMinutes = getCooldownMinutes(quota?.batchCooldownUntil ?? limits?.batchCooldownUntil);
-  const atDailyLimit = quota ? !quota.allowed && !cooldownMinutes : false;
-  const inCooldown = !!cooldownMinutes;
+  const atDailyLimit = quota ? !quota.allowed && !inCooldown : false;
   const isDisabled = loading || inCooldown || (quota !== null && !quota.allowed);
 
   const handleWatchAd = async () => {
@@ -87,7 +84,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     if (!canWatch.allowed) {
       Alert.alert(
         t.main.balance.limitReached,
-        canWatch.reason || t.main.balance.limitReachedMessage
+        canWatch.reason || t.main.balance.limitReachedMessage,
       );
       onError?.(canWatch.reason || 'Limit reached');
       return;
@@ -102,7 +99,10 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
         return;
       }
 
-      const adResult = await showRewardedAd(adReq.customData, profile?.id ? String(profile.id) : undefined);
+      const adResult = await showRewardedAd(
+        adReq.customData,
+        profile?.id ? String(profile.id) : undefined,
+      );
       if (!adResult.success) {
         Alert.alert(t.common.error, adResult.error || t.main.balance.adError);
         onError?.(adResult.error || 'Ad failed');
@@ -118,11 +118,11 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
         await fetchBalance();
         await fetchLimits();
         await refreshQuota();
-        const amount = formatRewardAmount(claim.rewardAmount ?? rewardPerView);
+        const displayReward = formatTwaAmount(rewardPerView);
         Alert.alert(
           t.common.success,
-          t.main.balance.bonusReceived.replace('{amount}', amount),
-          [{ text: t.main.balance.great }]
+          t.main.balance.bonusReceived.replace('{amount}', displayReward),
+          [{ text: t.main.balance.great }],
         );
         onSuccess?.();
         return;
@@ -144,15 +144,12 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const currentViews = quota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? 0;
   const maxViews = quota?.maxAdViewsPerDay ?? limits?.maxAdViewsPerDay ?? BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY;
 
-  let subtitle = t.main.balance.watchAdDescription.replace(
-    '{amount}',
-    formatRewardPerViewLabel(),
-  );
+  let subtitle = t.main.balance.watchAdDescription.replace('{amount}', formatRewardPerViewLabel());
   subtitle += `\n${t.main.balance.dailyQuota
     .replace('{current}', String(currentViews))
     .replace('{max}', String(maxViews))}`;
-  if (inCooldown && cooldownMinutes) {
-    subtitle += `\n${t.main.balance.batchCooldown.replace('{minutes}', String(cooldownMinutes))}`;
+  if (inCooldown && countdown) {
+    subtitle += `\n${t.main.balance.nextAdCooldown.replace('{time}', countdown)}`;
   } else if (batchLeft > 0 && batchLeft < ADS_PER_BATCH) {
     const batchNum = Math.min(BATCHES_PER_DAY, Math.floor(currentViews / ADS_PER_BATCH) + 1);
     subtitle += `\n${t.main.balance.batchProgress
@@ -160,6 +157,14 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
       .replace('{totalBatches}', String(BATCHES_PER_DAY))
       .replace('{left}', String(batchLeft))}`;
   }
+
+  const buttonTitle = loading
+    ? t.common.loading
+    : inCooldown && countdown
+      ? t.main.balance.nextAdCooldown.replace('{time}', countdown)
+      : atDailyLimit
+        ? t.main.balance.maxAdsReached
+        : t.main.balance.watchAdBtn;
 
   return (
     <TouchableOpacity
@@ -175,16 +180,10 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
         )}
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.buttonText} numberOfLines={1}>
-          {loading
-            ? t.common.loading
-            : inCooldown
-              ? t.main.balance.batchCooldown.replace('{minutes}', String(cooldownMinutes))
-              : atDailyLimit
-                ? t.main.balance.maxAdsReached
-                : t.main.balance.watchAdBtn}
+        <Text style={styles.buttonText} numberOfLines={2}>
+          {buttonTitle}
         </Text>
-        <Text style={styles.buttonSubtext} numberOfLines={4}>
+        <Text style={styles.buttonSubtext} numberOfLines={5}>
           {subtitle}
         </Text>
       </View>

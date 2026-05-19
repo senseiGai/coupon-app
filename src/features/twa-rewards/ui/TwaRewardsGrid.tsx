@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Gift, Plane, MapPin, Clock } from 'lucide-react-native';
+import { Gift, MapPin, Clock } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/MainStack';
@@ -68,6 +68,11 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true }) =
         {TWA_REWARDS_CATALOG.map((item) => {
           const canAfford = balance >= item.price;
           const colors = canAfford ? CARD_GRADIENT_GOLD : CARD_GRADIENT_GREY;
+          const actionLabel = canAfford
+            ? t.bonusShop.applyRewardButton
+            : item.isSurprise
+              ? t.bonusShop.surpriseBonus
+              : t.bonusShop.notEnough;
 
           return (
             <TouchableOpacity
@@ -93,41 +98,48 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true }) =
                   )}
                 </View>
 
-                <View style={styles.iconContainer}>
-                  <Gift size={28} color="#FFFFFF" strokeWidth={2} />
-                </View>
-
-                <View style={styles.itemContent}>
-                  <Text style={styles.itemName} numberOfLines={2}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.itemDescription} numberOfLines={3}>
-                    {item.description}
-                  </Text>
-
-                  {(item.location || item.duration) && (
-                    <View style={styles.metaContainer}>
-                      {item.location ? (
-                        <View style={styles.metaRow}>
-                          <MapPin size={11} color="rgba(255,255,255,0.85)" />
-                          <Text style={styles.metaText} numberOfLines={1}>
-                            {item.location}
-                          </Text>
-                        </View>
-                      ) : null}
-                      {item.duration ? (
-                        <View style={styles.metaRow}>
-                          <Clock size={11} color="rgba(255,255,255,0.85)" />
-                          <Text style={styles.metaText}>{item.duration}</Text>
-                        </View>
-                      ) : null}
+                {item.isSurprise ? (
+                  <View style={styles.surpriseBody}>
+                    <Text style={styles.surpriseQuestion}>?</Text>
+                  </View>
+                ) : (
+                  <>
+                    <View style={styles.iconContainer}>
+                      <Gift size={28} color="#FFFFFF" strokeWidth={2} />
                     </View>
-                  )}
-                </View>
+                    <View style={styles.itemContent}>
+                      <Text style={styles.itemName} numberOfLines={2}>
+                        {item.title}
+                      </Text>
+                      <Text style={styles.itemDescription} numberOfLines={3}>
+                        {item.description}
+                      </Text>
+                      {(item.location || item.duration) && (
+                        <View style={styles.metaContainer}>
+                          {item.location ? (
+                            <View style={styles.metaRow}>
+                              <MapPin size={11} color="rgba(255,255,255,0.85)" />
+                              <Text style={styles.metaText} numberOfLines={1}>
+                                {item.location}
+                              </Text>
+                            </View>
+                          ) : null}
+                          {item.duration ? (
+                            <View style={styles.metaRow}>
+                              <Clock size={11} color="rgba(255,255,255,0.85)" />
+                              <Text style={styles.metaText}>{item.duration}</Text>
+                            </View>
+                          ) : null}
+                        </View>
+                      )}
+                    </View>
+                  </>
+                )}
 
-                <View style={styles.priceContainer}>
-                  <Plane size={14} color="#FFD700" />
-                  <Text style={styles.priceText}>{formatTwaPrice(item.price)}</Text>
+                <View style={[styles.actionBtn, !canAfford && styles.actionBtnDisabled]}>
+                  <Text style={styles.actionBtnText} numberOfLines={2}>
+                    {actionLabel}
+                  </Text>
                 </View>
               </LinearGradient>
             </TouchableOpacity>
@@ -160,6 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 12,
     minHeight: 240,
+    justifyContent: 'space-between',
   },
   topBadgesRow: {
     flexDirection: 'row',
@@ -185,15 +198,29 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 6,
     maxWidth: '52%',
-  },
-  statusBadgePlaceholder: {
-    width: 1,
-    height: 1,
+    minHeight: 20,
+    justifyContent: 'center',
   },
   statusBadgeText: {
     fontSize: 9,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  statusBadgePlaceholder: {
+    width: 1,
+    height: 1,
+  },
+  surpriseBody: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 100,
+  },
+  surpriseQuestion: {
+    fontSize: 56,
+    fontWeight: '300',
+    color: '#FFFFFF',
+    lineHeight: 64,
   },
   iconContainer: {
     width: 44,
@@ -234,20 +261,22 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.85)',
     flex: 1,
   },
-  priceContainer: {
-    flexDirection: 'row',
+  actionBtn: {
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
-    alignSelf: 'flex-start',
-    marginTop: 10,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(15,23,42,0.85)',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    marginTop: 8,
   },
-  priceText: {
-    fontSize: 14,
+  actionBtnDisabled: {
+    backgroundColor: 'rgba(15,23,42,0.65)',
+  },
+  actionBtnText: {
+    fontSize: 11,
     fontWeight: '700',
     color: '#FFFFFF',
+    textAlign: 'center',
   },
 });

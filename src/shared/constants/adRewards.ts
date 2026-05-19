@@ -15,6 +15,21 @@ export function formatRewardPerViewLabel(locale = 'ru-RU'): string {
   })} TWA`;
 }
 
+/** MM:SS до следующего блока рекламы */
+export function formatCooldownCountdown(untilIso: string | null | undefined): string | null {
+  if (!untilIso) {
+    return null;
+  }
+  const ms = new Date(untilIso).getTime() - Date.now();
+  if (ms <= 0) {
+    return null;
+  }
+  const totalSec = Math.ceil(ms / 1000);
+  const min = Math.floor(totalSec / 60);
+  const sec = totalSec % 60;
+  return `${min}:${sec.toString().padStart(2, '0')}`;
+}
+
 export function formatTwaAmount(amount: number, locale = 'ru-RU'): string {
   const abs = Math.abs(amount);
   const maxFrac = abs >= 1 ? 2 : abs >= 0.01 ? 3 : 4;

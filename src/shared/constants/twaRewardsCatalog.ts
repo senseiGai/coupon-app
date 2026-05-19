@@ -6,18 +6,19 @@ export type TwaRewardItem = {
   location?: string;
   duration?: string;
   chatMessage: string;
+  /** Карточка-сюрприз: «?» и подпись внизу */
+  isSurprise?: boolean;
 };
 
 export const TWA_REWARDS_CATALOG: TwaRewardItem[] = [
   {
     id: 'tour-discount-1',
     price: 1,
-    title: 'Скидка на тур',
-    description: 'Бонус-приз: скидка 5–10 € на тур',
-    location: 'любое направление',
-    duration: 'по запросу',
+    isSurprise: true,
+    title: '',
+    description: '',
     chatMessage:
-      'Здравствуйте! Хочу применить бонус 1 TWA: прошу скидку 5–10 € на тур.',
+      'Здравствуйте! Хочу применить бонус 1 TWA — бонус-сюрприз 🎁',
   },
   {
     id: 'egypt-tours-3',
