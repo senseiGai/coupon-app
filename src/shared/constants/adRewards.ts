@@ -16,6 +16,32 @@ export function formatRewardPerViewLabel(locale = 'ru-RU'): string {
 }
 
 /** MM:SS до следующего блока рекламы */
+/** Когда API не отдаёт batchCooldownUntil — считаем по lastBatchCompletedAt. */
+export function resolveBatchCooldownUntil(
+  batchCooldownUntil: string | null | undefined,
+  currentAdViewsToday: number,
+  lastBatchCompletedAt: string | null | undefined,
+  adsPerBatch: number = ADS_PER_BATCH,
+): string | null {
+  if (batchCooldownUntil) {
+    const left = formatCooldownCountdown(batchCooldownUntil);
+    if (left) {
+      return batchCooldownUntil;
+    }
+  }
+  if (!lastBatchCompletedAt || currentAdViewsToday <= 0) {
+    return null;
+  }
+  if (currentAdViewsToday % adsPerBatch !== 0) {
+    return null;
+  }
+  const untilMs = new Date(lastBatchCompletedAt).getTime() + BATCH_COOLDOWN_MS;
+  if (untilMs <= Date.now()) {
+    return null;
+  }
+  return new Date(untilMs).toISOString();
+}
+
 export function formatCooldownCountdown(untilIso: string | null | undefined): string | null {
   if (!untilIso) {
     return null;

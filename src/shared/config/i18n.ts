@@ -140,6 +140,7 @@ export const translations = {
         batchProgress: 'Block {batch} of {totalBatches}: {left} views left',
         batchCooldown: 'Break between blocks: ~{minutes} min',
         nextAdCooldown: 'Next ad in {time} (30 min break)',
+        cooldownTitle: 'Break between blocks',
         dailyQuota: 'Today: {current}/{max} views ({perBatch}×{batches} blocks, 30 min break)',
         periodResetsAt: 'Quota renews at 12:00',
         transactionTypes: {
@@ -464,6 +465,7 @@ export const translations = {
         batchProgress: 'Блок {batch} из {totalBatches}: осталось {left} просмотров',
         batchCooldown: 'Перерыв между блоками: ~{minutes} мин',
         nextAdCooldown: 'Следующая реклама через {time} (пауза 30 мин)',
+        cooldownTitle: 'Перерыв между блоками',
         dailyQuota: 'Сегодня: {current}/{max} просмотров ({perBatch}×{batches} блоков, пауза 30 мин)',
         periodResetsAt: 'Лимит обновится в 12:00',
         transactionTypes: {
@@ -789,6 +791,7 @@ export const translations = {
         batchProgress: 'Блок {batch} з {totalBatches}: залишилось {left} переглядів',
         batchCooldown: 'Перерва між блоками: ~{minutes} хв',
         nextAdCooldown: 'Наступна реклама через {time} (пауза 30 хв)',
+        cooldownTitle: 'Перерва між блоками',
         dailyQuota: 'Сьогодні: {current}/{max} переглядів ({perBatch}×{batches} блоків, пауза 30 хв)',
         periodResetsAt: 'Ліміт оновиться о 12:00',
         transactionTypes: {

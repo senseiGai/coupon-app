@@ -24,6 +24,7 @@ import {
   VIEWS_PER_TWA,
   ADS_PER_BATCH,
   BATCHES_PER_DAY,
+  MAX_AD_VIEWS_PER_DAY,
 } from '@/shared/constants/adRewards';
 export const BalanceScreen = () => {
   const { t } = useLanguage();
@@ -45,7 +46,7 @@ export const BalanceScreen = () => {
       : getProgressTowardOneTwa(balance?.available ?? 0);
   const progressPercent = Math.min(100, Math.round(twaProgress.progress * 100));
   const currentViews = limits?.currentAdViewsToday ?? 0;
-  const maxViews = limits?.maxAdViewsPerDay ?? BONUS_CONFIG.LIMITS.MAX_AD_VIEWS_PER_DAY;
+  const maxViews = MAX_AD_VIEWS_PER_DAY;
 
   if (loading && !balance) {
     return (
