@@ -57,8 +57,15 @@ function normalizeRewardAmount(amount: number | undefined): number {
 
 export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, onError }) => {
   const { t } = useLanguage();
-  const { limits, checkCanWatchAd, requestAdView, claimAdReward, fetchBalance, fetchLimits } =
-    useBonus();
+  const {
+    limits,
+    checkCanWatchAd,
+    requestAdView,
+    claimAdReward,
+    earnAdViewBonus,
+    fetchBalance,
+    fetchLimits,
+  } = useBonus();
   const { data: profile } = useProfile();
   const userId = profile?.id;
   const [loading, setLoading] = useState(false);
@@ -178,7 +185,42 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   );
   const atDailyLimit = currentViews >= maxViews;
   const clientBlocked = !clientQuota.allowed;
+  const serverMaxViews =
+    quota?.maxAdViewsPerDay ?? limits?.maxAdViewsPerDay ?? MAX_AD_VIEWS_PER_DAY;
+  const serverUsesOldLimit = serverMaxViews < MAX_AD_VIEWS_PER_DAY;
   const isDisabled = loading || inCooldown || atDailyLimit || clientBlocked;
+
+  const finishRewardUi = useCallback(
+    async (creditedAmount: number, viewsAfter: number) => {
+      if (isBatchBreakViews(viewsAfter, adsPerBatch)) {
+        const until = await startLocalBatchCooldown(userId);
+        if (until) {
+          setLocalCooldownUntil(until);
+        }
+      }
+      await fetchBalance();
+      await fetchLimits();
+      await refreshQuota();
+      const displayAmount = formatTwaAmount(creditedAmount);
+      Alert.alert(
+        t.common.success,
+        t.main.balance.bonusReceived.replace('{amount}', displayAmount),
+        [{ text: t.main.balance.great }],
+      );
+      onSuccess?.();
+    },
+    [
+      adsPerBatch,
+      userId,
+      fetchBalance,
+      fetchLimits,
+      refreshQuota,
+      t.common.success,
+      t.main.balance.bonusReceived,
+      t.main.balance.great,
+      onSuccess,
+    ],
+  );
 
   const handleWatchAd = async () => {
     if (Platform.OS === 'web') {
@@ -208,17 +250,47 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
       const serverQuota = await checkCanWatchAd();
       setQuota(serverQuota);
 
+      const tryLegacyEarn = async (): Promise<boolean> => {
+        const adResult = await showRewardedAd(
+          undefined,
+          profile?.id ? String(profile.id) : undefined,
+        );
+        if (!adResult.success) {
+          Alert.alert(t.common.error, adResult.error || t.main.balance.adError);
+          onError?.(adResult.error || 'Ad failed');
+          return true;
+        }
+        if (!adResult.earned) {
+          return true;
+        }
+        const earn = await earnAdViewBonus();
+        if (!earn.success) {
+          Alert.alert(t.common.error, earn.error || t.main.balance.serverQuotaOutdated);
+          onError?.(earn.error || 'Earn failed');
+          return true;
+        }
+        const credited = normalizeRewardAmount(earn.transaction?.amount);
+        const viewsAfter =
+          serverQuota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? viewsNow + 1;
+        await finishRewardUi(credited, viewsAfter);
+        return true;
+      };
+
+      if (serverUsesOldLimit) {
+        await tryLegacyEarn();
+        return;
+      }
+
       const adReq = await requestAdView('admob');
       if (!adReq?.customData) {
         const serverSaysNo =
-          serverQuota && !serverQuota.allowed && clientQuota.allowed;
-        Alert.alert(
-          t.common.error,
-          serverSaysNo
-            ? t.main.balance.serverQuotaOutdated
-            : t.main.balance.bonusError,
-        );
-        onError?.(serverSaysNo ? 'Server quota outdated' : 'No ad request');
+          serverQuota && !serverQuota.allowed && localQuota.allowed;
+        if (serverSaysNo) {
+          await tryLegacyEarn();
+          return;
+        }
+        Alert.alert(t.common.error, t.main.balance.bonusError);
+        onError?.('No ad request');
         return;
       }
 
@@ -238,28 +310,11 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
       const claim = await claimAdReward(adReq.adViewId);
       if (claim.success || isAlreadyRewardedMessage(claim.error)) {
-        await fetchBalance();
-        await fetchLimits();
         const freshQuota = await refreshQuota();
-
         const viewsAfter =
           freshQuota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? viewsNow + 1;
-
-        if (isBatchBreakViews(viewsAfter, adsPerBatch)) {
-          const until = await startLocalBatchCooldown(userId);
-          if (until) {
-            setLocalCooldownUntil(until);
-          }
-        }
-
         const credited = normalizeRewardAmount(claim.rewardAmount);
-        const displayAmount = formatTwaAmount(credited);
-        Alert.alert(
-          t.common.success,
-          t.main.balance.bonusReceived.replace('{amount}', displayAmount),
-          [{ text: t.main.balance.great }],
-        );
-        onSuccess?.();
+        await finishRewardUi(credited, viewsAfter);
         return;
       }
 
@@ -300,6 +355,12 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
   return (
     <View>
+      {serverUsesOldLimit ? (
+        <View style={styles.serverWarn}>
+          <Text style={styles.serverWarnText}>{t.main.balance.serverQuotaOutdated}</Text>
+        </View>
+      ) : null}
+
       {inCooldown && countdown ? (
         <View style={styles.cooldownHero}>
           <Clock size={36} color="#B45309" />
@@ -340,6 +401,19 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 };
 
 const styles = StyleSheet.create({
+  serverWarn: {
+    backgroundColor: '#FEE2E2',
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+    borderRadius: wp(12),
+    padding: wp(12),
+    marginBottom: hp(10),
+  },
+  serverWarnText: {
+    fontSize: fontSize(12),
+    color: '#991B1B',
+    lineHeight: fontSize(17),
+  },
   cooldownHero: {
     alignItems: 'center',
     backgroundColor: '#FEF3C7',

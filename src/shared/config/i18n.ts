@@ -130,7 +130,7 @@ export const translations = {
         todayWord: 'today',
         limitReachedMessage: 'You have reached the daily bonus limit',
         serverQuotaOutdated:
-          'The server still has the old ad limit (5 views). Update and restart coupon-backend, then try again.',
+          'Server limit is still 5 views. On twa.su DB run scripts/fix-twa-production-ads.sql, restart coupon-backend, then try again.',
         twaProgressTitle: 'Progress to 1 TWA',
         twaProgressHint: 'Reward {reward} per view',
         availableRewards: 'Available rewards',
@@ -458,7 +458,7 @@ export const translations = {
         todayWord: 'сегодня',
         limitReachedMessage: 'Вы достигли дневного лимита просмотров',
         serverQuotaOutdated:
-          'На сервере ещё старый лимит (5 просмотров). Обновите и перезапустите coupon-backend, затем попробуйте снова.',
+          'На сервере twa.su всё ещё лимит 5 просмотров. Выполните SQL scripts/fix-twa-production-ads.sql в базе, перезапустите coupon-backend и попробуйте снова.',
         twaProgressTitle: 'Прогресс до 1 TWA',
         twaProgressHint: 'Награда {reward} за просмотр',
         availableRewards: 'Доступные награды',
@@ -787,7 +787,7 @@ export const translations = {
         todayWord: 'сьогодні',
         limitReachedMessage: 'Ви досягли денного ліміту переглядів',
         serverQuotaOutdated:
-          'На сервері ще старий ліміт (5 переглядів). Оновіть і перезапустіть coupon-backend, потім спробуйте знову.',
+          'На сервері twa.su ще ліміт 5 переглядів. Виконайте SQL scripts/fix-twa-production-ads.sql у базі, перезапустіть coupon-backend і спробуйте знову.',
         twaProgressTitle: 'Прогрес до 1 TWA',
         twaProgressHint: 'Нагорода {reward} за перегляд',
         availableRewards: 'Доступні нагороди',
