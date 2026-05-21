@@ -15,7 +15,7 @@ export default (): ExpoConfig =>
   ({
     name: 'Travel with Alina',
     slug: 'travel-with-alina',
-    version: '1.0.0',
+    version: '1.0.1',
     orientation: 'portrait',
     icon: './assets/logo.png',
     userInterfaceStyle: 'light',
@@ -32,6 +32,7 @@ export default (): ExpoConfig =>
       tsconfigPaths: true,
     },
     android: {
+      versionCode: 2,
       adaptiveIcon: {
         foregroundImage: './assets/logo.png',
         backgroundColor: '#ffffff',

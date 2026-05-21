@@ -26,6 +26,7 @@ import {
   BATCHES_PER_DAY,
   MAX_AD_VIEWS_PER_DAY,
 } from '@/shared/constants/adRewards';
+import { APP_BUILD_MARKER } from '@/shared/constants/appBuildInfo';
 export const BalanceScreen = () => {
   const { t } = useLanguage();
   const [showRules, setShowRules] = useState(false);
@@ -135,6 +136,7 @@ export const BalanceScreen = () => {
               }}
             />
           </View>
+          <Text style={styles.buildMarker}>Build: {APP_BUILD_MARKER}</Text>
         </View>
 
         {/* Bonus Rules (collapsible) */}
@@ -278,6 +280,12 @@ const styles = StyleSheet.create({
   adSection: {
     paddingHorizontal: wp(20),
     marginBottom: hp(20),
+  },
+  buildMarker: {
+    marginTop: hp(10),
+    fontSize: fontSize(11),
+    color: '#94A3B8',
+    textAlign: 'center',
   },
   watchAdButton: {
     backgroundColor: '#FFFFFF',

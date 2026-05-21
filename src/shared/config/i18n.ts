@@ -129,8 +129,10 @@ export const translations = {
         bonusesWord: 'bonuses',
         todayWord: 'today',
         limitReachedMessage: 'You have reached the daily bonus limit',
+        serverQuotaOutdated:
+          'The server still has the old ad limit (5 views). Update and restart coupon-backend, then try again.',
         twaProgressTitle: 'Progress to 1 TWA',
-        twaProgressHint: 'Reward +{reward} per view',
+        twaProgressHint: 'Reward {reward} per view',
         availableRewards: 'Available rewards',
         applyRewardTitle: 'Apply bonus',
         applyRewardMessage:
@@ -141,6 +143,7 @@ export const translations = {
         batchCooldown: 'Break between blocks: ~{minutes} min',
         nextAdCooldown: 'Next ad in {time} (30 min break)',
         cooldownTitle: 'Break between blocks',
+        cooldownSubtitle: 'You watched 12 ads — 30 minute break',
         dailyQuota: 'Today: {current}/{max} views ({perBatch}×{batches} blocks, 30 min break)',
         periodResetsAt: 'Quota renews at 12:00',
         transactionTypes: {
@@ -454,6 +457,8 @@ export const translations = {
         bonusesWord: 'бонусов',
         todayWord: 'сегодня',
         limitReachedMessage: 'Вы достигли дневного лимита просмотров',
+        serverQuotaOutdated:
+          'На сервере ещё старый лимит (5 просмотров). Обновите и перезапустите coupon-backend, затем попробуйте снова.',
         twaProgressTitle: 'Прогресс до 1 TWA',
         twaProgressHint: 'Награда {reward} за просмотр',
         availableRewards: 'Доступные награды',
@@ -466,6 +471,7 @@ export const translations = {
         batchCooldown: 'Перерыв между блоками: ~{minutes} мин',
         nextAdCooldown: 'Следующая реклама через {time} (пауза 30 мин)',
         cooldownTitle: 'Перерыв между блоками',
+        cooldownSubtitle: 'Вы посмотрели 12 реклам — пауза 30 минут',
         dailyQuota: 'Сегодня: {current}/{max} просмотров ({perBatch}×{batches} блоков, пауза 30 мин)',
         periodResetsAt: 'Лимит обновится в 12:00',
         transactionTypes: {
@@ -780,6 +786,8 @@ export const translations = {
         bonusesWord: 'бонусів',
         todayWord: 'сьогодні',
         limitReachedMessage: 'Ви досягли денного ліміту переглядів',
+        serverQuotaOutdated:
+          'На сервері ще старий ліміт (5 переглядів). Оновіть і перезапустіть coupon-backend, потім спробуйте знову.',
         twaProgressTitle: 'Прогрес до 1 TWA',
         twaProgressHint: 'Нагорода {reward} за перегляд',
         availableRewards: 'Доступні нагороди',
@@ -792,6 +800,7 @@ export const translations = {
         batchCooldown: 'Перерва між блоками: ~{minutes} хв',
         nextAdCooldown: 'Наступна реклама через {time} (пауза 30 хв)',
         cooldownTitle: 'Перерва між блоками',
+        cooldownSubtitle: 'Ви переглянули 12 реклам — пауза 30 хвилин',
         dailyQuota: 'Сьогодні: {current}/{max} переглядів ({perBatch}×{batches} блоків, пауза 30 хв)',
         periodResetsAt: 'Ліміт оновиться о 12:00',
         transactionTypes: {
