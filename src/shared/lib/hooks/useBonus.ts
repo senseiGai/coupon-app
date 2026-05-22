@@ -260,6 +260,26 @@ export const useBonus = () => {
   }, []);
 
   // Купить товар в магазине
+  const redeemCatalogReward = useCallback(
+    async (catalogId: string) => {
+      try {
+        setLoading(true);
+        const result = await bonusApi.redeemCatalogReward(catalogId);
+        await fetchBalance();
+        await fetchMyPurchases();
+        setError(null);
+        return { success: true, data: result };
+      } catch (err: any) {
+        setError(err.message || 'Failed to redeem reward');
+        if (__DEV__) console.error('Failed to redeem catalog reward:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchBalance, fetchMyPurchases],
+  );
+
   const purchaseShopItem = useCallback(
     async (itemId: number) => {
       try {
@@ -317,6 +337,7 @@ export const useBonus = () => {
     // Shop methods
     fetchShopItems,
     fetchMyPurchases,
+    redeemCatalogReward,
     purchaseShopItem,
   };
 };

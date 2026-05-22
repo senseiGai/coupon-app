@@ -144,7 +144,9 @@ export const translations = {
         nextAdCooldown: 'Next ad in {time} (30 min break)',
         cooldownTitle: 'Break between blocks',
         cooldownSubtitle: 'You watched 12 ads — 30 minute break',
+        cooldownRemaining: 'Time remaining: {time}',
         dailyQuota: 'Today: {current}/{max} views ({perBatch}×{batches} blocks, 30 min break)',
+        dailyLimitReached: 'Daily ad limit reached ({max} views)',
         periodResetsAt: 'Quota renews at 12:00',
         transactionTypes: {
           EARNED_AD_VIEW: 'Activity reward',
@@ -279,7 +281,7 @@ export const translations = {
       howItWorks: 'How It Works',
       step1: 'Earn bonuses for activity in the app',
       step2: 'Choose a reward from the shop',
-      step3: 'Use your discount when booking',
+      step3: 'Get a purchase code in My Purchases and send it to the manager in chat',
       items: {
         tourDiscount: 'Tour Discount',
         hotelDiscount: 'Hotel Discount',
@@ -304,6 +306,14 @@ export const translations = {
       applyRewardMessage:
         'We will open chat with a ready message for the manager. List or tour will be sent after confirmation in chat.',
       applyRewardButton: 'Apply bonus',
+      applyRewardConfirm:
+        'Bonuses will be deducted from your balance and you will receive a purchase code. Continue?',
+      applySuccessTitle: 'Bonus applied',
+      applySuccessMessage:
+        'Purchase code: {code}\n\nIt is saved in My Purchases. You can send the code to the manager in chat.',
+      applyFailed: 'Could not apply bonus. Check your balance and try again.',
+      openPurchases: 'My Purchases',
+      openChat: 'Open chat',
       surpriseBonus: 'Bonus surprise 🎁',
       purchaseCode: 'Purchase Code',
       validUntil: 'Valid until',
@@ -472,7 +482,9 @@ export const translations = {
         nextAdCooldown: 'Следующая реклама через {time} (пауза 30 мин)',
         cooldownTitle: 'Перерыв между блоками',
         cooldownSubtitle: 'Вы посмотрели 12 реклам — пауза 30 минут',
+        cooldownRemaining: 'Осталось времени: {time}',
         dailyQuota: 'Сегодня: {current}/{max} просмотров ({perBatch}×{batches} блоков, пауза 30 мин)',
+        dailyLimitReached: 'Дневной лимит рекламы исчерпан ({max} просмотров)',
         periodResetsAt: 'Лимит обновится в 12:00',
         transactionTypes: {
           EARNED_AD_VIEW: 'Награда за активность',
@@ -607,7 +619,7 @@ export const translations = {
       howItWorks: 'Как это работает',
       step1: 'Зарабатывайте бонусы за активность в приложении',
       step2: 'Выберите награду в магазине',
-      step3: 'Используйте скидку при бронировании',
+      step3: 'Получите код в «Мои покупки» и отправьте менеджеру в чате',
       items: {
         tourDiscount: 'Скидка на тур',
         hotelDiscount: 'Скидка на отель',
@@ -632,6 +644,14 @@ export const translations = {
       applyRewardMessage:
         'Откроем чат с готовым сообщением для менеджера. Список или тур отправим после подтверждения в чате.',
       applyRewardButton: 'Применить бонус',
+      applyRewardConfirm:
+        'Бонусы спишутся с баланса, вы получите код покупки (как в «Мои покупки»). Продолжить?',
+      applySuccessTitle: 'Бонус применён',
+      applySuccessMessage:
+        'Код покупки: {code}\n\nКод сохранён в «Мои покупки». Можете отправить его менеджеру в чате.',
+      applyFailed: 'Не удалось применить бонус. Проверьте баланс и попробуйте снова.',
+      openPurchases: 'Мои покупки',
+      openChat: 'Открыть чат',
       surpriseBonus: 'Бонус сюрприз 🎁',
       purchaseCode: 'Код покупки',
       validUntil: 'Действителен до',
@@ -801,7 +821,9 @@ export const translations = {
         nextAdCooldown: 'Наступна реклама через {time} (пауза 30 хв)',
         cooldownTitle: 'Перерва між блоками',
         cooldownSubtitle: 'Ви переглянули 12 реклам — пауза 30 хвилин',
+        cooldownRemaining: 'Залишилось часу: {time}',
         dailyQuota: 'Сьогодні: {current}/{max} переглядів ({perBatch}×{batches} блоків, пауза 30 хв)',
+        dailyLimitReached: 'Денний ліміт реклами вичерпано ({max} переглядів)',
         periodResetsAt: 'Ліміт оновиться о 12:00',
         transactionTypes: {
           EARNED_AD_VIEW: 'Винагорода за активність',
@@ -936,7 +958,7 @@ export const translations = {
       howItWorks: 'Як це працює',
       step1: 'Отримуйте бонуси за активність в додатку',
       step2: 'Оберіть нагороду в магазині',
-      step3: 'Використовуйте знижку при бронюванні',
+      step3: 'Отримайте код у «Мої покупки» і надішліть менеджеру в чаті',
       items: {
         tourDiscount: 'Знижка на тур',
         hotelDiscount: 'Знижка на готель',
@@ -961,6 +983,14 @@ export const translations = {
       applyRewardMessage:
         'Відкриємо чат із готовим повідомленням для менеджера. Список надішлемо після підтвердження в чаті.',
       applyRewardButton: 'Застосувати бонус',
+      applyRewardConfirm:
+        'Бонуси спишуться з балансу, ви отримаєте код покупки. Продовжити?',
+      applySuccessTitle: 'Бонус застосовано',
+      applySuccessMessage:
+        'Код покупки: {code}\n\nЗбережено в «Мої покупки». Можна надіслати менеджеру в чаті.',
+      applyFailed: 'Не вдалося застосувати бонус. Перевірте баланс.',
+      openPurchases: 'Мої покупки',
+      openChat: 'Відкрити чат',
       surpriseBonus: 'Бонус-сюрприз 🎁',
       purchaseCode: 'Код покупки',
       validUntil: 'Дійсний до',

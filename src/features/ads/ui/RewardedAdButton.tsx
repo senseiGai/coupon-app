@@ -31,6 +31,12 @@ import {
   startLocalBatchCooldown,
   clearLocalBatchCooldown,
 } from '@/shared/lib/ads/adBatchCooldownStorage';
+import {
+  getLocalAdViewsToday,
+  incrementLocalAdViewsToday,
+  syncLocalAdViewsFromServer,
+  getClientAdPeriodKey,
+} from '@/shared/lib/ads/adViewCountStorage';
 import { useProfile } from '@/shared/lib/hooks';
 import type { CanWatchAdResponse } from '@/shared/types/bonus';
 import { wp, hp, fontSize, responsive } from '@/shared/lib/responsive';
@@ -71,12 +77,14 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const [loading, setLoading] = useState(false);
   const [quota, setQuota] = useState<CanWatchAdResponse | null>(null);
   const [localCooldownUntil, setLocalCooldownUntil] = useState<string | null>(null);
+  const [localViews, setLocalViews] = useState(0);
   const [tick, setTick] = useState(0);
 
   const adsPerBatch = ADS_PER_BATCH;
   const batchesPerDay = BATCHES_PER_DAY;
   const maxViews = MAX_AD_VIEWS_PER_DAY;
-  const currentViews = quota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? 0;
+  const serverViews = quota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? 0;
+  const effectiveViews = Math.max(serverViews, localViews);
 
   const loadLocalCooldown = useCallback(async () => {
     const stored = await getLocalBatchCooldownUntil(userId);
@@ -84,10 +92,17 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     return stored;
   }, [userId]);
 
+  const syncLocalViews = useCallback(async () => {
+    const merged = await syncLocalAdViewsFromServer(userId, serverViews, getClientAdPeriodKey());
+    setLocalViews(merged);
+    return merged;
+  }, [userId, serverViews]);
+
   useEffect(() => {
     void loadLocalCooldown();
+    void syncLocalViews();
     preloadRewardedAd();
-  }, [loadLocalCooldown]);
+  }, [loadLocalCooldown, syncLocalViews]);
 
   useFocusEffect(
     useCallback(() => {
@@ -98,7 +113,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
   const cooldownUntilIso = getEffectiveBatchCooldownUntil({
     batchCooldownUntil: quota?.batchCooldownUntil ?? limits?.batchCooldownUntil,
-    currentAdViewsToday: currentViews,
+    currentAdViewsToday: effectiveViews,
     lastBatchCompletedAt: limits?.lastBatchCompletedAt,
     localCooldownUntil,
   });
@@ -106,7 +121,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const inCooldown = !!countdown;
 
   const clientQuota = evaluateClientAdQuota({
-    currentAdViewsToday: currentViews,
+    currentAdViewsToday: effectiveViews,
     lastBatchCompletedAt: limits?.lastBatchCompletedAt,
     batchCooldownUntil: quota?.batchCooldownUntil ?? limits?.batchCooldownUntil,
     localCooldownUntil,
@@ -122,7 +137,11 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     void refreshQuota();
     const poll = setInterval(() => void refreshQuota(), 20000);
     return () => clearInterval(poll);
-  }, [refreshQuota, limits?.currentAdViewsToday, limits?.batchCooldownUntil, localCooldownUntil]);
+  }, [refreshQuota, limits?.currentAdViewsToday, limits?.batchCooldownUntil, localCooldownUntil, serverViews]);
+
+  useEffect(() => {
+    void syncLocalViews();
+  }, [syncLocalViews, serverViews]);
 
   /** После 12/24/… просмотров сервер иногда не отдаёт время паузы — включаем локальный таймер. */
   useEffect(() => {
@@ -132,7 +151,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     if (localCooldownUntil && formatCooldownCountdown(localCooldownUntil)) {
       return;
     }
-    if (!isBatchBreakViews(currentViews, adsPerBatch)) {
+    if (!isBatchBreakViews(effectiveViews, adsPerBatch)) {
       return;
     }
     const serverBlocks = quota !== null && !quota.allowed;
@@ -149,7 +168,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   }, [
     userId,
     localCooldownUntil,
-    currentViews,
+    effectiveViews,
     adsPerBatch,
     quota?.allowed,
     quota?.batchCooldownUntil,
@@ -174,16 +193,16 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   }, [tick, cooldownUntilIso, userId, refreshQuota, fetchLimits]);
 
   const batchLeft =
-    currentViews > 0 && currentViews % adsPerBatch === 0
+    effectiveViews > 0 && effectiveViews % adsPerBatch === 0
       ? adsPerBatch
-      : adsPerBatch - (currentViews % adsPerBatch);
+      : adsPerBatch - (effectiveViews % adsPerBatch);
   const batchNum = Math.min(
     batchesPerDay,
-    currentViews > 0 && currentViews % adsPerBatch === 0
-      ? Math.floor(currentViews / adsPerBatch)
-      : Math.floor(currentViews / adsPerBatch) + 1,
+    effectiveViews > 0 && effectiveViews % adsPerBatch === 0
+      ? Math.floor(effectiveViews / adsPerBatch)
+      : Math.floor(effectiveViews / adsPerBatch) + 1,
   );
-  const atDailyLimit = currentViews >= maxViews;
+  const atDailyLimit = effectiveViews >= maxViews;
   const clientBlocked = !clientQuota.allowed;
   const serverMaxViews =
     quota?.maxAdViewsPerDay ?? limits?.maxAdViewsPerDay ?? MAX_AD_VIEWS_PER_DAY;
@@ -192,7 +211,10 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
   const finishRewardUi = useCallback(
     async (creditedAmount: number, viewsAfter: number) => {
-      if (isBatchBreakViews(viewsAfter, adsPerBatch)) {
+      const localAfter = await incrementLocalAdViewsToday(userId, getClientAdPeriodKey());
+      setLocalViews(localAfter);
+      const mergedAfter = Math.max(viewsAfter, localAfter);
+      if (isBatchBreakViews(mergedAfter, adsPerBatch)) {
         const until = await startLocalBatchCooldown(userId);
         if (until) {
           setLocalCooldownUntil(until);
@@ -228,8 +250,10 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
       return;
     }
 
-    const viewsNow =
-      limits?.currentAdViewsToday ?? quota?.currentAdViewsToday ?? currentViews;
+    const viewsNow = Math.max(
+      limits?.currentAdViewsToday ?? quota?.currentAdViewsToday ?? 0,
+      localViews,
+    );
     const localQuota = evaluateClientAdQuota({
       currentAdViewsToday: viewsNow,
       lastBatchCompletedAt: limits?.lastBatchCompletedAt,
@@ -335,7 +359,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   let subtitle = t.main.balance.watchAdDescription.replace('{amount}', formatRewardPerViewLabel());
   if (!inCooldown) {
     subtitle += `\n${t.main.balance.dailyQuota
-      .replace('{current}', String(currentViews))
+      .replace('{current}', String(effectiveViews))
       .replace('{max}', String(maxViews))
       .replace('{perBatch}', String(adsPerBatch))
       .replace('{batches}', String(batchesPerDay))}`;
@@ -348,9 +372,9 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const buttonTitle = loading
     ? t.common.loading
     : inCooldown && countdown
-      ? t.main.balance.nextAdCooldown.replace('{time}', countdown)
+      ? t.main.balance.cooldownRemaining.replace('{time}', countdown)
       : atDailyLimit
-        ? t.main.balance.maxAdsReached
+        ? t.main.balance.dailyLimitReached.replace('{max}', String(maxViews))
         : t.main.balance.watchAdBtn;
 
   return (
@@ -368,7 +392,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
           <Text style={styles.cooldownHeroHint}>{t.main.balance.cooldownSubtitle}</Text>
           <Text style={styles.cooldownHeroTimer}>{countdown}</Text>
           <Text style={styles.cooldownHeroSub}>
-            {t.main.balance.nextAdCooldown.replace('{time}', countdown)}
+            {t.main.balance.cooldownRemaining.replace('{time}', countdown)}
           </Text>
         </View>
       ) : null}

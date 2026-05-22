@@ -101,7 +101,7 @@ export const BonusShopScreen = () => {
         </TouchableOpacity>
 
         <View style={styles.rewardsSection}>
-          <TwaRewardsGrid balance={userBalance} />
+          <TwaRewardsGrid balance={userBalance} onBalanceChange={() => void fetchBalance()} />
         </View>
 
         <View style={styles.section}>

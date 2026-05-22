@@ -78,6 +78,7 @@ export const API_CONFIG = {
     BONUS_SHOP: {
       ITEMS: '/bonus-shop/items',
       PURCHASE: '/bonus-shop/purchase',
+      REDEEM_CATALOG: '/bonus-shop/redeem-catalog',
       MY_PURCHASES: '/bonus-shop/my-purchases',
       SETTINGS: '/bonus-shop/settings',
     },

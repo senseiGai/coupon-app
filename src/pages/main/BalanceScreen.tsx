@@ -46,7 +46,10 @@ export const BalanceScreen = () => {
         }
       : getProgressTowardOneTwa(balance?.available ?? 0);
   const progressPercent = Math.min(100, Math.round(twaProgress.progress * 100));
-  const currentViews = limits?.currentAdViewsToday ?? 0;
+  const currentViews = Math.min(
+    MAX_AD_VIEWS_PER_DAY,
+    limits?.currentAdViewsToday ?? 0,
+  );
   const maxViews = MAX_AD_VIEWS_PER_DAY;
 
   if (loading && !balance) {

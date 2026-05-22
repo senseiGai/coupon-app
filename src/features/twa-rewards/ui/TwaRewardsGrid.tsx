@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Gift, MapPin, Clock } from 'lucide-react-native';
@@ -13,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/MainStack';
 import { useLanguage } from '@/shared/lib/hooks';
+import { useBonus } from '@/shared/lib/hooks/useBonus';
 import { TWA_REWARDS_CATALOG, type TwaRewardItem } from '@/shared/constants/twaRewardsCatalog';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -23,6 +25,7 @@ const CARD_WIDTH = (SCREEN_WIDTH - H_PADDING * 2 - GAP) / 2;
 type Props = {
   balance: number;
   showTitle?: boolean;
+  onBalanceChange?: () => void;
 };
 
 const CARD_GRADIENT_GREY = ['#94A3B8', '#64748B'] as const;
@@ -32,9 +35,11 @@ function formatTwaPrice(price: number): string {
   return `${price.toLocaleString('ru-RU')} TWA`;
 }
 
-export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true }) => {
+export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true, onBalanceChange }) => {
   const { t } = useLanguage();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { redeemCatalogReward } = useBonus();
+  const [applyingId, setApplyingId] = useState<string | null>(null);
 
   const handleApply = (item: TwaRewardItem) => {
     if (balance < item.price) {
@@ -45,18 +50,54 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true }) =
       return;
     }
 
-    Alert.alert(t.bonusShop.applyRewardTitle, t.bonusShop.applyRewardMessage, [
+    Alert.alert(t.bonusShop.applyRewardTitle, t.bonusShop.applyRewardConfirm, [
       { text: t.common.cancel, style: 'cancel' },
       {
         text: t.bonusShop.applyRewardButton,
-        onPress: () => {
-          navigation.navigate('MainTabs', {
-            screen: 'Chat',
-            params: { draftMessage: item.chatMessage },
-          });
-        },
+        onPress: () => void confirmApply(item),
       },
     ]);
+  };
+
+  const confirmApply = async (item: TwaRewardItem) => {
+    setApplyingId(item.id);
+    try {
+      const result = await redeemCatalogReward(item.id);
+      if (!result.success || !result.data?.code) {
+        Alert.alert(
+          t.common.error,
+          result.error || t.bonusShop.applyFailed,
+        );
+        return;
+      }
+
+      const code = result.data.code;
+      const chatMessage = `${item.chatMessage}\n\n${t.bonusShop.purchaseCode}: ${code}`;
+
+      onBalanceChange?.();
+
+      Alert.alert(
+        t.bonusShop.applySuccessTitle,
+        t.bonusShop.applySuccessMessage.replace('{code}', code),
+        [
+          {
+            text: t.bonusShop.openPurchases,
+            onPress: () => navigation.navigate('MyPurchases'),
+          },
+          {
+            text: t.bonusShop.openChat,
+            onPress: () =>
+              navigation.navigate('MainTabs', {
+                screen: 'Chat',
+                params: { draftMessage: chatMessage },
+              }),
+          },
+          { text: t.main.balance.great, style: 'cancel' },
+        ],
+      );
+    } finally {
+      setApplyingId(null);
+    }
   };
 
   return (
@@ -67,6 +108,7 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true }) =
       <View style={styles.grid}>
         {TWA_REWARDS_CATALOG.map((item) => {
           const canAfford = balance >= item.price;
+          const isApplying = applyingId === item.id;
           const colors = canAfford ? CARD_GRADIENT_GOLD : CARD_GRADIENT_GREY;
           const actionLabel = canAfford
             ? t.bonusShop.applyRewardButton
@@ -79,6 +121,7 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true }) =
               key={item.id}
               style={styles.card}
               activeOpacity={0.85}
+              disabled={isApplying}
               onPress={() => handleApply(item)}>
               <LinearGradient
                 colors={[...colors]}
@@ -140,9 +183,13 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true }) =
                 )}
 
                 <View style={[styles.actionBtn, !canAfford && styles.actionBtnDisabled]}>
-                  <Text style={styles.actionBtnText} numberOfLines={2}>
-                    {actionLabel}
-                  </Text>
+                  {isApplying ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={styles.actionBtnText} numberOfLines={2}>
+                      {actionLabel}
+                    </Text>
+                  )}
                 </View>
               </LinearGradient>
             </TouchableOpacity>
@@ -273,6 +320,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 12,
     marginTop: 8,
+    minHeight: 36,
   },
   actionBtnDisabled: {
     backgroundColor: 'rgba(15,23,42,0.65)',

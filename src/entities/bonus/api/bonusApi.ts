@@ -183,6 +183,13 @@ class BonusApi {
     return apiClient.post<PurchaseResponse>(API_CONFIG.ENDPOINTS.BONUS_SHOP.PURCHASE, { itemId });
   }
 
+  /** Применить награду из каталога TWA: списание баланса + промокод. */
+  async redeemCatalogReward(catalogId: string): Promise<PurchaseResponse> {
+    return apiClient.post<PurchaseResponse>(API_CONFIG.ENDPOINTS.BONUS_SHOP.REDEEM_CATALOG, {
+      catalogId,
+    });
+  }
+
   /**
    * Получить мои покупки
    */
