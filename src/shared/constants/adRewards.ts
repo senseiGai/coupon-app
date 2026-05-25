@@ -120,15 +120,14 @@ export function evaluateClientAdQuota(params: {
     };
   }
 
-  /** После 12/24/… без метки паузы — блокируем (таймер включится на клиенте). */
+  /** После 12/24/… — блок до сохранённого cooldown (без «скользящего» now+30мин). */
   if (isBetweenBatches(current)) {
-    const syntheticUntil = new Date(now.getTime() + BATCH_COOLDOWN_MS).toISOString();
     return {
       allowed: false,
       reason: 'Перерыв между блоками (30 мин)',
       remaining,
       batchRemaining: batchRem,
-      batchCooldownUntil: syntheticUntil,
+      batchCooldownUntil: null,
     };
   }
 
@@ -152,7 +151,7 @@ export function formatCooldownCountdown(untilIso: string | null | undefined): st
   const totalSec = Math.max(0, Math.floor(ms / 1000));
   const min = Math.floor(totalSec / 60);
   const sec = totalSec % 60;
-  return `${min}:${sec.toString().padStart(2, '0')}`;
+  return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 }
 
 /** Сервер + lastBatchCompletedAt + локальная пауза на телефоне. */

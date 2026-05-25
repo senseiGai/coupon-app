@@ -15,7 +15,6 @@ import {
   Gift,
   Plane,
   Ticket,
-  Coffee,
   ShoppingBag,
   CheckCircle,
   Clock,
@@ -73,7 +72,6 @@ const TYPE_ICONS: Record<string, typeof Plane> = {
   TOUR_DISCOUNT: Plane,
   DISCOUNT_COUPON: Ticket,
   GIFT: Gift,
-  SERVICE: Coffee,
   OTHER: ShoppingBag,
 };
 
@@ -137,13 +135,22 @@ export const MyPurchasesScreen = () => {
             const itemDescription = getLocalizedText(purchase.item.description, currentLang as Language);
             const StatusIcon = STATUS_ICONS[purchase.status];
             const statusColor = STATUS_COLORS[purchase.status];
-            const ItemIcon = TYPE_ICONS[purchase.item.type] || ShoppingBag;
+            const ItemIcon = TYPE_ICONS[purchase.item.type] || Gift;
+            const useGiftEmoji =
+              purchase.item.type === 'SERVICE' ||
+              purchase.item.type === 'GIFT' ||
+              purchase.item.type === 'OTHER' ||
+              purchase.item.type === 'TOUR_DISCOUNT';
 
             return (
               <View key={purchase.id} style={styles.purchaseCard}>
                 <View style={styles.purchaseHeader}>
                   <View style={styles.purchaseIconContainer}>
-                    <ItemIcon size={24} color="#F59E0B" />
+                    {useGiftEmoji ? (
+                      <Text style={styles.giftEmoji}>🎁</Text>
+                    ) : (
+                      <ItemIcon size={24} color="#F59E0B" />
+                    )}
                   </View>
                   <View style={styles.purchaseInfo}>
                     <Text style={styles.purchaseName}>{itemName}</Text>
@@ -286,6 +293,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+  },
+  giftEmoji: {
+    fontSize: 26,
+    lineHeight: 30,
   },
   purchaseInfo: {
     flex: 1,

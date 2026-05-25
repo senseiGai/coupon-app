@@ -97,7 +97,7 @@ export const translations = {
         bonusesTitle: 'Bonuses',
         availableBonuses: 'Available bonuses',
         bonusEquivalent: 'discount',
-        bonusHint: '💡 1 bonus = 1 discount when booking',
+        bonusHint: '💡 60 views = 1 TWA',
         noticeText:
           'Bonuses are a virtual reward, NOT money. Used only as a discount within the app.',
         watchAdTitle: 'Earn Bonus',
@@ -436,7 +436,7 @@ export const translations = {
         bonusesTitle: 'Бонусы',
         availableBonuses: 'Доступно бонусов',
         bonusEquivalent: 'скидки',
-        bonusHint: '💡 1 бонус = 1 скидка при бронировании',
+        bonusHint: '💡 60 просмотров = 1 TWA',
         noticeText:
           'Бонусы — виртуальная награда, НЕ деньги. Используются только как скидка внутри приложения.',
         watchAdTitle: 'Получение бонуса',
@@ -776,7 +776,7 @@ export const translations = {
         bonusesTitle: 'Бонуси',
         availableBonuses: 'Доступно бонусів',
         bonusEquivalent: 'знижки',
-        bonusHint: '💡 1 бонус = 1 знижка при бронюванні',
+        bonusHint: '💡 60 переглядів = 1 TWA',
         noticeText:
           'Бонуси — віртуальна винагорода, НЕ гроші. Використовуються тільки як знижка всередині додатку.',
         watchAdTitle: 'Отримання бонусу',

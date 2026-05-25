@@ -111,27 +111,21 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     }, [fetchLimits, loadLocalCooldown]),
   );
 
-  const clientQuotaForCooldown = evaluateClientAdQuota({
+  const cooldownUntilIso = getEffectiveBatchCooldownUntil({
+    batchCooldownUntil: quota?.batchCooldownUntil ?? limits?.batchCooldownUntil,
+    currentAdViewsToday: effectiveViews,
+    lastBatchCompletedAt: limits?.lastBatchCompletedAt,
+    localCooldownUntil,
+  });
+
+  const clientQuota = evaluateClientAdQuota({
     currentAdViewsToday: effectiveViews,
     lastBatchCompletedAt: limits?.lastBatchCompletedAt,
     batchCooldownUntil: quota?.batchCooldownUntil ?? limits?.batchCooldownUntil,
     localCooldownUntil,
   });
-  const cooldownUntilIso =
-    getEffectiveBatchCooldownUntil({
-      batchCooldownUntil: quota?.batchCooldownUntil ?? limits?.batchCooldownUntil,
-      currentAdViewsToday: effectiveViews,
-      lastBatchCompletedAt: limits?.lastBatchCompletedAt,
-      localCooldownUntil,
-    }) ??
-    (clientQuotaForCooldown.batchCooldownUntil &&
-    formatCooldownCountdown(clientQuotaForCooldown.batchCooldownUntil)
-      ? clientQuotaForCooldown.batchCooldownUntil
-      : null);
   const countdown = formatCooldownCountdown(cooldownUntilIso);
   const inCooldown = !!countdown;
-
-  const clientQuota = clientQuotaForCooldown;
 
   const refreshQuota = useCallback(async () => {
     const result = await checkCanWatchAd();
@@ -432,35 +426,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF3C7',
     borderWidth: 2,
     borderColor: '#F59E0B',
-    borderRadius: wp(16),
-    paddingVertical: hp(20),
-    paddingHorizontal: wp(16),
-    marginBottom: hp(14),
+    borderRadius: wp(14),
+    paddingVertical: hp(14),
+    paddingHorizontal: wp(14),
+    marginBottom: hp(12),
   },
   cooldownHeroTitle: {
-    fontSize: fontSize(16),
+    fontSize: fontSize(14),
     fontWeight: '700',
     color: '#92400E',
-    marginTop: hp(8),
+    marginTop: hp(6),
     textAlign: 'center',
   },
   cooldownHeroHint: {
-    fontSize: fontSize(13),
+    fontSize: fontSize(12),
     color: '#B45309',
-    marginTop: hp(4),
+    marginTop: hp(2),
     textAlign: 'center',
   },
   cooldownHeroTimer: {
-    fontSize: fontSize(48),
+    fontSize: fontSize(32),
     fontWeight: '800',
     color: '#D97706',
-    marginTop: hp(12),
+    marginTop: hp(8),
     fontVariant: ['tabular-nums'],
+    letterSpacing: 1,
   },
   cooldownHeroSub: {
-    fontSize: fontSize(14),
+    fontSize: fontSize(12),
     color: '#92400E',
-    marginTop: hp(8),
+    marginTop: hp(6),
     textAlign: 'center',
   },
   button: {
