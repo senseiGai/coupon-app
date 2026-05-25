@@ -312,6 +312,7 @@ export const translations = {
       applySuccessMessage:
         'Purchase code: {code}\n\nIt is saved in My Purchases. You can send the code to the manager in chat.',
       applyFailed: 'Could not apply bonus. Check your balance and try again.',
+      applyAndChat: 'Apply and message manager',
       openPurchases: 'My Purchases',
       openChat: 'Open chat',
       surpriseBonus: 'Bonus surprise 🎁',
@@ -650,6 +651,7 @@ export const translations = {
       applySuccessMessage:
         'Код покупки: {code}\n\nКод сохранён в «Мои покупки». Можете отправить его менеджеру в чате.',
       applyFailed: 'Не удалось применить бонус. Проверьте баланс и попробуйте снова.',
+      applyAndChat: 'Применить и написать в чат',
       openPurchases: 'Мои покупки',
       openChat: 'Открыть чат',
       surpriseBonus: 'Бонус сюрприз 🎁',
@@ -989,6 +991,7 @@ export const translations = {
       applySuccessMessage:
         'Код покупки: {code}\n\nЗбережено в «Мої покупки». Можна надіслати менеджеру в чаті.',
       applyFailed: 'Не вдалося застосувати бонус. Перевірте баланс.',
+      applyAndChat: 'Застосувати і написати в чат',
       openPurchases: 'Мої покупки',
       openChat: 'Відкрити чат',
       surpriseBonus: 'Бонус-сюрприз 🎁',

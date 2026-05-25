@@ -111,21 +111,27 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     }, [fetchLimits, loadLocalCooldown]),
   );
 
-  const cooldownUntilIso = getEffectiveBatchCooldownUntil({
-    batchCooldownUntil: quota?.batchCooldownUntil ?? limits?.batchCooldownUntil,
+  const clientQuotaForCooldown = evaluateClientAdQuota({
     currentAdViewsToday: effectiveViews,
     lastBatchCompletedAt: limits?.lastBatchCompletedAt,
+    batchCooldownUntil: quota?.batchCooldownUntil ?? limits?.batchCooldownUntil,
     localCooldownUntil,
   });
+  const cooldownUntilIso =
+    getEffectiveBatchCooldownUntil({
+      batchCooldownUntil: quota?.batchCooldownUntil ?? limits?.batchCooldownUntil,
+      currentAdViewsToday: effectiveViews,
+      lastBatchCompletedAt: limits?.lastBatchCompletedAt,
+      localCooldownUntil,
+    }) ??
+    (clientQuotaForCooldown.batchCooldownUntil &&
+    formatCooldownCountdown(clientQuotaForCooldown.batchCooldownUntil)
+      ? clientQuotaForCooldown.batchCooldownUntil
+      : null);
   const countdown = formatCooldownCountdown(cooldownUntilIso);
   const inCooldown = !!countdown;
 
-  const clientQuota = evaluateClientAdQuota({
-    currentAdViewsToday: effectiveViews,
-    lastBatchCompletedAt: limits?.lastBatchCompletedAt,
-    batchCooldownUntil: quota?.batchCooldownUntil ?? limits?.batchCooldownUntil,
-    localCooldownUntil,
-  });
+  const clientQuota = clientQuotaForCooldown;
 
   const refreshQuota = useCallback(async () => {
     const result = await checkCanWatchAd();
@@ -143,20 +149,12 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     void syncLocalViews();
   }, [syncLocalViews, serverViews]);
 
-  /** После 12/24/… просмотров сервер иногда не отдаёт время паузы — включаем локальный таймер. */
+  /** После 12/24/… всегда включаем локальный таймер 30 мин. */
   useEffect(() => {
-    if (!userId) {
+    if (!userId || !isBatchBreakViews(effectiveViews, adsPerBatch)) {
       return;
     }
     if (localCooldownUntil && formatCooldownCountdown(localCooldownUntil)) {
-      return;
-    }
-    if (!isBatchBreakViews(effectiveViews, adsPerBatch)) {
-      return;
-    }
-    const serverBlocks = quota !== null && !quota.allowed;
-    const serverCooldown = quota?.batchCooldownUntil ?? limits?.batchCooldownUntil;
-    if (!serverBlocks && !serverCooldown) {
       return;
     }
     void (async () => {
@@ -165,15 +163,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
         setLocalCooldownUntil(until);
       }
     })();
-  }, [
-    userId,
-    localCooldownUntil,
-    effectiveViews,
-    adsPerBatch,
-    quota?.allowed,
-    quota?.batchCooldownUntil,
-    limits?.batchCooldownUntil,
-  ]);
+  }, [userId, localCooldownUntil, effectiveViews, adsPerBatch]);
 
   useEffect(() => {
     const id = setInterval(() => setTick((n) => n + 1), 1000);
@@ -213,8 +203,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     async (creditedAmount: number, viewsAfter: number) => {
       const localAfter = await incrementLocalAdViewsToday(userId, getClientAdPeriodKey());
       setLocalViews(localAfter);
-      const mergedAfter = Math.max(viewsAfter, localAfter);
-      if (isBatchBreakViews(mergedAfter, adsPerBatch)) {
+      if (isBatchBreakViews(localAfter, adsPerBatch)) {
         const until = await startLocalBatchCooldown(userId);
         if (until) {
           setLocalCooldownUntil(until);

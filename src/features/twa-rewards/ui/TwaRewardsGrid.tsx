@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Gift, MapPin, Clock } from 'lucide-react-native';
+import { Gift, MapPin, Clock, MessageCircle } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/MainStack';
@@ -41,6 +41,29 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true, onB
   const { redeemCatalogReward } = useBonus();
   const [applyingId, setApplyingId] = useState<string | null>(null);
 
+  const applyAndOpenChat = async (item: TwaRewardItem) => {
+    setApplyingId(item.id);
+    try {
+      const result = await redeemCatalogReward(item.id);
+      if (!result.success || !result.data?.code) {
+        Alert.alert(t.common.error, result.error || t.bonusShop.applyFailed);
+        return;
+      }
+
+      const code = result.data.code;
+      const chatMessage = `${item.chatMessage}\n\n${t.bonusShop.purchaseCode}: ${code}`;
+
+      onBalanceChange?.();
+
+      navigation.navigate('MainTabs', {
+        screen: 'Chat',
+        params: { draftMessage: chatMessage },
+      });
+    } finally {
+      setApplyingId(null);
+    }
+  };
+
   const handleApply = (item: TwaRewardItem) => {
     if (balance < item.price) {
       Alert.alert(
@@ -53,51 +76,10 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true, onB
     Alert.alert(t.bonusShop.applyRewardTitle, t.bonusShop.applyRewardConfirm, [
       { text: t.common.cancel, style: 'cancel' },
       {
-        text: t.bonusShop.applyRewardButton,
-        onPress: () => void confirmApply(item),
+        text: t.bonusShop.applyAndChat,
+        onPress: () => void applyAndOpenChat(item),
       },
     ]);
-  };
-
-  const confirmApply = async (item: TwaRewardItem) => {
-    setApplyingId(item.id);
-    try {
-      const result = await redeemCatalogReward(item.id);
-      if (!result.success || !result.data?.code) {
-        Alert.alert(
-          t.common.error,
-          result.error || t.bonusShop.applyFailed,
-        );
-        return;
-      }
-
-      const code = result.data.code;
-      const chatMessage = `${item.chatMessage}\n\n${t.bonusShop.purchaseCode}: ${code}`;
-
-      onBalanceChange?.();
-
-      Alert.alert(
-        t.bonusShop.applySuccessTitle,
-        t.bonusShop.applySuccessMessage.replace('{code}', code),
-        [
-          {
-            text: t.bonusShop.openPurchases,
-            onPress: () => navigation.navigate('MyPurchases'),
-          },
-          {
-            text: t.bonusShop.openChat,
-            onPress: () =>
-              navigation.navigate('MainTabs', {
-                screen: 'Chat',
-                params: { draftMessage: chatMessage },
-              }),
-          },
-          { text: t.main.balance.great, style: 'cancel' },
-        ],
-      );
-    } finally {
-      setApplyingId(null);
-    }
   };
 
   return (
@@ -111,7 +93,7 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true, onB
           const isApplying = applyingId === item.id;
           const colors = canAfford ? CARD_GRADIENT_GOLD : CARD_GRADIENT_GREY;
           const actionLabel = canAfford
-            ? t.bonusShop.applyRewardButton
+            ? t.bonusShop.applyAndChat
             : item.isSurprise
               ? t.bonusShop.surpriseBonus
               : t.bonusShop.notEnough;
@@ -147,6 +129,7 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true, onB
                       <Gift size={28} color="#FFFFFF" strokeWidth={2} />
                     </View>
                     <Text style={styles.surpriseQuestion}>?</Text>
+                    <Text style={styles.surpriseLabel}>{t.bonusShop.surpriseBonus}</Text>
                   </View>
                 ) : (
                   <>
@@ -186,9 +169,14 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true, onB
                   {isApplying ? (
                     <ActivityIndicator color="#fff" size="small" />
                   ) : (
-                    <Text style={styles.actionBtnText} numberOfLines={2}>
-                      {actionLabel}
-                    </Text>
+                    <>
+                      {canAfford ? (
+                        <MessageCircle size={14} color="#fff" style={styles.actionIcon} />
+                      ) : null}
+                      <Text style={styles.actionBtnText} numberOfLines={2}>
+                        {actionLabel}
+                      </Text>
+                    </>
                   )}
                 </View>
               </LinearGradient>
@@ -273,6 +261,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     lineHeight: 64,
   },
+  surpriseLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+    textAlign: 'center',
+  },
   iconContainer: {
     width: 44,
     height: 44,
@@ -313,6 +307,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(15,23,42,0.85)',
@@ -321,14 +316,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 8,
     minHeight: 36,
+    gap: 6,
   },
   actionBtnDisabled: {
     backgroundColor: 'rgba(15,23,42,0.65)',
   },
+  actionIcon: {
+    flexShrink: 0,
+  },
   actionBtnText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     color: '#FFFFFF',
     textAlign: 'center',
+    flexShrink: 1,
   },
 });

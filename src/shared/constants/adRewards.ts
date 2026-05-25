@@ -120,6 +120,18 @@ export function evaluateClientAdQuota(params: {
     };
   }
 
+  /** После 12/24/… без метки паузы — блокируем (таймер включится на клиенте). */
+  if (isBetweenBatches(current)) {
+    const syntheticUntil = new Date(now.getTime() + BATCH_COOLDOWN_MS).toISOString();
+    return {
+      allowed: false,
+      reason: 'Перерыв между блоками (30 мин)',
+      remaining,
+      batchRemaining: batchRem,
+      batchCooldownUntil: syntheticUntil,
+    };
+  }
+
   return {
     allowed: true,
     reason: null,

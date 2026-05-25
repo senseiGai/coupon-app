@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Gift, Plane, Star, ShoppingCart } from 'lucide-react-native';
+import { ArrowLeft, Plane, Star, ShoppingCart } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage, useBonus } from '@/shared/lib/hooks';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -55,12 +55,6 @@ export const BonusShopScreen = () => {
             <Plane size={16} color="#FFD700" />
             <Text style={styles.balanceText}>{formatTwaAmount(userBalance)}</Text>
           </View>
-        </View>
-
-        <View style={styles.myBonusesRow}>
-          <Gift size={20} color="#F59E0B" />
-          <Text style={styles.myBonusesText}>{t.bonusShop.myBonuses}</Text>
-          <Text style={styles.myBonusesAmount}>{formatTwaAmount(userBalance)}</Text>
         </View>
 
         <View style={styles.infoBanner}>
