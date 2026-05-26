@@ -30,6 +30,8 @@ import {
   getLocalBatchCooldownUntil,
   startLocalBatchCooldown,
   clearLocalBatchCooldown,
+  getHandledBatchBoundary,
+  markBatchBoundaryHandled,
 } from '@/shared/lib/ads/adBatchCooldownStorage';
 import {
   incrementLocalAdViewsToday,
@@ -78,6 +80,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const [quota, setQuota] = useState<CanWatchAdResponse | null>(null);
   const [localCooldownUntil, setLocalCooldownUntil] = useState<string | null>(null);
   const [localViews, setLocalViews] = useState(0);
+  const [handledBatchBoundary, setHandledBatchBoundary] = useState<number | null>(null);
   const [tick, setTick] = useState(0);
 
   const adsPerBatch = ADS_PER_BATCH;
@@ -92,6 +95,13 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     return stored;
   }, [storageUserKey]);
 
+  const loadHandledBatchBoundary = useCallback(async () => {
+    const periodKey = getClientAdPeriodKey();
+    const value = await getHandledBatchBoundary(storageUserKey, periodKey);
+    setHandledBatchBoundary(value);
+    return value;
+  }, [storageUserKey]);
+
   const syncLocalViews = useCallback(async () => {
     const merged = await syncLocalAdViewsFromServer(
       storageUserKey,
@@ -104,15 +114,17 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
   useEffect(() => {
     void loadLocalCooldown();
+    void loadHandledBatchBoundary();
     void syncLocalViews();
     preloadRewardedAd();
-  }, [loadLocalCooldown, syncLocalViews]);
+  }, [loadLocalCooldown, loadHandledBatchBoundary, syncLocalViews]);
 
   useFocusEffect(
     useCallback(() => {
       void fetchLimits();
       void loadLocalCooldown();
-    }, [fetchLimits, loadLocalCooldown]),
+      void loadHandledBatchBoundary();
+    }, [fetchLimits, loadLocalCooldown, loadHandledBatchBoundary]),
   );
 
   const cooldownUntilIso = getEffectiveBatchCooldownUntil({
@@ -152,16 +164,22 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     if (!isBatchBreakViews(effectiveViews, adsPerBatch)) {
       return;
     }
+    if (handledBatchBoundary === effectiveViews) {
+      return;
+    }
     if (localCooldownUntil && formatCooldownCountdown(localCooldownUntil)) {
       return;
     }
     void (async () => {
       const until = await startLocalBatchCooldown(storageUserKey);
       if (until) {
+        const periodKey = getClientAdPeriodKey();
+        await markBatchBoundaryHandled(storageUserKey, periodKey, effectiveViews);
+        setHandledBatchBoundary(effectiveViews);
         setLocalCooldownUntil(until);
       }
     })();
-  }, [storageUserKey, localCooldownUntil, effectiveViews, adsPerBatch]);
+  }, [storageUserKey, localCooldownUntil, effectiveViews, adsPerBatch, handledBatchBoundary]);
 
   useEffect(() => {
     const id = setInterval(() => setTick((n) => n + 1), 1000);
