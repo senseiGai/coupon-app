@@ -392,9 +392,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
       {inCooldown && countdown ? (
         <View style={styles.cooldownHero}>
-          <Clock size={36} color="#B45309" />
-          <Text style={styles.cooldownHeroTitle}>{t.main.balance.cooldownTitle}</Text>
-          <Text style={styles.cooldownHeroHint}>{t.main.balance.cooldownSubtitle}</Text>
+          <Clock size={28} color="#B45309" />
           <Text style={styles.cooldownHeroTimer}>{countdown}</Text>
           <Text style={styles.cooldownHeroSub}>
             {t.main.balance.cooldownRemaining.replace('{time}', countdown)}
@@ -452,19 +450,6 @@ const styles = StyleSheet.create({
     paddingVertical: hp(14),
     paddingHorizontal: wp(14),
     marginBottom: hp(12),
-  },
-  cooldownHeroTitle: {
-    fontSize: fontSize(14),
-    fontWeight: '700',
-    color: '#92400E',
-    marginTop: hp(6),
-    textAlign: 'center',
-  },
-  cooldownHeroHint: {
-    fontSize: fontSize(12),
-    color: '#B45309',
-    marginTop: hp(2),
-    textAlign: 'center',
   },
   cooldownHeroTimer: {
     fontSize: fontSize(32),

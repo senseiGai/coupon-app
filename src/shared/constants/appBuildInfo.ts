@@ -1,2 +1,2 @@
 /** Меняйте при каждой сборке APK — видно на экране «Бонусы» для проверки обновления. */
-export const APP_BUILD_MARKER = '2026-05-21-ads-b8';
+export const APP_BUILD_MARKER = '2026-05-21-ads-b9';
