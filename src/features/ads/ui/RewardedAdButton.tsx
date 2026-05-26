@@ -32,7 +32,6 @@ import {
   clearLocalBatchCooldown,
 } from '@/shared/lib/ads/adBatchCooldownStorage';
 import {
-  getLocalAdViewsToday,
   incrementLocalAdViewsToday,
   syncLocalAdViewsFromServer,
   getClientAdPeriodKey,
@@ -74,6 +73,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   } = useBonus();
   const { data: profile } = useProfile();
   const userId = profile?.id;
+  const storageUserKey = userId ?? 'local-device-user';
   const [loading, setLoading] = useState(false);
   const [quota, setQuota] = useState<CanWatchAdResponse | null>(null);
   const [localCooldownUntil, setLocalCooldownUntil] = useState<string | null>(null);
@@ -87,16 +87,20 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const effectiveViews = Math.max(serverViews, localViews);
 
   const loadLocalCooldown = useCallback(async () => {
-    const stored = await getLocalBatchCooldownUntil(userId);
+    const stored = await getLocalBatchCooldownUntil(storageUserKey);
     setLocalCooldownUntil(stored);
     return stored;
-  }, [userId]);
+  }, [storageUserKey]);
 
   const syncLocalViews = useCallback(async () => {
-    const merged = await syncLocalAdViewsFromServer(userId, serverViews, getClientAdPeriodKey());
+    const merged = await syncLocalAdViewsFromServer(
+      storageUserKey,
+      serverViews,
+      getClientAdPeriodKey(),
+    );
     setLocalViews(merged);
     return merged;
-  }, [userId, serverViews]);
+  }, [storageUserKey, serverViews]);
 
   useEffect(() => {
     void loadLocalCooldown();
@@ -145,19 +149,19 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
   /** После 12/24/… всегда включаем локальный таймер 30 мин. */
   useEffect(() => {
-    if (!userId || !isBatchBreakViews(effectiveViews, adsPerBatch)) {
+    if (!isBatchBreakViews(effectiveViews, adsPerBatch)) {
       return;
     }
     if (localCooldownUntil && formatCooldownCountdown(localCooldownUntil)) {
       return;
     }
     void (async () => {
-      const until = await startLocalBatchCooldown(userId);
+      const until = await startLocalBatchCooldown(storageUserKey);
       if (until) {
         setLocalCooldownUntil(until);
       }
     })();
-  }, [userId, localCooldownUntil, effectiveViews, adsPerBatch]);
+  }, [storageUserKey, localCooldownUntil, effectiveViews, adsPerBatch]);
 
   useEffect(() => {
     const id = setInterval(() => setTick((n) => n + 1), 1000);
@@ -169,12 +173,12 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
       return;
     }
     if (!formatCooldownCountdown(cooldownUntilIso)) {
-      void clearLocalBatchCooldown(userId);
+      void clearLocalBatchCooldown(storageUserKey);
       setLocalCooldownUntil(null);
       void refreshQuota();
       void fetchLimits();
     }
-  }, [tick, cooldownUntilIso, userId, refreshQuota, fetchLimits]);
+  }, [tick, cooldownUntilIso, storageUserKey, refreshQuota, fetchLimits]);
 
   const batchLeft =
     effectiveViews > 0 && effectiveViews % adsPerBatch === 0
@@ -195,10 +199,10 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
   const finishRewardUi = useCallback(
     async (creditedAmount: number, viewsAfter: number) => {
-      const localAfter = await incrementLocalAdViewsToday(userId, getClientAdPeriodKey());
+      const localAfter = await incrementLocalAdViewsToday(storageUserKey, getClientAdPeriodKey());
       setLocalViews(localAfter);
       if (isBatchBreakViews(localAfter, adsPerBatch)) {
-        const until = await startLocalBatchCooldown(userId);
+        const until = await startLocalBatchCooldown(storageUserKey);
         if (until) {
           setLocalCooldownUntil(until);
         }
@@ -216,7 +220,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     },
     [
       adsPerBatch,
-      userId,
+      storageUserKey,
       fetchBalance,
       fetchLimits,
       refreshQuota,
