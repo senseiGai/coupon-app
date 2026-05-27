@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Send, Paperclip } from 'lucide-react-native';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import {
@@ -31,6 +31,11 @@ import { API_CONFIG } from '../../shared/config/api';
 import type { PrivateMessage } from '../../shared/types/message';
 import { AirplaneBackground } from '../../shared/ui/AirplaneBackground';
 import { wp, hp, fontSize, sizes, responsive } from '../../shared/lib/responsive';
+import {
+  formatChatDayLabel,
+  formatChatMessageDateTime,
+  getChatDayKey,
+} from '../../shared/lib/utils/formatChatDate';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import type { MainTabParamList } from '@/app/navigation/MainStack';
@@ -40,7 +45,11 @@ const { screenWidth: SCREEN_WIDTH, screenHeight: SCREEN_HEIGHT } = sizes;
 type ChatRouteProp = RouteProp<MainTabParamList, 'Chat'>;
 
 export const ChatScreen = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const dateLabels = useMemo(
+    () => ({ today: t.common.today, yesterday: t.common.yesterday }),
+    [t.common.today, t.common.yesterday],
+  );
   const route = useRoute<ChatRouteProp>();
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -292,22 +301,45 @@ export const ChatScreen = () => {
     setTypingTimeout(timeout);
   };
 
-  // Форматируем сообщения для отображения
-  const formatMessages = () => {
-    return messages.map((msg) => ({
-      id: msg.id,
-      text: msg.message,
-      imageUrl: msg.imageUrl,
-      isUser: msg.senderId !== ADMIN_ID,
-      time: new Date(msg.createdAt).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      isRead: msg.isRead,
-    }));
-  };
+  type ChatListItem =
+    | { kind: 'date'; id: string; label: string }
+    | {
+        kind: 'message';
+        id: number;
+        text: string;
+        imageUrl?: string | null;
+        isUser: boolean;
+        time: string;
+        isRead: boolean;
+      };
 
-  const formattedMessages = formatMessages();
+  const chatListItems = useMemo((): ChatListItem[] => {
+    const items: ChatListItem[] = [];
+    let lastDayKey = '';
+
+    for (const msg of messages) {
+      const dayKey = getChatDayKey(msg.createdAt);
+      if (dayKey !== lastDayKey) {
+        items.push({
+          kind: 'date',
+          id: `date-${dayKey}`,
+          label: formatChatDayLabel(msg.createdAt, language, dateLabels),
+        });
+        lastDayKey = dayKey;
+      }
+      items.push({
+        kind: 'message',
+        id: msg.id,
+        text: msg.message,
+        imageUrl: msg.imageUrl,
+        isUser: msg.senderId !== ADMIN_ID,
+        time: formatChatMessageDateTime(msg.createdAt, language, dateLabels),
+        isRead: msg.isRead,
+      });
+    }
+
+    return items;
+  }, [messages, language, dateLabels]);
 
   // Полный URL для изображения
   const getImageFullUrl = (imageUrl: string) => {
@@ -357,26 +389,26 @@ export const ChatScreen = () => {
           style={styles.messagesContainer}
           contentContainerStyle={styles.messagesContent}
           showsVerticalScrollIndicator={false}>
-          {/* Date */}
-          <View style={styles.dateContainer}>
-            <Text style={styles.dateText}>{t.common.today || 'Today'}</Text>
-          </View>
-
           {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#0EA5E9" />
             </View>
           ) : (
             <>
-              {formattedMessages.map((message) => (
+              {chatListItems.map((item) =>
+                item.kind === 'date' ? (
+                  <View key={item.id} style={styles.dateContainer}>
+                    <Text style={styles.dateText}>{item.label}</Text>
+                  </View>
+                ) : (
                 <View
-                  key={message.id}
+                  key={item.id}
                   style={[
                     styles.messageWrapper,
-                    message.isUser ? styles.userMessageWrapper : styles.supportMessageWrapper,
+                    item.isUser ? styles.userMessageWrapper : styles.supportMessageWrapper,
                   ]}>
                   {/* Аватар поддержки с логотипом */}
-                  {!message.isUser && (
+                  {!item.isUser && (
                     <View style={styles.messageAvatarContainer}>
                       <View style={styles.messageAvatar}>
                         <Image
@@ -387,47 +419,47 @@ export const ChatScreen = () => {
                     </View>
                   )}
 
-                  {message.isUser ? (
+                  {item.isUser ? (
                     <LinearGradient
                       colors={['#0EA5E9', '#0284C7']}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
                       style={[styles.messageBubble, styles.userMessage]}>
-                      {message.imageUrl && (
+                      {item.imageUrl && (
                         <Image
-                          source={{ uri: getImageFullUrl(message.imageUrl) }}
+                          source={{ uri: getImageFullUrl(item.imageUrl) }}
                           style={styles.messageImage}
                           resizeMode="cover"
                         />
                       )}
-                      {message.text ? (
+                      {item.text ? (
                         <Text style={[styles.messageText, styles.userMessageText]}>
-                          {message.text}
+                          {item.text}
                         </Text>
                       ) : null}
                       <View style={styles.messageFooter}>
                         <Text style={[styles.messageTime, styles.userMessageTime]}>
-                          {message.time}
+                          {item.time}
                         </Text>
-                        <Text style={styles.readStatus}>{message.isRead ? '✓✓' : '✓'}</Text>
+                        <Text style={styles.readStatus}>{item.isRead ? '✓✓' : '✓'}</Text>
                       </View>
                     </LinearGradient>
                   ) : (
                     <View style={[styles.messageBubble, styles.supportMessage]}>
-                      {message.imageUrl && (
+                      {item.imageUrl && (
                         <Image
-                          source={{ uri: getImageFullUrl(message.imageUrl) }}
+                          source={{ uri: getImageFullUrl(item.imageUrl) }}
                           style={styles.messageImage}
                           resizeMode="cover"
                         />
                       )}
-                      {message.text ? (
+                      {item.text ? (
                         <Text style={[styles.messageText, styles.supportMessageText]}>
-                          {message.text}
+                          {item.text}
                         </Text>
                       ) : null}
                       <Text style={[styles.messageTime, styles.supportMessageTime]}>
-                        {message.time}
+                        {item.time}
                       </Text>
                     </View>
                   )}

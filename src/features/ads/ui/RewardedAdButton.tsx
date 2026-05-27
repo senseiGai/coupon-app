@@ -36,7 +36,6 @@ import {
   markBatchCooldownSatisfied,
 } from '@/shared/lib/ads/adBatchCooldownStorage';
 import {
-  incrementLocalAdViewsToday,
   syncLocalAdViewsFromServer,
   getClientAdPeriodKey,
 } from '@/shared/lib/ads/adViewCountStorage';
@@ -173,38 +172,6 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     void syncLocalViews();
   }, [syncLocalViews, serverViews]);
 
-  /** После 12/24/… всегда включаем локальный таймер 30 мин. */
-  useEffect(() => {
-    if (!isBatchBreakViews(effectiveViews, adsPerBatch)) {
-      return;
-    }
-    if (handledBatchBoundary === effectiveViews) {
-      return;
-    }
-    if (cooldownSatisfiedAtViews === effectiveViews) {
-      return;
-    }
-    if (localCooldownUntil && formatCooldownCountdown(localCooldownUntil)) {
-      return;
-    }
-    void (async () => {
-      const until = await startLocalBatchCooldown(storageUserKey);
-      if (until) {
-        const periodKey = getClientAdPeriodKey();
-        await markBatchBoundaryHandled(storageUserKey, periodKey, effectiveViews);
-        setHandledBatchBoundary(effectiveViews);
-        setLocalCooldownUntil(until);
-      }
-    })();
-  }, [
-    storageUserKey,
-    localCooldownUntil,
-    effectiveViews,
-    adsPerBatch,
-    handledBatchBoundary,
-    cooldownSatisfiedAtViews,
-  ]);
-
   useEffect(() => {
     const id = setInterval(() => setTick((n) => n + 1), 1000);
     return () => clearInterval(id);
@@ -256,22 +223,28 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const isDisabled = loading || inCooldown || atDailyLimit || clientBlocked;
 
   const finishRewardUi = useCallback(
-    async (creditedAmount: number, viewsAfter: number) => {
-      const localAfter = await incrementLocalAdViewsToday(storageUserKey, getClientAdPeriodKey());
-      setLocalViews(localAfter);
-      if (isBatchBreakViews(localAfter, adsPerBatch)) {
+    async (creditedAmount: number) => {
+      await fetchBalance();
+      await fetchLimits();
+      const freshQuota = await refreshQuota();
+      const serverCount =
+        freshQuota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? localViews;
+      const syncedViews = await syncLocalAdViewsFromServer(
+        storageUserKey,
+        serverCount,
+        getClientAdPeriodKey(),
+      );
+      setLocalViews(syncedViews);
+      if (isBatchBreakViews(syncedViews, adsPerBatch)) {
         setCooldownSatisfiedAtViews(null);
         const until = await startLocalBatchCooldown(storageUserKey);
         if (until) {
           const periodKey = getClientAdPeriodKey();
-          await markBatchBoundaryHandled(storageUserKey, periodKey, localAfter);
-          setHandledBatchBoundary(localAfter);
+          await markBatchBoundaryHandled(storageUserKey, periodKey, syncedViews);
+          setHandledBatchBoundary(syncedViews);
           setLocalCooldownUntil(until);
         }
       }
-      await fetchBalance();
-      await fetchLimits();
-      await refreshQuota();
       const displayAmount = formatTwaAmount(creditedAmount);
       Alert.alert(
         t.common.success,
@@ -283,6 +256,8 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
     [
       adsPerBatch,
       storageUserKey,
+      localViews,
+      limits?.currentAdViewsToday,
       fetchBalance,
       fetchLimits,
       refreshQuota,
@@ -348,9 +323,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
           return true;
         }
         const credited = normalizeRewardAmount(earn.transaction?.amount);
-        const viewsAfter =
-          serverQuota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? viewsNow + 1;
-        await finishRewardUi(credited, viewsAfter);
+        await finishRewardUi(credited);
         return true;
       };
 
@@ -393,11 +366,8 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
       const claim = await claimAdReward(adReq.adViewId);
       if (claim.success || isAlreadyRewardedMessage(claim.error)) {
-        const freshQuota = await refreshQuota();
-        const viewsAfter =
-          freshQuota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? viewsNow + 1;
         const credited = normalizeRewardAmount(claim.rewardAmount);
-        await finishRewardUi(credited, viewsAfter);
+        await finishRewardUi(credited);
         return;
       }
 
