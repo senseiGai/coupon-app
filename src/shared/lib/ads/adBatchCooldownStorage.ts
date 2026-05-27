@@ -4,6 +4,8 @@ import { BATCH_COOLDOWN_MS } from '@/shared/constants/adRewards';
 const keyForUser = (userId: string | number) => `@ad_batch_cooldown_until_${userId}`;
 const handledBatchKey = (userId: string | number, periodKey: string) =>
   `@ad_batch_cooldown_handled_${userId}_${periodKey}`;
+const satisfiedBatchKey = (userId: string | number, periodKey: string) =>
+  `@ad_batch_cooldown_satisfied_${userId}_${periodKey}`;
 
 export async function getLocalBatchCooldownUntil(
   userId: string | number | undefined,
@@ -62,4 +64,29 @@ export async function markBatchBoundaryHandled(
     return;
   }
   await AsyncStorage.setItem(handledBatchKey(userId, periodKey), String(viewsBoundary));
+}
+
+/** Пауза для границы 12/24/… завершена — не учитывать устаревший cooldown с сервера. */
+export async function getBatchCooldownSatisfiedBoundary(
+  userId: string | number | undefined,
+  periodKey: string,
+): Promise<number | null> {
+  if (userId === undefined || userId === null || userId === '') {
+    return null;
+  }
+  const raw = await AsyncStorage.getItem(satisfiedBatchKey(userId, periodKey));
+  const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+export async function markBatchCooldownSatisfied(
+  userId: string | number | undefined,
+  periodKey: string,
+  viewsBoundary: number,
+): Promise<void> {
+  if (userId === undefined || userId === null || userId === '') {
+    return;
+  }
+  await AsyncStorage.setItem(satisfiedBatchKey(userId, periodKey), String(viewsBoundary));
+  await markBatchBoundaryHandled(userId, periodKey, viewsBoundary);
 }

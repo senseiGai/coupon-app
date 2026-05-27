@@ -68,6 +68,7 @@ export function evaluateClientAdQuota(params: {
   lastBatchCompletedAt?: string | null;
   batchCooldownUntil?: string | null;
   localCooldownUntil?: string | null;
+  cooldownSatisfiedAtViews?: number | null;
   now?: Date;
 }): {
   allowed: boolean;
@@ -86,6 +87,7 @@ export function evaluateClientAdQuota(params: {
     currentAdViewsToday: current,
     lastBatchCompletedAt: params.lastBatchCompletedAt,
     localCooldownUntil: params.localCooldownUntil,
+    cooldownSatisfiedAtViews: params.cooldownSatisfiedAtViews,
   });
   const cooldownActive = !!cooldownUntilIso && !!formatCooldownCountdown(cooldownUntilIso);
 
@@ -120,16 +122,7 @@ export function evaluateClientAdQuota(params: {
     };
   }
 
-  /** После 12/24/… — блок до сохранённого cooldown (без «скользящего» now+30мин). */
-  if (isBetweenBatches(current)) {
-    return {
-      allowed: false,
-      reason: 'Перерыв между блоками (30 мин)',
-      remaining,
-      batchRemaining: batchRem,
-      batchCooldownUntil: null,
-    };
-  }
+  /** На границе 12/24/… после окончания паузы — можно начинать следующий блок. */
 
   return {
     allowed: true,
@@ -161,18 +154,27 @@ export function getEffectiveBatchCooldownUntil(params: {
   lastBatchCompletedAt?: string | null;
   localCooldownUntil?: string | null;
   adsPerBatch?: number;
+  /** Локальная пауза для этой границы уже отсидена — не тянуть cooldown с API. */
+  cooldownSatisfiedAtViews?: number | null;
 }): string | null {
   const adsPerBatch = params.adsPerBatch ?? ADS_PER_BATCH;
   const candidates: string[] = [];
+  const waiveServerCooldown =
+    params.cooldownSatisfiedAtViews != null &&
+    params.cooldownSatisfiedAtViews > 0 &&
+    params.currentAdViewsToday === params.cooldownSatisfiedAtViews &&
+    isBetweenBatches(params.currentAdViewsToday);
 
-  const fromApi = resolveBatchCooldownUntil(
-    params.batchCooldownUntil,
-    params.currentAdViewsToday,
-    params.lastBatchCompletedAt,
-    adsPerBatch,
-  );
-  if (fromApi && formatCooldownCountdown(fromApi)) {
-    candidates.push(fromApi);
+  if (!waiveServerCooldown) {
+    const fromApi = resolveBatchCooldownUntil(
+      params.batchCooldownUntil,
+      params.currentAdViewsToday,
+      params.lastBatchCompletedAt,
+      adsPerBatch,
+    );
+    if (fromApi && formatCooldownCountdown(fromApi)) {
+      candidates.push(fromApi);
+    }
   }
 
   if (params.localCooldownUntil && formatCooldownCountdown(params.localCooldownUntil)) {
