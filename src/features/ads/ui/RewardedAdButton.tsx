@@ -89,7 +89,9 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
   const batchesPerDay = BATCHES_PER_DAY;
   const maxViews = MAX_AD_VIEWS_PER_DAY;
   const serverViews = quota?.currentAdViewsToday ?? limits?.currentAdViewsToday ?? 0;
-  const effectiveViews = Math.max(serverViews, localViews);
+  /** Счётчик с сервера; локальный — только пока сервер ещё не ответил. */
+  const effectiveViews =
+    limits != null || quota != null ? serverViews : Math.max(serverViews, localViews);
 
   const loadLocalCooldown = useCallback(async () => {
     const stored = await getLocalBatchCooldownUntil(storageUserKey);
@@ -131,11 +133,12 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
   useFocusEffect(
     useCallback(() => {
-      void fetchLimits();
+      void fetchLimits().then(() => void syncLocalViews());
       void loadLocalCooldown();
       void loadHandledBatchBoundary();
       void loadCooldownSatisfied();
-    }, [fetchLimits, loadLocalCooldown, loadHandledBatchBoundary, loadCooldownSatisfied]),
+      preloadRewardedAd();
+    }, [fetchLimits, loadLocalCooldown, loadHandledBatchBoundary, loadCooldownSatisfied, syncLocalViews]),
   );
 
   const cooldownUntilIso = getEffectiveBatchCooldownUntil({
@@ -274,10 +277,7 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
       return;
     }
 
-    const viewsNow = Math.max(
-      limits?.currentAdViewsToday ?? quota?.currentAdViewsToday ?? 0,
-      localViews,
-    );
+    const viewsNow = effectiveViews;
     const localQuota = evaluateClientAdQuota({
       currentAdViewsToday: viewsNow,
       lastBatchCompletedAt: limits?.lastBatchCompletedAt,
@@ -296,62 +296,29 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
 
     setLoading(true);
     try {
-      const serverQuota = await checkCanWatchAd();
-      setQuota(serverQuota);
+      let adViewId: string | undefined;
+      let customData: string | undefined;
 
-      const serverCooldownActive =
-        !!serverQuota?.batchCooldownUntil &&
-        !!formatCooldownCountdown(serverQuota.batchCooldownUntil);
-
-      const tryLegacyEarn = async (): Promise<boolean> => {
-        const adResult = await showRewardedAd(
-          undefined,
-          profile?.id ? String(profile.id) : undefined,
-        );
-        if (!adResult.success) {
-          Alert.alert(t.common.error, adResult.error || t.main.balance.adError);
-          onError?.(adResult.error || 'Ad failed');
-          return true;
+      try {
+        const serverQuota = await checkCanWatchAd();
+        setQuota(serverQuota);
+        if (serverQuota?.allowed) {
+          try {
+            const adReq = await requestAdView('admob');
+            if (adReq?.customData && adReq.adViewId) {
+              adViewId = adReq.adViewId;
+              customData = adReq.customData;
+            }
+          } catch {
+            /* SSV-запрос не прошёл — покажем рекламу без customData */
+          }
         }
-        if (!adResult.earned) {
-          return true;
-        }
-        const earn = await earnAdViewBonus();
-        if (!earn.success) {
-          Alert.alert(t.common.error, earn.error || t.main.balance.serverQuotaOutdated);
-          onError?.(earn.error || 'Earn failed');
-          return true;
-        }
-        const credited = normalizeRewardAmount(earn.transaction?.amount);
-        await finishRewardUi(credited);
-        return true;
-      };
-
-      if (serverUsesOldLimit) {
-        await tryLegacyEarn();
-        return;
-      }
-
-      if (!serverQuota?.allowed && localQuota.allowed && serverCooldownActive) {
-        await tryLegacyEarn();
-        return;
-      }
-
-      const adReq = await requestAdView('admob');
-      if (!adReq?.customData) {
-        const serverSaysNo =
-          serverQuota && !serverQuota.allowed && localQuota.allowed;
-        if (serverSaysNo) {
-          await tryLegacyEarn();
-          return;
-        }
-        Alert.alert(t.common.error, t.main.balance.bonusError);
-        onError?.('No ad request');
-        return;
+      } catch {
+        /* canWatchAd недоступен — всё равно пробуем показать рекламу */
       }
 
       const adResult = await showRewardedAd(
-        adReq.customData,
+        customData,
         profile?.id ? String(profile.id) : undefined,
       );
       if (!adResult.success) {
@@ -359,26 +326,36 @@ export const RewardedAdButton: React.FC<RewardedAdButtonProps> = ({ onSuccess, o
         onError?.(adResult.error || 'Ad failed');
         return;
       }
-
       if (!adResult.earned) {
         return;
       }
 
-      const claim = await claimAdReward(adReq.adViewId);
-      if (claim.success || isAlreadyRewardedMessage(claim.error)) {
-        const credited = normalizeRewardAmount(claim.rewardAmount);
-        await finishRewardUi(credited);
+      if (adViewId) {
+        const claim = await claimAdReward(adViewId);
+        if (claim.success || isAlreadyRewardedMessage(claim.error)) {
+          await finishRewardUi(normalizeRewardAmount(claim.rewardAmount));
+          return;
+        }
+      }
+
+      const earn = await earnAdViewBonus();
+      if (earn.success) {
+        await finishRewardUi(normalizeRewardAmount(earn.transaction?.amount));
         return;
       }
 
-      Alert.alert(t.common.error, claim.error || t.main.balance.bonusError);
-      onError?.(claim.error || 'Claim failed');
+      Alert.alert(
+        t.common.error,
+        earn.error || t.main.balance.bonusError,
+      );
+      onError?.(earn.error || 'Earn failed');
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : t.main.balance.generalError;
       Alert.alert(t.common.error, message);
       onError?.(message);
     } finally {
       setLoading(false);
+      preloadRewardedAd();
     }
   };
 

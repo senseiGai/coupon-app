@@ -56,10 +56,9 @@ export async function syncLocalAdViewsFromServer(
   serverCount: number,
   periodKey = getClientAdPeriodKey(),
 ): Promise<number> {
-  const local = await getLocalAdViewsToday(userId, periodKey);
   const merged = Math.min(
     MAX_AD_VIEWS_PER_DAY,
-    Math.max(local, Number.isFinite(serverCount) ? serverCount : 0),
+    Math.max(0, Number.isFinite(serverCount) ? serverCount : 0),
   );
   if (userId !== undefined && userId !== null && userId !== '') {
     await AsyncStorage.setItem(countKey(userId, periodKey), String(merged));
