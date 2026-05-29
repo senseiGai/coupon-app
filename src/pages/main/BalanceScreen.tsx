@@ -28,7 +28,7 @@ import {
 } from '@/shared/constants/adRewards';
 import { APP_BUILD_MARKER } from '@/shared/constants/appBuildInfo';
 export const BalanceScreen = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [showRules, setShowRules] = useState(false);
   const { balance, limits, loading, fetchBalance, fetchLimits } = useBonus();
 
@@ -86,7 +86,10 @@ export const BalanceScreen = () => {
           <Text style={styles.balanceLabel}>{t.main.balance.twaBalanceLabel}</Text>
           <Text style={styles.balanceAmount}>{formatTwaAmount(balance?.available || 0)}</Text>
           <Text style={styles.balanceEquivalent}>
-            = {(balance?.available || 0).toLocaleString('ru-RU')} {t.main.balance.bonusEquivalent}
+            = {(balance?.available || 0).toLocaleString(
+              language === 'uk' ? 'uk-UA' : language === 'en' ? 'en-US' : 'ru-RU',
+            )}{' '}
+            {t.main.balance.bonusEquivalent}
           </Text>
           <View style={styles.balanceHint}>
             <Text style={styles.balanceHintText}>{t.main.balance.bonusHint}</Text>

@@ -15,7 +15,11 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/app/navigation/MainStack';
 import { useLanguage } from '@/shared/lib/hooks';
 import { useBonus } from '@/shared/lib/hooks/useBonus';
-import { TWA_REWARDS_CATALOG, type TwaRewardItem } from '@/shared/constants/twaRewardsCatalog';
+import {
+  getLocalizedRewardsCatalog,
+  formatTwaPrice,
+  type TwaRewardItem,
+} from '@/shared/constants/twaRewardsCatalog';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const H_PADDING = 16;
@@ -31,12 +35,8 @@ type Props = {
 const CARD_GRADIENT_GREY = ['#94A3B8', '#64748B'] as const;
 const CARD_GRADIENT_GOLD = ['#FCD34D', '#F59E0B'] as const;
 
-function formatTwaPrice(price: number): string {
-  return `${price.toLocaleString('ru-RU')} TWA`;
-}
-
 export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true, onBalanceChange }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { redeemCatalogReward } = useBonus();
   const [applyingId, setApplyingId] = useState<string | null>(null);
@@ -82,13 +82,15 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true, onB
     ]);
   };
 
+  const catalogItems = getLocalizedRewardsCatalog(language);
+
   return (
     <View style={styles.section}>
       {showTitle ? (
         <Text style={styles.sectionTitle}>{t.bonusShop.availableRewards}</Text>
       ) : null}
       <View style={styles.grid}>
-        {TWA_REWARDS_CATALOG.map((item) => {
+        {catalogItems.map((item) => {
           const canAfford = balance >= item.price;
           const isApplying = applyingId === item.id;
           const colors = canAfford ? CARD_GRADIENT_GOLD : CARD_GRADIENT_GREY;
@@ -112,7 +114,7 @@ export const TwaRewardsGrid: React.FC<Props> = ({ balance, showTitle = true, onB
                 style={styles.gradient}>
                 <View style={styles.topBadgesRow}>
                   <View style={styles.priceBadge}>
-                    <Text style={styles.priceBadgeText}>{formatTwaPrice(item.price)}</Text>
+                    <Text style={styles.priceBadgeText}>{formatTwaPrice(item.price, language)}</Text>
                   </View>
                   {!canAfford ? (
                     <View style={styles.statusBadge}>

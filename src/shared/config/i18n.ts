@@ -96,8 +96,8 @@ export const translations = {
         adReward: 'Activity reward',
         bonusesTitle: 'Bonuses',
         availableBonuses: 'Available bonuses',
-        bonusEquivalent: 'discount',
-        bonusHint: '💡 60 views = 1 TWA',
+        bonusEquivalent: 'bonus points',
+        bonusHint: 'Daily reward limit: 60',
         noticeText:
           'Bonuses are a virtual reward, NOT money. Used only as a discount within the app.',
         watchAdTitle: 'Earn Bonus',
@@ -436,8 +436,8 @@ export const translations = {
         adReward: 'Награда за активность',
         bonusesTitle: 'Бонусы',
         availableBonuses: 'Доступно бонусов',
-        bonusEquivalent: 'скидки',
-        bonusHint: '💡 60 просмотров = 1 TWA',
+        bonusEquivalent: 'бонусных баллов',
+        bonusHint: 'Дневной лимит наград: 60',
         noticeText:
           'Бонусы — виртуальная награда, НЕ деньги. Используются только как скидка внутри приложения.',
         watchAdTitle: 'Получение бонуса',
@@ -777,8 +777,8 @@ export const translations = {
         adReward: 'Винагорода за активність',
         bonusesTitle: 'Бонуси',
         availableBonuses: 'Доступно бонусів',
-        bonusEquivalent: 'знижки',
-        bonusHint: '💡 60 переглядів = 1 TWA',
+        bonusEquivalent: 'бонусних балів',
+        bonusHint: 'Денний ліміт винагород: 60',
         noticeText:
           'Бонуси — віртуальна винагорода, НЕ гроші. Використовуються тільки як знижка всередині додатку.',
         watchAdTitle: 'Отримання бонусу',
